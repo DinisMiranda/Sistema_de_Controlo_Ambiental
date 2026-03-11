@@ -39,8 +39,7 @@ Fornecer um **modelo relacional claro e normalizado**, adequado a sistemas como 
 
 O modelo foi pensado para ser implementado num **SGBD relacional**, como:
 
-- PostgreSQL
-- MySQL / MariaDB
+- MySQL 
 
 Nesta fase, o repositório foca-se apenas na **definição do modelo** (sem dados de exemplo, nem scripts de população).
 
