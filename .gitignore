@@ -12,6 +12,7 @@ build/
 .env
 .env.local
 .env.*.local
+docker-compose.env
 
 # Logs and debug
 logs/
@@ -32,3 +33,5 @@ coverage/
 # Misc
 *.local
 .cache
+.cursor/
+.cursor/rules/

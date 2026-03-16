@@ -1,88 +1,125 @@
 # Environmental Control System (SCA)
 
-Monitoring and control system for sensors, actuators, and consumption records.
+A monitoring and control system for environmental sensors, actuators, and consumption records.
+
+---
+
+## Table of contents
+
+- [Project structure](#project-structure)
+- [Prerequisites](#prerequisites)
+- [Quick start](#quick-start)
+- [Configuration](#configuration)
+- [Data model](#data-model)
+- [Tech stack](#tech-stack)
+- [Documentation](#documentation)
+
+---
 
 ## Project structure
 
-```
-Sistema_de_Controlo_Ambiental/
-├── frontend/     # Web app (React + Vite + TypeScript)
-├── backend/       # REST API (Node.js + Express + TypeScript)
-├── database/      # MySQL schema and scripts
-├── docs/          # Documentation and references
-├── docker-compose.yml
-└── .gitignore
-```
+| Path | Purpose |
+|------|--------|
+| `frontend/` | Web UI — React, Vite, TypeScript |
+| `backend/` | REST API — Node.js, Express, TypeScript |
+| `database/` | MySQL schema and migration scripts |
+| `docs/` | Design docs, use cases, and references |
+| `docker-compose.yml` | Local MySQL 8 service for development |
+
+---
 
 ## Prerequisites
 
-- **Node.js** 18+
-- **MySQL** 8+ (or Docker)
+- **Node.js** 18 or later  
+- **MySQL** 8 (or use the provided Docker setup)  
 - **npm** or **pnpm**
+
+---
 
 ## Quick start
 
+Run from the **project root** (`Sistema_de_Controlo_Ambiental/`).
+
 ### 1. Database
 
-With Docker (from this folder):
+Start MySQL with Docker:
 
 ```bash
 docker compose up -d db
 ```
 
-Then import the schema (root password: `sca_root`). The database name is **sistema_controlo_ambiental2**:
+Wait until the container is healthy, then load the schema:
 
 ```bash
 mysql -h 127.0.0.1 -P 3306 -u root -psca_root < database/schema.sql
 ```
 
-Without Docker: create the database and import `database/schema.sql` in your MySQL server.
+Database name: `sistema_controlo_ambiental2`.
 
-### 2. Backend (API)
+**Without Docker:** create the database in your MySQL server and run `database/schema.sql`.
+
+### 2. Backend
 
 ```bash
 cd backend
-cp .env.example .env   # edit with DB credentials and port
+cp .env.example .env
+# Edit .env with your DB credentials (see Configuration)
 npm install
 npm run dev
 ```
 
-API runs at `http://localhost:3001` (or the port set in `.env`).
+API: **http://localhost:3001**
 
 ### 3. Frontend
 
 ```bash
 cd frontend
-cp .env.example .env   # optional: set VITE_API_URL to backend URL
+cp .env.example .env
+# Optional: set VITE_API_URL if not using the dev proxy
 npm install
 npm run dev
 ```
 
-Web UI at `http://localhost:5173`.
+UI: **http://localhost:5173**
 
-## Environment variables
+---
 
-- **Backend**: copy `backend/.env.example` to `backend/.env`. With Docker: `DB_HOST=127.0.0.1`, `DB_USER=root`, `DB_PASSWORD=sca_root`, `DB_NAME=sistema_controlo_ambiental2`.
-- **Frontend**: see `frontend/.env.example`. In development the Vite proxy forwards `/api` to the backend, so `VITE_API_URL` can be left empty.
+## Configuration
 
-## Main entities (schema sistema_controlo_ambiental2)
+| Component | Config file | Notes |
+|-----------|-------------|--------|
+| **Docker (DB)** | `docker-compose.env.example` → `.env` | Optional overrides; do not commit `.env`. |
+| **Backend** | `backend/.env.example` → `backend/.env` | Required. With default Docker: `DB_HOST=127.0.0.1`, `DB_USER=root`, `DB_PASSWORD=sca_root`, `DB_NAME=sistema_controlo_ambiental2`. |
+| **Frontend** | `frontend/.env.example` → `frontend/.env` | Optional in dev; Vite proxies `/api` to the backend. |
 
-- **Tipos** – type catalogue referenced by sensors, actuators, and actions
-- **Utilizadores** and **administradores** – users and admins
-- **sensores** and **atuadores** – devices (FK to Tipos)
-- **leituras_sensor** – sensor readings over time
-- **acoes_sistema** – actions on actuators
-- **parametros_automaticos** – linked to system actions
-- **registos_consumo** – consumption per period (FK to sensores)
+---
+
+## Data model
+
+Schema: **sistema_controlo_ambiental2**
+
+| Entity | Description |
+|--------|-------------|
+| **Tipos** | Type catalogue (referenced by sensors, actuators, actions). |
+| **Utilizadores** / **administradores** | Users and administrators. |
+| **sensores** / **atuadores** | Sensors and actuators (FK to Tipos). |
+| **leituras_sensor** | Sensor readings over time. |
+| **acoes_sistema** | Actions performed on actuators. |
+| **parametros_automaticos** | Configuration parameters (linked to actions). |
+| **registos_consumo** | Consumption per period (FK to sensores). |
+
+---
 
 ## Tech stack
 
-| Layer       | Stack                         |
-|------------|--------------------------------|
-| Frontend   | React, Vite, TypeScript       |
-| Backend    | Node.js, Express, TypeScript  |
-| Database   | MySQL 8                       |
+| Layer | Stack |
+|-------|--------|
+| Frontend | React, Vite, TypeScript |
+| Backend | Node.js, Express, TypeScript |
+| Database | MySQL 8 |
+
+---
 
 ## Documentation
 
-See `docs/` for design and data model documents.
+Design documents, use cases, and data model references are in **`docs/`**.

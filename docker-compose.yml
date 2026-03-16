@@ -1,5 +1,10 @@
-# Sistema de Controlo Ambiental – serviços para desenvolvimento
-# Uso: docker compose up -d db
+# -----------------------------------------------------------------------------
+# Environmental Control System (SCA) — Development
+# -----------------------------------------------------------------------------
+# Start database only:  docker compose up -d db
+# Stop:                 docker compose down
+# Override credentials: copy docker-compose.env.example to .env (do not commit .env)
+# -----------------------------------------------------------------------------
 
 services:
   db:
@@ -7,12 +12,12 @@ services:
     container_name: sca-mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: sca_root
-      MYSQL_DATABASE: sistema_controlo_ambiental2
-      MYSQL_USER: sca
-      MYSQL_PASSWORD: sca_dev
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-sca_root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-sistema_controlo_ambiental2}
+      MYSQL_USER: ${MYSQL_USER:-sca}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-sca_dev}
     ports:
-      - "3306:3306"
+      - "${MYSQL_PORT:-3306}:3306"
     volumes:
       - sca_mysql_data:/var/lib/mysql
     healthcheck:
@@ -20,6 +25,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 15s
 
 volumes:
   sca_mysql_data:
