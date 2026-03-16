@@ -1,52 +1,88 @@
-# Sistema de Controlo Ambiental – Base de Dados
+# Environmental Control System (SCA)
 
-Este repositório contém o modelo de base de dados para um **Sistema de Controlo Ambiental**, que gere:
+Monitoring and control system for sensors, actuators, and consumption records.
 
-- Sensores (temperatura, humidade, etc.) e as suas leituras ao longo do tempo;
-- Atuadores (ex.: aquecedores, ventoinhas) e as ações realizadas;
-- Parâmetros automáticos de funcionamento;
-- Registos de consumo energético;
-- Alertas gerados pelo sistema;
-- Administradores responsáveis pela configuração e supervisão.
+## Project structure
 
----
+```
+Sistema_de_Controlo_Ambiental/
+├── frontend/     # Web app (React + Vite + TypeScript)
+├── backend/       # REST API (Node.js + Express + TypeScript)
+├── database/      # MySQL schema and scripts
+├── docs/          # Documentation and references
+├── docker-compose.yml
+└── .gitignore
+```
 
-## Objetivo
+## Prerequisites
 
-Fornecer um **modelo relacional claro e normalizado**, adequado a sistemas como **PostgreSQL** ou **MySQL**, que:
+- **Node.js** 18+
+- **MySQL** 8+ (or Docker)
+- **npm** or **pnpm**
 
-- garanta integridade referencial entre entidades;
-- permita armazenar histórico detalhado de leituras, ações e consumos;
-- suporte funcionalidades de monitorização, controlo e auditoria;
-- seja simples de explicar e evoluir em contexto académico.
+## Quick start
 
----
+### 1. Database
 
-## Entidades principais
+With Docker (from this folder):
 
-- **Administradores** – utilizadores com permissões de gestão e configuração.
-- **Sensores** – dispositivos que recolhem dados ambientais.
-- **Leituras de Sensores** – valores lidos pelos sensores ao longo do tempo.
-- **Atuadores** – dispositivos que executam ações físicas (ex.: ligar/desligar).
-- **Parâmetros Automáticos** – limiares e regras de configuração.
-- **Ações do Sistema** – ações executadas automaticamente ou manualmente.
-- **Registos de Consumo** – consumos energéticos associados a atuadores.
-- **Alertas** – eventos de alerta (falhas, consumos anómalos, valores fora de intervalo, etc.).
+```bash
+docker compose up -d db
+```
 
----
+Then import the schema (root password: `sca_root`). The database name is **sistema_controlo_ambiental2**:
 
-## Tecnologias alvo
+```bash
+mysql -h 127.0.0.1 -P 3306 -u root -psca_root < database/schema.sql
+```
 
-O modelo foi pensado para ser implementado num **SGBD relacional**, como:
+Without Docker: create the database and import `database/schema.sql` in your MySQL server.
 
-- MySQL 
+### 2. Backend (API)
 
-Nesta fase, o repositório foca-se apenas na **definição do modelo** (sem dados de exemplo, nem scripts de população).
+```bash
+cd backend
+cp .env.example .env   # edit with DB credentials and port
+npm install
+npm run dev
+```
 
----
+API runs at `http://localhost:3001` (or the port set in `.env`).
 
-## Próximos passos (planeado)
+### 3. Frontend
 
-- Adicionar esquema SQL completo (criação de tabelas e chaves).
-- Incluir restrições (chaves primárias, estrangeiras, `NOT NULL`, `UNIQUE`, índices).
-- (Opcional) Disponibilizar configuração para execução rápida com Docker.
+```bash
+cd frontend
+cp .env.example .env   # optional: set VITE_API_URL to backend URL
+npm install
+npm run dev
+```
+
+Web UI at `http://localhost:5173`.
+
+## Environment variables
+
+- **Backend**: copy `backend/.env.example` to `backend/.env`. With Docker: `DB_HOST=127.0.0.1`, `DB_USER=root`, `DB_PASSWORD=sca_root`, `DB_NAME=sistema_controlo_ambiental2`.
+- **Frontend**: see `frontend/.env.example`. In development the Vite proxy forwards `/api` to the backend, so `VITE_API_URL` can be left empty.
+
+## Main entities (schema sistema_controlo_ambiental2)
+
+- **Tipos** – type catalogue referenced by sensors, actuators, and actions
+- **Utilizadores** and **administradores** – users and admins
+- **sensores** and **atuadores** – devices (FK to Tipos)
+- **leituras_sensor** – sensor readings over time
+- **acoes_sistema** – actions on actuators
+- **parametros_automaticos** – linked to system actions
+- **registos_consumo** – consumption per period (FK to sensores)
+
+## Tech stack
+
+| Layer       | Stack                         |
+|------------|--------------------------------|
+| Frontend   | React, Vite, TypeScript       |
+| Backend    | Node.js, Express, TypeScript  |
+| Database   | MySQL 8                       |
+
+## Documentation
+
+See `docs/` for design and data model documents.

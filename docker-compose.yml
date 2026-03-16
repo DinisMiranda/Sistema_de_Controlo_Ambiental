@@ -1,0 +1,25 @@
+# Sistema de Controlo Ambiental – serviços para desenvolvimento
+# Uso: docker compose up -d db
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: sca-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: sca_root
+      MYSQL_DATABASE: sistema_controlo_ambiental2
+      MYSQL_USER: sca
+      MYSQL_PASSWORD: sca_dev
+    ports:
+      - "3306:3306"
+    volumes:
+      - sca_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-psca_root"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  sca_mysql_data:
