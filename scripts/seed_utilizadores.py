@@ -10,6 +10,9 @@ How this file is organised: a short overview here, then the rest of the document
 placed next to the code it describes. Flow: ``parse_args`` → ``load_env_from_script_dir`` →
 ``resolve_config`` → ``build_utilizadores_lines`` → ``write_lines_to_file``. Env vars are
 documented in ``resolve_config`` and ``scripts/.env.example``.
+
+**Admin field:** each generated user has an independent probability of 1/20 of being admin;
+that is not the same as “exactly 1 in 20 users are admin.”
 """
 
 from __future__ import annotations
@@ -138,15 +141,19 @@ def build_utilizadores_lines(faker: Faker, num_users: int) -> list[str]:
     Build the full file body: comment header, blank line, then ``num_users`` data lines.
 
     Each data line: ``nome | email | palavra_passe_hash | data_criacao | admin``.
-    Admin is ``1`` with independent probability ``1/20`` per row (Bernoulli).
+
+    **Admin column:** each user has an **independent** probability of **1/20** of being
+    admin (``1``). That does **not** mean exactly 1 in 20 users are admin—only that each
+    draw is separate with that chance (so you can get 0, 1, or several admins in 20 rows).
     """
     used_emails: set[str] = set()
     lines: list[str] = []
 
     lines.append("# Utilizadores — generated for examination (not inserted into DB)")
+    lines.append("# Format: nome | email | palavra_passe_hash | data_criacao | admin (0 or 1)")
     lines.append(
-        "# Format: nome | email | palavra_passe_hash | data_criacao | admin "
-        "(0/1; each row ~1/20 chance of admin, independent — not exactly 1 per 20 rows)"
+        "# Admin: each user has an independent probability of 1/20 of being admin — "
+        "this is not the same as exactly 1 in 20 users being admin."
     )
     lines.append("# Email pattern: firstname.lastname@example.pt")
     lines.append("")
@@ -156,6 +163,7 @@ def build_utilizadores_lines(faker: Faker, num_users: int) -> list[str]:
         email = email_from_name(nome, used_emails)
         palavra_passe_hash = faker.sha256()
         data_criacao = faker.date_time_between(start_date="-1y", end_date="now")
+        # Independent P(admin)=1/20 for this row (not "1 admin per 20 users" globally).
         admin_flag = int(random.randint(1, 20) == 1)
 
         lines.append(
