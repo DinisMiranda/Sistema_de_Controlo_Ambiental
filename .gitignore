@@ -37,4 +37,5 @@ coverage/
 .cursor/rules/
 scripts/.venv/
 scripts/.env
+scripts/generated/
 
