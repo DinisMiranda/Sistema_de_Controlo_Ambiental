@@ -18,7 +18,8 @@ Fake data for the ``Utilizadores`` table — **text file only** (no MySQL connec
 **End-to-end flow** (see ``main()``)::
 
     parse_args → load_env_from_script_dir → create_faker → resolve_config
-        → build_utilizadores_lines → write_lines_to_file → print path
+        → load_emails_from_existing_output → build_utilizadores_lines → write_lines_to_file
+        → print path
 
 **Pieces to read in order**
 
@@ -26,14 +27,15 @@ Fake data for the ``Utilizadores`` table — **text file only** (no MySQL connec
 Function / type               Role
 ============================= =============================================================
 ``slug_for_email``            One name token → ASCII slug (accents stripped).
-``email_from_name``           Full name → ``firstname.lastname@example.pt``, unique per run.
+``email_from_name``           Full name → ``firstname.lastname@example.pt``; unique vs ``used_emails``.
+``load_emails_from_existing_output``  Emails already in the target file (before overwrite).
 ``parse_args``                ``-n`` / ``--count``, ``--seed``.
 ``create_faker``              ``Faker("pt_PT")`` + optional seeding of ``random`` + Faker.
 ``load_env_from_script_dir``  Loads only ``scripts/.env`` into the process environment.
 ``parse_int_env``             Safe ``int`` for ``NUM_UTILIZADORES`` (no bare ``ValueError``).
 ``SeedConfig``                Frozen dataclass: ``num_users``, ``output_path``.
 ``resolve_config``            Merges CLI + env into ``SeedConfig`` (validates count ≥ 1).
-``build_utilizadores_lines``  Comment header + one pipe-separated line per fake user.
+``build_utilizadores_lines``  Comment header + data lines; seeds ``used_emails`` from prior file.
 ``write_lines_to_file``       ``mkdir`` parents, UTF-8 write, trailing newline.
 ============================= =============================================================
 
@@ -64,8 +66,9 @@ from faker import Faker
 # ---------------------------------------------------------------------------
 # Email helpers — turn a display name into firstname.lastname@example.pt
 # ---------------------------------------------------------------------------
-# We need ASCII slugs (no accents) for the local part, and every address in a run must
-# be unique so the file could be imported without duplicate-key errors later.
+# We need ASCII slugs (no accents) for the local part. Emails must be unique within the
+# ``used_emails`` set (seeded from the previous contents of the output file when it exists,
+# plus new rows in this run) so you do not repeat addresses across runs to the same path.
 
 
 def slug_for_email(part: str) -> str:
@@ -214,9 +217,47 @@ def resolve_config(args: argparse.Namespace, base_dir: Path) -> SeedConfig:
 # ---------------------------------------------------------------------------
 
 
-def build_utilizadores_lines(faker: Faker, num_users: int) -> list[str]:
+def load_emails_from_existing_output(path: Path) -> set[str]:
+    """
+    Read the email column from an existing output file at ``path``, if any.
+
+    Before each run overwrites the file, we parse prior data lines (pipe-separated, same
+    format as we write) and collect emails so **new** rows never reuse them. Comment and
+    blank lines are skipped; malformed lines are ignored.
+
+    If ``path`` is missing or unreadable, returns an empty set.
+    """
+    if not path.is_file():
+        return set()
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        return set()
+
+    emails: set[str] = set()
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        parts = stripped.split(" | ", 4)
+        if len(parts) != 5:
+            continue
+        emails.add(parts[1].strip())
+    return emails
+
+
+def build_utilizadores_lines(
+    faker: Faker,
+    num_users: int,
+    *,
+    existing_emails: set[str] | None = None,
+) -> list[str]:
     """
     Build the full file body: comment header, blank line, then ``num_users`` data lines.
+
+    ``existing_emails`` is merged into the working set so addresses from a **previous**
+    version of the same output file are not generated again (cross-run uniqueness for
+    that path). Pass ``None`` or ``set()`` when starting from an empty or new file.
 
     Each data line: ``nome | email | palavra_passe_hash | data_criacao | admin``.
 
@@ -224,7 +265,7 @@ def build_utilizadores_lines(faker: Faker, num_users: int) -> list[str]:
     admin (``1``). That does **not** mean exactly 1 in 20 users are admin—only that each
     draw is separate with that chance (so you can get 0, 1, or several admins in 20 rows).
     """
-    used_emails: set[str] = set()
+    used_emails: set[str] = set(existing_emails) if existing_emails else set()
     lines: list[str] = []
 
     lines.append("# Utilizadores — generated for examination (not inserted into DB)")
@@ -234,6 +275,10 @@ def build_utilizadores_lines(faker: Faker, num_users: int) -> list[str]:
         "this is not the same as exactly 1 in 20 users being admin."
     )
     lines.append("# Email pattern: firstname.lastname@example.pt")
+    lines.append(
+        "# Email uniqueness: also avoids addresses already present in the previous "
+        "contents of this output file (when the file existed before this run)."
+    )
     lines.append("")
 
     for _ in range(num_users):
@@ -264,16 +309,23 @@ def main() -> None:
     1. Remember ``scripts/`` as ``base_dir`` (where ``.env`` and default output live).
     2. Parse CLI; load ``scripts/.env`` if it exists.
     3. Build a seeded or unseeded ``Faker`` instance.
-    4. Resolve row count and output path; build lines; write file; print confirmation.
+    4. Resolve row count and output path; read existing emails from that path if present.
+    5. Build lines (new emails avoid prior + in-run collisions); write file; print confirmation.
     """
     base_dir = Path(__file__).resolve().parent
     args = parse_args()
     load_env_from_script_dir(base_dir)
     faker = create_faker("pt_PT", args.seed)
     config = resolve_config(args, base_dir)
-    lines = build_utilizadores_lines(faker, config.num_users)
+    prior_emails = load_emails_from_existing_output(config.output_path)
+    lines = build_utilizadores_lines(
+        faker, config.num_users, existing_emails=prior_emails
+    )
     write_lines_to_file(config.output_path, lines)
-    print(f"Wrote {config.num_users} user(s) to {config.output_path}")
+    msg = f"Wrote {config.num_users} user(s) to {config.output_path}"
+    if prior_emails:
+        msg += f" (reserved {len(prior_emails)} email(s) from previous file for uniqueness)"
+    print(msg)
 
 
 if __name__ == "__main__":
