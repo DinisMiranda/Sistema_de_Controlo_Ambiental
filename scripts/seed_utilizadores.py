@@ -5,6 +5,10 @@ Run from ``scripts/``::
 
     python seed_utilizadores.py
     python seed_utilizadores.py -n 20
+    python seed_utilizadores.py -n 10 --seed 42
+
+Pass ``--seed`` with an integer to fix ``random`` and Faker’s RNG so two runs with the same
+seed and options produce the same file (reproducibility).
 
 How this file is organised: a short overview here, then the rest of the documentation is
 placed next to the code it describes. Flow: ``parse_args`` → ``load_env_from_script_dir`` →
@@ -74,7 +78,7 @@ def email_from_name(full_name: str, used_emails: set[str]) -> str:
 
 
 def parse_args() -> argparse.Namespace:
-    """Define and parse ``-n`` / ``--count`` (overrides ``NUM_UTILIZADORES`` after env load)."""
+    """Define and parse CLI (count, optional seed for reproducible output)."""
     parser = argparse.ArgumentParser(description="Generate fake Utilizadores to a text file.")
     parser.add_argument(
         "-n",
@@ -84,7 +88,29 @@ def parse_args() -> argparse.Namespace:
         metavar="N",
         help="number of users (overrides NUM_UTILIZADORES in scripts/.env)",
     )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        metavar="N",
+        help="optional seed: same seed + options → same output (seeds random and Faker)",
+    )
     return parser.parse_args()
+
+
+def create_faker(locale: str, seed: int | None) -> Faker:
+    """
+    Build a ``Faker`` for ``locale``.
+
+    If ``seed`` is set, seed ``random`` (for ``randint`` / admin flag) and Faker’s internal
+    RNG (for names, hashes, datetimes) so runs are reproducible.
+    """
+    if seed is not None:
+        random.seed(seed)
+    faker = Faker(locale)
+    if seed is not None:
+        faker.seed_instance(seed)
+    return faker
 
 
 def load_env_from_script_dir(base_dir: Path) -> None:
@@ -207,7 +233,7 @@ def main() -> None:
     base_dir = Path(__file__).resolve().parent
     args = parse_args()
     load_env_from_script_dir(base_dir)
-    faker = Faker("pt_PT")
+    faker = create_faker("pt_PT", args.seed)
     config = resolve_config(args, base_dir)
     lines = build_utilizadores_lines(faker, config.num_users)
     write_lines_to_file(config.output_path, lines)
