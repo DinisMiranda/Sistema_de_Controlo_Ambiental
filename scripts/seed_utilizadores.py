@@ -95,6 +95,28 @@ def load_env_from_script_dir(base_dir: Path) -> None:
         load_dotenv(env_path)
 
 
+def parse_int_env(var_name: str, default: int) -> int:
+    """
+    Read ``var_name`` from the environment; return ``default`` if unset or blank.
+
+    If the value is set but not a valid integer, exit with a clear message instead of
+    raising ``ValueError`` from ``int()`` (review feedback on ``NUM_UTILIZADORES``).
+    """
+    raw = os.getenv(var_name)
+    if raw is None:
+        return default
+    stripped = raw.strip()
+    if stripped == "":
+        return default
+    try:
+        return int(stripped)
+    except ValueError:
+        raise SystemExit(
+            f"{var_name} must be an integer, got {raw!r} "
+            "(check scripts/.env or your shell environment)."
+        ) from None
+
+
 @dataclass(frozen=True)
 class SeedConfig:
     """Resolved settings for one run (row count and where to write)."""
@@ -108,6 +130,7 @@ def resolve_config(args: argparse.Namespace, base_dir: Path) -> SeedConfig:
     Combine CLI and environment into a ``SeedConfig``.
 
     Precedence for row count: ``args.count`` > ``NUM_UTILIZADORES`` > default ``20``.
+    Invalid ``NUM_UTILIZADORES`` (non-integer) exits with a message instead of ``ValueError``.
     Must be ``>= 1`` or the process exits.
 
     Output path: ``UTILIZADORES_OUTPUT`` if set, else
@@ -117,7 +140,7 @@ def resolve_config(args: argparse.Namespace, base_dir: Path) -> SeedConfig:
     if args.count is not None:
         num_users = args.count
     else:
-        num_users = int(os.getenv("NUM_UTILIZADORES", "20"))
+        num_users = parse_int_env("NUM_UTILIZADORES", 20)
 
     if num_users < 1:
         raise SystemExit("User count must be at least 1.")
