@@ -1,22 +1,51 @@
 """
-Fake data for the ``Utilizadores`` table: writes a text file you can review (no database).
+Fake data for the ``Utilizadores`` table — **text file only** (no MySQL connection).
 
-Run from ``scripts/``::
+**What it does**
+    Uses the Faker library (Portuguese locale) to invent names, datetimes, and placeholder
+    “hash” strings, applies your email and admin rules, and writes a ``.txt`` you can open
+    in an editor or parse later for ``INSERT`` statements. See https://faker.readthedocs.io/
+
+**Quick run** (from ``scripts/``, with venv active or ``.venv/bin/python``)::
 
     python seed_utilizadores.py
     python seed_utilizadores.py -n 20
     python seed_utilizadores.py -n 10 --seed 42
 
-Pass ``--seed`` with an integer to fix ``random`` and Faker’s RNG so two runs with the same
-seed and options produce the same file (reproducibility).
+``--seed`` fixes both ``random`` and Faker’s RNG so identical flags produce identical files
+(reproducibility). Omit it for different output every run.
 
-How this file is organised: a short overview here, then the rest of the documentation is
-placed next to the code it describes. Flow: ``parse_args`` → ``load_env_from_script_dir`` →
-``resolve_config`` → ``build_utilizadores_lines`` → ``write_lines_to_file``. Env vars are
-documented in ``resolve_config`` and ``scripts/.env.example``.
+**End-to-end flow** (see ``main()``)::
 
-**Admin field:** each generated user has an independent probability of 1/20 of being admin;
-that is not the same as “exactly 1 in 20 users are admin.”
+    parse_args → load_env_from_script_dir → create_faker → resolve_config
+        → build_utilizadores_lines → write_lines_to_file → print path
+
+**Pieces to read in order**
+
+============================= =============================================================
+Function / type               Role
+============================= =============================================================
+``slug_for_email``            One name token → ASCII slug (accents stripped).
+``email_from_name``           Full name → ``firstname.lastname@example.pt``, unique per run.
+``parse_args``                ``-n`` / ``--count``, ``--seed``.
+``create_faker``              ``Faker("pt_PT")`` + optional seeding of ``random`` + Faker.
+``load_env_from_script_dir``  Loads only ``scripts/.env`` into the process environment.
+``parse_int_env``             Safe ``int`` for ``NUM_UTILIZADORES`` (no bare ``ValueError``).
+``SeedConfig``                Frozen dataclass: ``num_users``, ``output_path``.
+``resolve_config``            Merges CLI + env into ``SeedConfig`` (validates count ≥ 1).
+``build_utilizadores_lines``  Comment header + one pipe-separated line per fake user.
+``write_lines_to_file``       ``mkdir`` parents, UTF-8 write, trailing newline.
+============================= =============================================================
+
+**Environment** (optional; copy ``.env.example`` → ``scripts/.env``):
+
+* ``NUM_UTILIZADORES`` — default row count when ``-n`` is not passed (must be valid int).
+* ``UTILIZADORES_OUTPUT`` — output path (default ``generated/utilizadores_examination.txt``).
+
+**Admin column:** each row gets ``admin=1`` with independent probability **1/20**; that is
+*not* the same as “exactly one admin in every batch of 20 users.”
+
+For setup, table mapping, and troubleshooting, see ``README.md`` in this folder.
 """
 
 from __future__ import annotations
@@ -229,7 +258,14 @@ def write_lines_to_file(output_path: Path, lines: list[str]) -> None:
 
 
 def main() -> None:
-    """Orchestrate: args → env → config → lines → disk."""
+    """
+    Run the generator end-to-end.
+
+    1. Remember ``scripts/`` as ``base_dir`` (where ``.env`` and default output live).
+    2. Parse CLI; load ``scripts/.env`` if it exists.
+    3. Build a seeded or unseeded ``Faker`` instance.
+    4. Resolve row count and output path; build lines; write file; print confirmation.
+    """
     base_dir = Path(__file__).resolve().parent
     args = parse_args()
     load_env_from_script_dir(base_dir)
