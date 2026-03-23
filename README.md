@@ -1,53 +1,128 @@
-# Sistema de Controlo Ambiental – Base de Dados
+# Environmental Control System (SCA)
 
-Este repositório contém o modelo de base de dados para um **Sistema de Controlo Ambiental**, que gere:
-
-- Sensores (temperatura, humidade, etc.) e as suas leituras ao longo do tempo;
-- Atuadores (ex.: aquecedores, ventoinhas) e as ações realizadas;
-- Parâmetros automáticos de funcionamento;
-- Registos de consumo energético;
-- Alertas gerados pelo sistema;
-- Administradores responsáveis pela configuração e supervisão.
+A monitoring and control system for environmental sensors, actuators, and consumption records.
 
 ---
 
-## Objetivo
+## Table of contents
 
-Fornecer um **modelo relacional claro e normalizado**, adequado a sistemas como **PostgreSQL** ou **MySQL**, que:
-
-- garanta integridade referencial entre entidades;
-- permita armazenar histórico detalhado de leituras, ações e consumos;
-- suporte funcionalidades de monitorização, controlo e auditoria;
-- seja simples de explicar e evoluir em contexto académico.
-
----
-
-## Entidades principais
-
-- **Administradores** – utilizadores com permissões de gestão e configuração.
-- **Sensores** – dispositivos que recolhem dados ambientais.
-- **Leituras de Sensores** – valores lidos pelos sensores ao longo do tempo.
-- **Atuadores** – dispositivos que executam ações físicas (ex.: ligar/desligar).
-- **Parâmetros Automáticos** – limiares e regras de configuração.
-- **Ações do Sistema** – ações executadas automaticamente ou manualmente.
-- **Registos de Consumo** – consumos energéticos associados a atuadores.
-- **Alertas** – eventos de alerta (falhas, consumos anómalos, valores fora de intervalo, etc.).
+- [Project structure](#project-structure)
+- [Prerequisites](#prerequisites)
+- [Quick start](#quick-start)
+- [Configuration](#configuration)
+- [Data model](#data-model)
+- [Tech stack](#tech-stack)
+- [Documentation](#documentation)
 
 ---
 
-## Tecnologias alvo
+## Project structure
 
-O modelo foi pensado para ser implementado num **SGBD relacional**, como:
-
-- PostgreSQL
-- MySQL / MariaDB
-
-Nesta fase, o repositório foca-se apenas na **definição do modelo** (sem dados de exemplo, nem scripts de população).
+| Path | Purpose |
+|------|--------|
+| `frontend/` | Web UI — React, Vite, TypeScript |
+| `backend/` | REST API — Node.js, Express, TypeScript |
+| `database/` | MySQL schema and migration scripts |
+| `docs/` | Design docs, use cases, and references |
+| `scripts/` | Fake data generators (see `scripts/README.md`) |
+| `docker-compose.yml` | Local MySQL 8 service for development |
 
 ---
 
-## Próximos passos (planeado)
+## Prerequisites
 
-- Adicionar esquema SQL completo (criação de tabelas e chaves).
-- Incluir restrições (chaves primárias, estrangeiras, `NOT NULL`, `UNIQUE`, índices).
-- (Opcional) Disponibilizar configuração para execução rápida com Docker.
+- **Node.js** 18 or later  
+- **MySQL** 8 (or use the provided Docker setup)  
+- **npm** or **pnpm**
+
+---
+
+## Quick start
+
+Run from the **project root** (`Sistema_de_Controlo_Ambiental/`).
+
+### 1. Database
+
+Start MySQL with Docker:
+
+```bash
+docker compose up -d db
+```
+
+Wait until the container is healthy, then load the schema:
+
+```bash
+mysql -h 127.0.0.1 -P 3306 -u root -psca_root < database/schema.sql
+```
+
+Database name: `sistema_controlo_ambiental2`.
+
+**Without Docker:** create the database in your MySQL server and run `database/schema.sql`.
+
+### 2. Backend
+
+```bash
+cd backend
+cp .env.example .env
+# Edit .env with your DB credentials (see Configuration)
+npm install
+npm run dev
+```
+
+API: **http://localhost:3001**
+
+### 3. Frontend
+
+```bash
+cd frontend
+cp .env.example .env
+# Optional: set VITE_API_URL if not using the dev proxy
+npm install
+npm run dev
+```
+
+UI: **http://localhost:5173**
+
+---
+
+## Configuration
+
+| Component | Config file | Notes |
+|-----------|-------------|--------|
+| **Docker (DB)** | `docker-compose.env.example` → `.env` | Optional overrides; do not commit `.env`. |
+| **Backend** | `backend/.env.example` → `backend/.env` | Required. With default Docker: `DB_HOST=127.0.0.1`, `DB_USER=root`, `DB_PASSWORD=sca_root`, `DB_NAME=sistema_controlo_ambiental2`. |
+| **Frontend** | `frontend/.env.example` → `frontend/.env` | Optional in dev; Vite proxies `/api` to the backend. |
+
+---
+
+## Data model
+
+Schema: **sistema_controlo_ambiental2**
+
+| Entity | Description |
+|--------|-------------|
+| **Tipos** | Type catalogue (referenced by sensors, actuators, actions). |
+| **Utilizadores** / **administradores** | Users and administrators. |
+| **sensores** / **atuadores** | Sensors and actuators (FK to Tipos). |
+| **leituras_sensor** | Sensor readings over time. |
+| **acoes_sistema** | Actions performed on actuators. |
+| **parametros_automaticos** | Configuration parameters (linked to actions). |
+| **registos_consumo** | Consumption per period (FK to sensores). |
+
+---
+
+## Tech stack
+
+| Layer | Stack |
+|-------|--------|
+| Frontend | React, Vite, TypeScript |
+| Backend | Node.js, Express, TypeScript |
+| Database | MySQL 8 |
+
+---
+
+## Documentation
+
+Design documents, use cases, and data model references are in **`docs/`**.
+
+Fake data scripts (e.g. **`Utilizadores`** text output) are documented in **`scripts/README.md`** and in the module docstring at the top of **`scripts/seed_utilizadores.py`**.

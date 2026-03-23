@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+.env.*.local
+docker-compose.env
+
+# Logs and debug
+logs/
+*.log
+npm-debug.log*
+.DS_Store
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Testing
+coverage/
+.nyc_output/
+
+# Misc
+*.local
+.cache
+.cursor/
+.cursor/rules/
+scripts/.venv/
+scripts/.env
+scripts/generated/
+
+# Python
+__pycache__/
+*.py[cod]
+
