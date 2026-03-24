@@ -17,10 +17,12 @@ python3 -m venv .venv
 
 Use **`.venv/bin/python`** (or `source .venv/bin/activate`) so dependencies are available. Avoid installing into the system Python on macOS (PEP 668 / Homebrew).
 
+**Caminho:** o `cd` tem de apontar para a pasta `scripts/` dentro do clone do projeto (substitui `/caminho/para/` pelo caminho real; `…` não é válido no terminal).
+
 ### How to run
 
 ```bash
-cd …/Sistema_de_Controlo_Ambiental/scripts
+cd /caminho/para/Sistema_de_Controlo_Ambiental/scripts
 .venv/bin/python seed_utilizadores.py
 .venv/bin/python seed_utilizadores.py -n 20
 .venv/bin/python seed_utilizadores.py -n 20 --seed 42
@@ -79,6 +81,44 @@ Execution order in `main()`:
 7. `write_lines_to_file()` — create parent dirs, write UTF-8.
 
 More detail lives in the **module docstring** at the top of `seed_utilizadores.py` and in **function docstrings** next to each helper.
+
+## `seed_tipos.py`
+
+Generates rows shaped like the **`Tipos`** table (`classe`, `tipo`, `descrição`). The built-in catalog has **three sensor types** — `Luminosidade`, `Temperatura_ambiente`, `Humidade_relativa` (all `classe=Sensor`). Each `tipo` is globally unique, as required by **UNIQUE** on `tipo` in `database/schema.sql`.
+
+**Dependencies:** `python-dotenv` only (same venv as `seed_utilizadores.py`; Faker is not used).
+
+### How to run
+
+```bash
+cd /caminho/para/Sistema_de_Controlo_Ambiental/scripts
+.venv/bin/python seed_tipos.py
+.venv/bin/python seed_tipos.py -n 2
+```
+
+| Variable | Meaning |
+|----------|--------|
+| `NUM_TIPOS` | Max rows from catalog if you omit `-n` (default = **3**, the full catalog). |
+| `TIPOS_OUTPUT` | Output path. Default: `generated/tipos_examination.txt`. |
+
+**Precedence:** `-n` / `--count` beats `NUM_TIPOS`.
+
+### Output file
+
+- **Default:** `scripts/generated/tipos_examination.txt`
+- **Data lines:** `classe | tipo | descricao` (third column maps to SQL `` `descrição` `` — use backticks in `INSERT`).
+
+### Map to the database table
+
+| File column | SQL column (`Tipos`) |
+|-------------|-------------------------|
+| classe | `classe` (PK part 1) |
+| tipo | `tipo` (PK part 2; also UNIQUE) |
+| descricao | `descrição` |
+
+### Load order
+
+Insert **`Tipos`** before **`sensores`**, **`atuadores`**, and **`acoes_sistema`** (foreign keys reference `Tipos.classe` / `Tipos.tipo`).
 
 ### Related files
 
