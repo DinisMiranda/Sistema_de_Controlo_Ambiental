@@ -1,6 +1,6 @@
 # Scripts — fake data generation
 
-Utilities that generate **text files** for reviewing fake rows before loading them into MySQL (or for documentation). They do **not** connect to the database by default.
+Utilities that generate **CSV files** (UTF-8, header row) for reviewing fake rows before loading them into MySQL (or for spreadsheets). They do **not** connect to the database by default.
 
 ## `seed_utilizadores.py`
 
@@ -33,7 +33,7 @@ Optional config: copy `.env.example` → `.env` in **`scripts/`** (not committed
 | Variable | Meaning |
 |----------|--------|
 | `NUM_UTILIZADORES` | Row count if you omit `-n` (default **20** in code). Must be a valid integer or the script exits with a message. |
-| `UTILIZADORES_OUTPUT` | Output file path (UTF-8; **overwritten** each run). Default: `generated/utilizadores_examination.txt`. |
+| `UTILIZADORES_OUTPUT` | Output file path (UTF-8 CSV; **overwritten** each run). Default: `generated/utilizadores_examination.csv`. |
 
 **Precedence:** `-n` / `--count` beats `NUM_UTILIZADORES`. `--seed` is only from the CLI.
 
@@ -41,24 +41,20 @@ Optional config: copy `.env.example` → `.env` in **`scripts/`** (not committed
 
 ### Email uniqueness across runs
 
-If the **output file already exists**, the script reads its data lines first and collects the **email** column. New rows will **not** reuse those addresses, even though the file is overwritten — so uniqueness applies **across consecutive runs** that target the **same path**.
+If the **output file already exists**, the script reads the **email** column (CSV with header, or legacy pipe-separated `.txt`) and new rows will **not** reuse those addresses, even though the file is overwritten.
 
 This does **not** read other files or the database; use one canonical output path or merge files yourself if you need global uniqueness.
 
 ### Output file
 
-- **Default path:** `scripts/generated/utilizadores_examination.txt` (folder is gitignored).
-- Lines starting with `#` are comments (format, admin semantics, email pattern).
-- **Data lines** are pipe-separated:
-
-  `nome | email | palavra_passe_hash | data_criacao | admin`
-
+- **Default path:** `scripts/generated/utilizadores_examination.csv` (folder is gitignored).
+- **Format:** CSV with header: `nome`, `email`, `palavra_passe_hash`, `data_criacao`, `admin`.
 - **Email:** `firstname.lastname@example.pt` (ASCII; collisions get `firstname.lastname2@example.pt`, etc.).
 - **Admin:** `0` or `1`. Each row is drawn with **independent** probability **1/20** for `1` — not “exactly one admin every 20 users.”
 
 ### Map to the database table
 
-| File column | SQL column (`Utilizadores`) |
+| CSV column | SQL column (`Utilizadores`) |
 |-------------|-----------------------------|
 | nome | `nome` |
 | email | `email` |
@@ -77,14 +73,18 @@ Execution order in `main()`:
 3. `create_faker()` — `pt_PT` locale; seeds `random` + Faker if `--seed` set.
 4. `resolve_config()` — row count + output path → `SeedConfig`.
 5. `load_emails_from_existing_output()` — emails already in the target file (if it exists).
-6. `build_utilizadores_lines()` — build all lines in memory (merges prior emails into the uniqueness set).
-7. `write_lines_to_file()` — create parent dirs, write UTF-8.
+6. `build_utilizadores_rows()` — build data rows (merges prior emails into the uniqueness set).
+7. `write_utilizadores_csv()` — create parent dirs, write UTF-8 CSV.
 
 More detail lives in the **module docstring** at the top of `seed_utilizadores.py` and in **function docstrings** next to each helper.
 
 ## `seed_tipos.py`
 
-Generates rows shaped like the **`Tipos`** table (`classe`, `tipo`, `descrição`). The built-in catalog has **three sensor types** — `Luminosidade`, `Temperatura_ambiente`, `Humidade_relativa` (all `classe=Sensor`). Each `tipo` is globally unique, as required by **UNIQUE** on `tipo` in `database/schema.sql`.
+Generates rows shaped like the **`Tipos`** table (`classe`, `tipo`, `descrição`). **Sensores e atuadores vão no mesmo ficheiro CSV** — um único `tipos_examination.csv` corresponde à tabela `Tipos` completa (não há CSV separado por equipamento).
+
+O catálogo tem **três sensores** (`Luminosidade`, `Temperatura_ambiente`, `Humidade_relativa`) e **três atuadores** em correspondência **1:1** com esses sensores (iluminação regulatória, climatização, ventilação/tratamento de ar). Cada `tipo` é único globalmente (**UNIQUE** em `tipo` no `database/schema.sql`).
+
+**Importante:** se usares `-n 3` ou `NUM_TIPOS=3` no `.env`, o CSV fica **só com os sensores**. Para incluir os atuadores **pareados**, corre sem `-n` e sem `NUM_TIPOS`, ou define `NUM_TIPOS=6`.
 
 **Dependencies:** `python-dotenv` only (same venv as `seed_utilizadores.py`; Faker is not used).
 
@@ -98,19 +98,19 @@ cd /caminho/para/Sistema_de_Controlo_Ambiental/scripts
 
 | Variable | Meaning |
 |----------|--------|
-| `NUM_TIPOS` | Max rows from catalog if you omit `-n` (default = **3**, the full catalog). |
-| `TIPOS_OUTPUT` | Output path. Default: `generated/tipos_examination.txt`. |
+| `NUM_TIPOS` | Max rows from catalog if you omit `-n` (default = **6**: 3 sensores + 3 atuadores pareados). |
+| `TIPOS_OUTPUT` | Output path. Default: `generated/tipos_examination.csv`. |
 
 **Precedence:** `-n` / `--count` beats `NUM_TIPOS`.
 
 ### Output file
 
-- **Default:** `scripts/generated/tipos_examination.txt`
-- **Data lines:** `classe | tipo | descricao` (third column maps to SQL `` `descrição` `` — use backticks in `INSERT`).
+- **Default:** `scripts/generated/tipos_examination.csv`
+- **Format:** CSV with header: `classe`, `tipo`, `descricao` (maps to SQL `` `descrição` `` — use backticks in `INSERT`).
 
 ### Map to the database table
 
-| File column | SQL column (`Tipos`) |
+| CSV column | SQL column (`Tipos`) |
 |-------------|-------------------------|
 | classe | `classe` (PK part 1) |
 | tipo | `tipo` (PK part 2; also UNIQUE) |

@@ -1,5 +1,9 @@
 """
-Fake rows for the ``Tipos`` table — **text file only** (no MySQL connection).
+Fake rows for the ``Tipos`` table — **UTF-8 CSV** (no MySQL connection).
+
+**Um único ficheiro CSV** (ex.: ``generated/tipos_examination.csv``) contém **toda** a tabela
+``Tipos``: tipos de **sensor** e de **atuador** na mesma grelha (colunas ``classe``,
+``tipo``, ``descricao``). Não há ficheiro separado para atuadores.
 
 Composite primary key: ``(classe, tipo)``. The physical schema also defines a **unique**
 index on ``tipo`` alone, so every ``tipo`` value must be **globally** distinct.
@@ -12,21 +16,28 @@ index on ``tipo`` alone, so every ``tipo`` value must be **globally** distinct.
 ``-n`` limits how many rows are taken from the catalog (from the start; max = catalog size).
 Optional env: ``NUM_TIPOS``, ``TIPOS_OUTPUT`` (see ``.env.example``).
 
-The default catalog is **three sensor types**: ``Luminosidade``, ``Temperatura_ambiente``,
-``Humidade_relativa`` (all ``classe=Sensor``).
+The default catalog has **three sensors** and **three actuators** in **1:1 correspondence**
+(light → iluminação, temperatura → climatização, humidade → ventilação/tratamento de ar).
+All rows share one CSV. Every ``tipo`` is unique (MySQL ``UNIQUE`` on ``tipo``).
 """
 
 from __future__ import annotations
 
 import argparse
+import csv
 import os
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
 from dotenv import load_dotenv
 
+TIPOS_FIELDNAMES = ("classe", "tipo", "descricao")
+
 # Catalog: each ``tipo`` must be unique (MySQL UNIQUE on ``tipo``).
 # ``descrição`` column max VARCHAR(255) — keep lines under limit.
+#
+# Order: 3 sensores, depois 3 atuadores (cada atuador corresponde ao sensor na mesma posição).
 TIPOS_CATALOG: list[tuple[str, str, str]] = [
     ("Sensor", "Luminosidade", "Nível de luminosidade ambiente."),
     (
@@ -35,12 +46,28 @@ TIPOS_CATALOG: list[tuple[str, str, str]] = [
         "Medição de temperatura do ar interior, habitualmente em °C.",
     ),
     ("Sensor", "Humidade_relativa", "Humidade relativa do ar em percentagem."),
+    # Atuadores alinhados aos tipos de sensor acima (1 → 1).
+    (
+        "Atuador",
+        "Iluminacao_regulatoria_Luminosidade",
+        "Regulação de iluminação (ex.: LED) associada ao sensor tipo Luminosidade.",
+    ),
+    (
+        "Atuador",
+        "Climatizacao_Temperatura_ambiente",
+        "Climatização / aquecimento-arrefecimento associado ao sensor Temperatura_ambiente.",
+    ),
+    (
+        "Atuador",
+        "Ventilacao_Humidade_relativa",
+        "Ventilação ou tratamento de ar associado ao sensor Humidade_relativa.",
+    ),
 ]
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Write Tipos-shaped rows (catalog) to a UTF-8 text file."
+        description="Write Tipos-shaped rows (catalog) to a UTF-8 CSV file."
     )
     parser.add_argument(
         "-n",
@@ -99,32 +126,27 @@ def resolve_config(args: argparse.Namespace, base_dir: Path) -> TiposConfig:
     output_path = Path(
         os.getenv(
             "TIPOS_OUTPUT",
-            str(base_dir / "generated" / "tipos_examination.txt"),
+            str(base_dir / "generated" / "tipos_examination.csv"),
         )
     )
     return TiposConfig(num_rows=num_rows, output_path=output_path)
 
 
-def build_tipos_lines(rows: list[tuple[str, str, str]]) -> list[str]:
-    lines: list[str] = [
-        "# Tipos — generated for examination (not inserted into DB)",
-        "# MySQL column: descrição (backtick in INSERT). File header uses ASCII.",
-        "# Format: classe | tipo | descricao",
-        "# Schema: PK (classe, tipo); UNIQUE on tipo — each tipo value must be unique.",
-        "",
-    ]
+def catalog_rows_to_lists(rows: list[tuple[str, str, str]]) -> list[list[str]]:
+    out: list[list[str]] = []
     for classe, tipo, desc in rows:
-        if " | " in classe or " | " in tipo or " | " in desc:
-            raise ValueError("Catalog entries must not contain ' | ' (field separator).")
         if len(desc) > 255:
             raise ValueError(f"Description too long for VARCHAR(255): {tipo!r}")
-        lines.append(f"{classe} | {tipo} | {desc}")
-    return lines
+        out.append([classe, tipo, desc])
+    return out
 
 
-def write_lines_to_file(output_path: Path, lines: list[str]) -> None:
+def write_tipos_csv(output_path: Path, rows: list[list[str]]) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    with output_path.open("w", encoding="utf-8", newline="") as f:
+        writer = csv.writer(f, lineterminator="\n")
+        writer.writerow(TIPOS_FIELDNAMES)
+        writer.writerows(rows)
 
 
 def main() -> None:
@@ -133,9 +155,16 @@ def main() -> None:
     load_env_from_script_dir(base_dir)
     config = resolve_config(args, base_dir)
     selected = TIPOS_CATALOG[: config.num_rows]
-    lines = build_tipos_lines(selected)
-    write_lines_to_file(config.output_path, lines)
+    rows = catalog_rows_to_lists(selected)
+    write_tipos_csv(config.output_path, rows)
     print(f"Wrote {len(selected)} tipo(s) to {config.output_path}")
+    full = len(TIPOS_CATALOG)
+    if len(selected) < full:
+        print(
+            f"Note: CSV has only the first {len(selected)} of {full} catalog rows "
+            f"(sensors + actuators). Omit -n and NUM_TIPOS for the full Tipos file.",
+            file=sys.stderr,
+        )
 
 
 if __name__ == "__main__":
