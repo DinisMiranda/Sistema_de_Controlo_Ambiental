@@ -39,3 +39,7 @@ scripts/.venv/
 scripts/.env
 scripts/generated/
 
+# Python
+__pycache__/
+*.py[cod]
+

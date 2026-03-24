@@ -24,6 +24,7 @@ A monitoring and control system for environmental sensors, actuators, and consum
 | `backend/` | REST API — Node.js, Express, TypeScript |
 | `database/` | MySQL schema and migration scripts |
 | `docs/` | Design docs, use cases, and references |
+| `scripts/` | Fake data generators (see `scripts/README.md`) |
 | `docker-compose.yml` | Local MySQL 8 service for development |
 
 ---
@@ -123,3 +124,5 @@ Schema: **sistema_controlo_ambiental2**
 ## Documentation
 
 Design documents, use cases, and data model references are in **`docs/`**.
+
+Fake data scripts (e.g. **`Utilizadores`** text output) are documented in **`scripts/README.md`** and in the module docstring at the top of **`scripts/seed_utilizadores.py`**.
