@@ -2,8 +2,10 @@
 Fake rows for the ``Tipos`` table — **UTF-8 CSV** (no MySQL connection).
 
 **Um único ficheiro CSV** (ex.: ``generated/tipos_examination.csv``) contém **toda** a tabela
-``Tipos``: tipos de **sensor** e de **atuador** na mesma grelha (colunas ``classe``,
-``tipo``, ``descricao``). Não há ficheiro separado para atuadores.
+``Tipos``: **sensores**, **atuadores** e **ações de sistema** na mesma grelha (colunas
+``classe``, ``tipo``, ``descricao``). A classe ``Acao_sistema`` classifica linhas em
+``acoes_sistema`` (FK ``Tipos_classe`` / ``Tipos_tipo``); o campo ``tipo_acao`` na tabela
+continua a descrever o comando curto (ex.: ON, OFF, 21.5).
 
 Composite primary key: ``(classe, tipo)``. The physical schema also defines a **unique**
 index on ``tipo`` alone, so every ``tipo`` value must be **globally** distinct.
@@ -16,8 +18,8 @@ index on ``tipo`` alone, so every ``tipo`` value must be **globally** distinct.
 ``-n`` limits how many rows are taken from the catalog (from the start; max = catalog size).
 Optional env: ``NUM_TIPOS``, ``TIPOS_OUTPUT`` (see ``.env.example``).
 
-The default catalog has **four sensors** and **four actuators** in **1:1 correspondence**
-(light, temperatura, humidade, consumo energético kWh → atuadores correspondentes).
+The default catalog has **four sensors**, **four paired actuators**, plus **seven action
+types** (``classe=Acao_sistema``) for classifying what happened in ``acoes_sistema``.
 All rows share one CSV. Every ``tipo`` is unique (MySQL ``UNIQUE`` on ``tipo``).
 """
 
@@ -37,7 +39,7 @@ TIPOS_FIELDNAMES = ("classe", "tipo", "descricao")
 # Catalog: each ``tipo`` must be unique (MySQL UNIQUE on ``tipo``).
 # ``descrição`` column max VARCHAR(255) — keep lines under limit.
 #
-# Order: sensores, depois atuadores (cada atuador corresponde ao sensor na mesma posição).
+# Order: sensores → atuadores pareados (1:1) → tipos de ação para ``acoes_sistema``.
 TIPOS_CATALOG: list[tuple[str, str, str]] = [
     ("Sensor", "Luminosidade", "Nível de luminosidade ambiente."),
     (
@@ -71,6 +73,43 @@ TIPOS_CATALOG: list[tuple[str, str, str]] = [
         "Atuador",
         "Rele_circuito_Consumo_energetico_kWh",
         "Relé ou contactor para comutação de circuito associado ao medidor Consumo_energetico_kWh.",
+    ),
+    # Classificação de ações (``acoes_sistema``.Tipos_classe / Tipos_tipo). Cada ``tipo``
+    # é único; escolhe o que melhor descreve a ação (conforto, poupança, proteção).
+    (
+        "Acao_sistema",
+        "Iluminacao_ligar_ou_aumentar",
+        "Ação de ligar ou aumentar iluminação (baixa luminosidade ou comando).",
+    ),
+    (
+        "Acao_sistema",
+        "Iluminacao_desligar_ou_reduzir",
+        "Ação de desligar ou reduzir iluminação (excesso de luz ou poupança).",
+    ),
+    (
+        "Acao_sistema",
+        "Climatizacao_definir_consigna",
+        "Ação de alterar consigna ou modo de climatização (temperatura alvo).",
+    ),
+    (
+        "Acao_sistema",
+        "Ventilacao_reforco_ou_arranque",
+        "Ação de ativar ou intensificar ventilação (humidade, renovação de ar).",
+    ),
+    (
+        "Acao_sistema",
+        "Circuito_energia_corte",
+        "Ação de corte: relé aberto ou circuito desenergizado (proteção ou gestão de carga).",
+    ),
+    (
+        "Acao_sistema",
+        "Circuito_energia_restabelecer",
+        "Ação de restabelecer alimentação ao circuito (relé fechado).",
+    ),
+    (
+        "Acao_sistema",
+        "Controlo_automatico_por_limite",
+        "Ação disparada automaticamente por regra ou limiar (parametrização automática).",
     ),
 ]
 

@@ -80,11 +80,11 @@ More detail lives in the **module docstring** at the top of `seed_utilizadores.p
 
 ## `seed_tipos.py`
 
-Generates rows shaped like the **`Tipos`** table (`classe`, `tipo`, `descrição`). **Sensores e atuadores vão no mesmo ficheiro CSV** — um único `tipos_examination.csv` corresponde à tabela `Tipos` completa (não há CSV separado por equipamento).
+Generates rows shaped like the **`Tipos`** table (`classe`, `tipo`, `descrição`). **Tudo vai no mesmo CSV** — sensores, atuadores e **tipos de ação** (`classe=Acao_sistema`) para classificar linhas em `acoes_sistema` (FK `Tipos_classe` / `Tipos_tipo`).
 
-O catálogo tem **quatro sensores** — `Luminosidade`, `Temperatura_ambiente`, `Humidade_relativa`, `Consumo_energetico_kWh` (medidor de consumo energético em kWh) — e **quatro atuadores** em correspondência **1:1**. Cada `tipo` é único globalmente (**UNIQUE** em `tipo` no `database/schema.sql`).
+O catálogo tem **quatro sensores**, **quatro atuadores** (1:1 com os sensores) e **sete tipos de ação** (ligar/desligar luz, consigna de climatização, ventilação, corte/restabelecimento de circuito, disparo automático por limite). O campo `tipo_acao` na tabela `acoes_sistema` continua a ser o texto curto do comando (ex.: `ON`, `22`); o par `(Tipos_classe, Tipos_tipo)` categoriza a ação. Cada `tipo` em `Tipos` é único globalmente.
 
-**Importante:** se usares `-n 4` ou `NUM_TIPOS=4` no `.env`, o CSV fica **só com os sensores**. Para incluir os atuadores **pareados**, corre sem `-n` e sem `NUM_TIPOS`, ou define `NUM_TIPOS=8`.
+**Importante:** export completo = **15** linhas (4 + 4 + 7). Só sensores: `-n 4`. Sensores + atuadores: `-n 8`. Tudo: omite `-n` / usa `NUM_TIPOS=15`.
 
 **Dependencies:** `python-dotenv` only (same venv as `seed_utilizadores.py`; Faker is not used).
 
@@ -98,7 +98,7 @@ cd /caminho/para/Sistema_de_Controlo_Ambiental/scripts
 
 | Variable | Meaning |
 |----------|--------|
-| `NUM_TIPOS` | Max rows from catalog if you omit `-n` (default = **8**: 4 sensores + 4 atuadores pareados). |
+| `NUM_TIPOS` | Max rows from catalog if you omit `-n` (default = **15**: 4 sensores + 4 atuadores + 7 ações). |
 | `TIPOS_OUTPUT` | Output path. Default: `generated/tipos_examination.csv`. |
 
 **Precedence:** `-n` / `--count` beats `NUM_TIPOS`.
@@ -118,7 +118,7 @@ cd /caminho/para/Sistema_de_Controlo_Ambiental/scripts
 
 ### Load order
 
-Insert **`Tipos`** before **`sensores`**, **`atuadores`**, and **`acoes_sistema`** (foreign keys reference `Tipos.classe` / `Tipos.tipo`).
+Insert **`Tipos`** before **`sensores`**, **`atuadores`**, and **`acoes_sistema`** (FKs referenciam `Tipos.classe` / `Tipos.tipo`). Garante que existem linhas `Acao_sistema` / … antes de inserir `acoes_sistema`.
 
 ### Related files
 
