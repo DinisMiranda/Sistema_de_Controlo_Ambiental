@@ -82,9 +82,9 @@ More detail lives in the **module docstring** at the top of `seed_utilizadores.p
 
 Generates rows shaped like the **`Tipos`** table (`classe`, `tipo`, `descrição`). **Sensores e atuadores vão no mesmo ficheiro CSV** — um único `tipos_examination.csv` corresponde à tabela `Tipos` completa (não há CSV separado por equipamento).
 
-O catálogo tem **três sensores** (`Luminosidade`, `Temperatura_ambiente`, `Humidade_relativa`) e **três atuadores** em correspondência **1:1** com esses sensores (iluminação regulatória, climatização, ventilação/tratamento de ar). Cada `tipo` é único globalmente (**UNIQUE** em `tipo` no `database/schema.sql`).
+O catálogo tem **quatro sensores** — `Luminosidade`, `Temperatura_ambiente`, `Humidade_relativa`, `Consumo_energetico_kWh` (medidor de consumo energético em kWh) — e **quatro atuadores** em correspondência **1:1**. Cada `tipo` é único globalmente (**UNIQUE** em `tipo` no `database/schema.sql`).
 
-**Importante:** se usares `-n 3` ou `NUM_TIPOS=3` no `.env`, o CSV fica **só com os sensores**. Para incluir os atuadores **pareados**, corre sem `-n` e sem `NUM_TIPOS`, ou define `NUM_TIPOS=6`.
+**Importante:** se usares `-n 4` ou `NUM_TIPOS=4` no `.env`, o CSV fica **só com os sensores**. Para incluir os atuadores **pareados**, corre sem `-n` e sem `NUM_TIPOS`, ou define `NUM_TIPOS=8`.
 
 **Dependencies:** `python-dotenv` only (same venv as `seed_utilizadores.py`; Faker is not used).
 
@@ -98,7 +98,7 @@ cd /caminho/para/Sistema_de_Controlo_Ambiental/scripts
 
 | Variable | Meaning |
 |----------|--------|
-| `NUM_TIPOS` | Max rows from catalog if you omit `-n` (default = **6**: 3 sensores + 3 atuadores pareados). |
+| `NUM_TIPOS` | Max rows from catalog if you omit `-n` (default = **8**: 4 sensores + 4 atuadores pareados). |
 | `TIPOS_OUTPUT` | Output path. Default: `generated/tipos_examination.csv`. |
 
 **Precedence:** `-n` / `--count` beats `NUM_TIPOS`.

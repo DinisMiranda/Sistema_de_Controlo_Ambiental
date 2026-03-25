@@ -16,8 +16,8 @@ index on ``tipo`` alone, so every ``tipo`` value must be **globally** distinct.
 ``-n`` limits how many rows are taken from the catalog (from the start; max = catalog size).
 Optional env: ``NUM_TIPOS``, ``TIPOS_OUTPUT`` (see ``.env.example``).
 
-The default catalog has **three sensors** and **three actuators** in **1:1 correspondence**
-(light → iluminação, temperatura → climatização, humidade → ventilação/tratamento de ar).
+The default catalog has **four sensors** and **four actuators** in **1:1 correspondence**
+(light, temperatura, humidade, consumo energético kWh → atuadores correspondentes).
 All rows share one CSV. Every ``tipo`` is unique (MySQL ``UNIQUE`` on ``tipo``).
 """
 
@@ -37,7 +37,7 @@ TIPOS_FIELDNAMES = ("classe", "tipo", "descricao")
 # Catalog: each ``tipo`` must be unique (MySQL UNIQUE on ``tipo``).
 # ``descrição`` column max VARCHAR(255) — keep lines under limit.
 #
-# Order: 3 sensores, depois 3 atuadores (cada atuador corresponde ao sensor na mesma posição).
+# Order: sensores, depois atuadores (cada atuador corresponde ao sensor na mesma posição).
 TIPOS_CATALOG: list[tuple[str, str, str]] = [
     ("Sensor", "Luminosidade", "Nível de luminosidade ambiente."),
     (
@@ -46,6 +46,11 @@ TIPOS_CATALOG: list[tuple[str, str, str]] = [
         "Medição de temperatura do ar interior, habitualmente em °C.",
     ),
     ("Sensor", "Humidade_relativa", "Humidade relativa do ar em percentagem."),
+    (
+        "Sensor",
+        "Consumo_energetico_kWh",
+        "Medidor de consumo ou energia elétrica acumulada, habitualmente em kWh.",
+    ),
     # Atuadores alinhados aos tipos de sensor acima (1 → 1).
     (
         "Atuador",
@@ -61,6 +66,11 @@ TIPOS_CATALOG: list[tuple[str, str, str]] = [
         "Atuador",
         "Ventilacao_Humidade_relativa",
         "Ventilação ou tratamento de ar associado ao sensor Humidade_relativa.",
+    ),
+    (
+        "Atuador",
+        "Rele_circuito_Consumo_energetico_kWh",
+        "Relé ou contactor para comutação de circuito associado ao medidor Consumo_energetico_kWh.",
     ),
 ]
 
