@@ -31,7 +31,7 @@ A monitoring and control system for environmental sensors, actuators, and consum
 
 ## Prerequisites
 
-- **Node.js** 18 or later  
+- **Node.js** 18.20.8 or later ([v18.20.8 release](https://nodejs.org/en/blog/release/v18.20.8); newer LTS/current versions are fine)  
 - **MySQL** 8 (or use the provided Docker setup)  
 - **npm** or **pnpm**
 
