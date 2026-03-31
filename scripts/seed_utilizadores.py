@@ -1,5 +1,6 @@
 """
-Fake data for the ``Utilizadores`` table — **UTF-8 CSV only** (no MySQL connection).
+Fake data for the ``Utilizadores`` table — **UTF-8 CSV** by default; direct MySQL load is
+planned (``--db`` hook; not implemented yet).
 
 **What it does**
     Uses the Faker library (Portuguese locale) to invent names, datetimes, and placeholder
@@ -11,8 +12,11 @@ Fake data for the ``Utilizadores`` table — **UTF-8 CSV only** (no MySQL connec
     python seed_utilizadores.py
     python seed_utilizadores.py -n 20
     python seed_utilizadores.py -n 10 --seed 42
+    python seed_utilizadores.py -o generated/out.csv
+    python seed_utilizadores.py --db   # MySQL path not implemented yet (see run message)
 
-``--seed`` fixes both ``random`` and Faker’s RNG so identical flags produce identical files
+``--csv`` / ``--no-csv`` toggle the output file; ``--db`` is reserved for a future direct
+MySQL load. ``--seed`` fixes both ``random`` and Faker’s RNG so identical flags produce identical files
 (reproducibility). Omit it for different output every run.
 
 **End-to-end flow** (see ``main()``)::
@@ -64,6 +68,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 from faker import Faker
 
+# CSV header column order — must match each row built in ``build_utilizadores_rows`` and the
+# ``Utilizadores`` table / import tooling (``LOAD DATA``, spreadsheets, etc.).
 UTILIZADORES_FIELDNAMES = (
     "nome",
     "email",
@@ -119,7 +125,7 @@ def email_from_name(full_name: str, used_emails: set[str]) -> str:
 
 
 def parse_args() -> argparse.Namespace:
-    """Define and parse CLI (count, optional seed for reproducible output)."""
+    """Define and parse CLI: count, seed, CSV path, CSV on/off, reserved ``--db`` flag."""
     parser = argparse.ArgumentParser(description="Generate fake Utilizadores to a CSV file.")
     parser.add_argument(
         "-n",
@@ -135,6 +141,26 @@ def parse_args() -> argparse.Namespace:
         default=None,
         metavar="N",
         help="optional seed: same seed + options → same output (seeds random and Faker)",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=Path,
+        default=None,
+        metavar="PATH",
+        help="CSV output path (overrides UTILIZADORES_OUTPUT / default for this run)",
+    )
+    parser.add_argument(
+        "--csv",
+        dest="write_csv",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="write UTF-8 CSV (default: yes)",
+    )
+    parser.add_argument(
+        "--db",
+        action="store_true",
+        help="(planned) load rows into MySQL; not implemented — use CSV import for now",
     )
     return parser.parse_args()
 
@@ -200,7 +226,7 @@ def resolve_config(args: argparse.Namespace, base_dir: Path) -> SeedConfig:
     Invalid ``NUM_UTILIZADORES`` (non-integer) exits with a message instead of ``ValueError``.
     Must be ``>= 1`` or the process exits.
 
-    Output path: ``UTILIZADORES_OUTPUT`` if set, else
+    Output path: ``args.output`` if set, else ``UTILIZADORES_OUTPUT`` if set, else
     ``generated/utilizadores_examination.csv`` under ``base_dir``. Parent directories are
     not created here — see ``write_utilizadores_csv``.
     """
@@ -212,12 +238,15 @@ def resolve_config(args: argparse.Namespace, base_dir: Path) -> SeedConfig:
     if num_users < 1:
         raise SystemExit("User count must be at least 1.")
 
-    output_path = Path(
-        os.getenv(
-            "UTILIZADORES_OUTPUT",
-            str(base_dir / "generated" / "utilizadores_examination.csv"),
+    if args.output is not None:
+        output_path = args.output
+    else:
+        output_path = Path(
+            os.getenv(
+                "UTILIZADORES_OUTPUT",
+                str(base_dir / "generated" / "utilizadores_examination.csv"),
+            )
         )
-    )
     return SeedConfig(num_users=num_users, output_path=output_path)
 
 
@@ -328,6 +357,19 @@ def write_utilizadores_csv(output_path: Path, rows: list[list[str]]) -> None:
         writer.writerows(rows)
 
 
+def load_utilizadores_to_db(_rows: list[list[str]], _config: SeedConfig) -> None:
+    """
+    Reserved for a future MySQL connection (e.g. ``INSERT`` or ``executemany``).
+
+    Today: exit with a clear message; use CSV and ``LOAD DATA`` / your SQL tool until this
+    is implemented.
+    """
+    raise SystemExit(
+        "Direct MySQL insert is not implemented yet. "
+        "Omit --db to write a CSV, then import with your client or LOAD DATA."
+    )
+
+
 def main() -> None:
     """
     Run the generator end-to-end.
@@ -347,11 +389,22 @@ def main() -> None:
     rows = build_utilizadores_rows(
         faker, config.num_users, existing_emails=prior_emails
     )
-    write_utilizadores_csv(config.output_path, rows)
-    msg = f"Wrote {config.num_users} user(s) to {config.output_path}"
-    if prior_emails:
-        msg += f" (reserved {len(prior_emails)} email(s) from previous file for uniqueness)"
-    print(msg)
+    if args.db:
+        load_utilizadores_to_db(rows, config)
+
+    if not args.write_csv and not args.db:
+        raise SystemExit(
+            "CSV output is disabled (--no-csv) and --db is not available yet. Nothing to do."
+        )
+
+    if args.write_csv:
+        write_utilizadores_csv(config.output_path, rows)
+        msg = f"Wrote {config.num_users} user(s) to {config.output_path}"
+        if prior_emails:
+            msg += (
+                f" (reserved {len(prior_emails)} email(s) from previous file for uniqueness)"
+            )
+        print(msg)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 """
-Fake rows for the ``Tipos`` table — **UTF-8 CSV** (no MySQL connection).
+Fake rows for the ``Tipos`` table — **UTF-8 CSV** by default; direct MySQL load is planned
+(``--db`` hook; not implemented yet).
 
 **Um único ficheiro CSV** (ex.: ``generated/tipos_examination.csv``) contém **toda** a tabela
 ``Tipos``: **sensores**, **atuadores** e **ações de sistema** na mesma grelha (colunas
@@ -14,16 +15,22 @@ index on ``tipo`` alone, so every ``tipo`` value must be **globally** distinct.
 
     .venv/bin/python seed_tipos.py
     .venv/bin/python seed_tipos.py -n 2
+    .venv/bin/python seed_tipos.py -o generated/meu_tipos.csv
+    .venv/bin/python seed_tipos.py --db   # shows that MySQL load is not implemented yet
 
-``-n`` limits how many rows are taken from the catalog (from the start; max = catalog size).
+By default the script **writes a UTF-8 CSV**. ``--csv`` / ``--no-csv`` toggle the file;
+``--no-csv`` alone exits until ``--db`` can insert rows. ``--db`` is reserved for a future
+direct MySQL load; until then, use CSV and import with your client or ``LOAD DATA``.
+
+``-n`` / ``--count`` limits how many rows are taken from the catalog (from the start;
+max = catalog size). ``-o`` / ``--output`` overrides the CSV path for this run.
+
 Optional env: ``NUM_TIPOS``, ``TIPOS_OUTPUT`` (see ``.env.example``).
 
 The default catalog has **four sensors**, **four paired actuators**, plus **seven action
 types** (``classe=Acao_sistema``) for classifying what happened in ``acoes_sistema``.
 All rows share one CSV. Every ``tipo`` is unique (MySQL ``UNIQUE`` on ``tipo``).
 """
-
-from __future__ import annotations
 
 import argparse
 import csv
@@ -115,6 +122,7 @@ TIPOS_CATALOG: list[tuple[str, str, str]] = [
 
 
 def parse_args() -> argparse.Namespace:
+    """Define and parse CLI: row count, CSV path, CSV on/off, and reserved ``--db`` flag."""
     parser = argparse.ArgumentParser(
         description="Write Tipos-shaped rows (catalog) to a UTF-8 CSV file."
     )
@@ -126,16 +134,42 @@ def parse_args() -> argparse.Namespace:
         metavar="N",
         help="max rows from catalog (default: all). Overrides NUM_TIPOS in scripts/.env",
     )
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=Path,
+        default=None,
+        metavar="PATH",
+        help="CSV output path (overrides TIPOS_OUTPUT / default for this run)",
+    )
+    parser.add_argument(
+        "--csv",
+        dest="write_csv",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="write UTF-8 CSV (default: yes)",
+    )
+    parser.add_argument(
+        "--db",
+        action="store_true",
+        help="(planned) load rows into MySQL; not implemented — use CSV import for now",
+    )
     return parser.parse_args()
 
 
 def load_env_from_script_dir(base_dir: Path) -> None:
+    """Load ``scripts/.env`` if present so ``os.getenv`` sees ``NUM_TIPOS`` / ``TIPOS_OUTPUT``."""
     env_path = base_dir / ".env"
     if env_path.exists():
         load_dotenv(env_path)
 
 
 def parse_int_env(var_name: str, default: int) -> int:
+    """
+    Read ``var_name`` from the environment; return ``default`` if unset or blank.
+
+    Exits with a clear message if the value is non-empty but not a valid integer.
+    """
     raw = os.getenv(var_name)
     if raw is None:
         return default
@@ -158,6 +192,14 @@ class TiposConfig:
 
 
 def resolve_config(args: argparse.Namespace, base_dir: Path) -> TiposConfig:
+    """
+    Combine CLI and environment into row count and CSV path.
+
+    Row count: ``args.count`` if set, else ``NUM_TIPOS`` from env, else full catalog length.
+
+    Output path: ``args.output`` if set, else ``TIPOS_OUTPUT`` from env, else
+    ``generated/tipos_examination.csv`` under ``base_dir``.
+    """
     catalog_len = len(TIPOS_CATALOG)
     if args.count is not None:
         num_rows = args.count
@@ -172,16 +214,20 @@ def resolve_config(args: argparse.Namespace, base_dir: Path) -> TiposConfig:
             f"Extend TIPOS_CATALOG in seed_tipos.py or use -n {catalog_len}."
         )
 
-    output_path = Path(
-        os.getenv(
-            "TIPOS_OUTPUT",
-            str(base_dir / "generated" / "tipos_examination.csv"),
+    if args.output is not None:
+        output_path = args.output
+    else:
+        output_path = Path(
+            os.getenv(
+                "TIPOS_OUTPUT",
+                str(base_dir / "generated" / "tipos_examination.csv"),
+            )
         )
-    )
     return TiposConfig(num_rows=num_rows, output_path=output_path)
 
 
 def catalog_rows_to_lists(rows: list[tuple[str, str, str]]) -> list[list[str]]:
+    """Turn catalog tuples into string rows; enforce ``descricao`` length for ``VARCHAR(255)``."""
     out: list[list[str]] = []
     for classe, tipo, desc in rows:
         if len(desc) > 255:
@@ -191,6 +237,7 @@ def catalog_rows_to_lists(rows: list[tuple[str, str, str]]) -> list[list[str]]:
 
 
 def write_tipos_csv(output_path: Path, rows: list[list[str]]) -> None:
+    """Write UTF-8 CSV with header ``TIPOS_FIELDNAMES`` and one row per tipo."""
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", encoding="utf-8", newline="") as f:
         writer = csv.writer(f, lineterminator="\n")
@@ -198,22 +245,49 @@ def write_tipos_csv(output_path: Path, rows: list[list[str]]) -> None:
         writer.writerows(rows)
 
 
+def load_tipos_to_db(_rows: list[list[str]], _config: TiposConfig) -> None:
+    """
+    Reserved for a future MySQL connection (e.g. ``INSERT`` or ``executemany``).
+
+    Today: exit with a clear message; use CSV (with or without ``--db`` on the CLI) and
+    ``LOAD DATA`` / your SQL tool until this is implemented.
+    """
+    raise SystemExit(
+        "Direct MySQL insert is not implemented yet. "
+        "Omit --db to write a CSV, then import with your client or LOAD DATA."
+    )
+
+
 def main() -> None:
+    """
+    Parse CLI, load ``scripts/.env``, build catalog slice, optionally call ``load_tipos_to_db``,
+    and write CSV when ``--csv`` is enabled.
+    """
     base_dir = Path(__file__).resolve().parent
     args = parse_args()
     load_env_from_script_dir(base_dir)
     config = resolve_config(args, base_dir)
     selected = TIPOS_CATALOG[: config.num_rows]
     rows = catalog_rows_to_lists(selected)
-    write_tipos_csv(config.output_path, rows)
-    print(f"Wrote {len(selected)} tipo(s) to {config.output_path}")
-    full = len(TIPOS_CATALOG)
-    if len(selected) < full:
-        print(
-            f"Note: CSV has only the first {len(selected)} of {full} catalog rows "
-            f"(sensors + actuators). Omit -n and NUM_TIPOS for the full Tipos file.",
-            file=sys.stderr,
+
+    if args.db:
+        load_tipos_to_db(rows, config)
+
+    if not args.write_csv and not args.db:
+        raise SystemExit(
+            "CSV output is disabled (--no-csv) and --db is not available yet. Nothing to do."
         )
+
+    if args.write_csv:
+        write_tipos_csv(config.output_path, rows)
+        print(f"Wrote {len(selected)} tipo(s) to {config.output_path}")
+        full = len(TIPOS_CATALOG)
+        if len(selected) < full:
+            print(
+                f"Note: CSV has only the first {len(selected)} of {full} catalog rows "
+                f"(sensors + actuators). Omit -n and NUM_TIPOS for the full Tipos file.",
+                file=sys.stderr,
+            )
 
 
 if __name__ == "__main__":
