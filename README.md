@@ -125,4 +125,4 @@ Schema: **sistema_controlo_ambiental2**
 
 Design documents, use cases, and data model references are in **`docs/`**.
 
-Fake data scripts (e.g. **`Utilizadores`** text output) are documented in **`scripts/README.md`** and in the module docstring at the top of **`scripts/seed_utilizadores.py`**.
+Fake data scripts (e.g. **`Utilizadores`** / **`Tipos`** CSV output) are documented in **`scripts/README.md`** and in the module docstrings under **`scripts/`**.
