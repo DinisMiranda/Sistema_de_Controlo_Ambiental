@@ -1,6 +1,6 @@
 -- MySQL Workbench Forward Engineering
 -- Schema: sistema_controlo_ambiental2
--- casas: só dados da residência (sem FK a utilizadores; relação N:N virá numa tabela de associação).
+-- Relação N:N utilizadores↔casas: tabela ``Casa_Administradores``.
 
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
@@ -100,6 +100,32 @@ CREATE TABLE IF NOT EXISTS `sistema_controlo_ambiental2`.`Utilizadores` (
   `admin` TINYINT NOT NULL,
   PRIMARY KEY (`id_administrador`),
   UNIQUE INDEX `email` (`email` ASC) VISIBLE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `sistema_controlo_ambiental2`.`Casa_Administradores`
+-- Associação N:N entre ``casas`` e ``Utilizadores``.
+-- Nota: PK de ``Utilizadores`` é ``id_administrador``; aqui ``id_utilizador`` referencia essa coluna.
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `sistema_controlo_ambiental2`.`Casa_Administradores` (
+  `id_casa` INT NOT NULL,
+  `id_utilizador` INT NOT NULL,
+  PRIMARY KEY (`id_casa`, `id_utilizador`),
+  INDEX `fk_Casa_Administradores_casas_idx` (`id_casa` ASC) VISIBLE,
+  INDEX `fk_Casa_Administradores_Utilizadores_idx` (`id_utilizador` ASC) VISIBLE,
+  CONSTRAINT `fk_Casa_Administradores_casas`
+    FOREIGN KEY (`id_casa`)
+    REFERENCES `sistema_controlo_ambiental2`.`casas` (`id_casa`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_Casa_Administradores_Utilizadores`
+    FOREIGN KEY (`id_utilizador`)
+    REFERENCES `sistema_controlo_ambiental2`.`Utilizadores` (`id_administrador`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
