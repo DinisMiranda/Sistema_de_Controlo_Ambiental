@@ -107,8 +107,19 @@ COLLATE = utf8mb4_0900_ai_ci;
 
 -- -----------------------------------------------------
 -- Table `sistema_controlo_ambiental2`.`Casa_Administradores`
--- Associação N:N entre ``casas`` e ``Utilizadores``.
--- Nota: PK de ``Utilizadores`` é ``id_administrador``; aqui ``id_utilizador`` referencia essa coluna.
+--
+-- Porquê esta tabela (revisão / documentação):
+-- O domínio é N:N entre residências e contas de utilizador. Uma ``casa`` pode ter vários
+-- utilizadores com acesso (agregado familiar, co-proprietários, contas de manutenção);
+-- por outro lado, um ``Utilizador`` pode gerir várias casas (segunda habitação, pais,
+-- portefólio de instalações). Uma FK única de ``Utilizadores`` para ``casas`` ou o
+-- inverso só modelaria 1:N e forçaria duplicação de linhas ou um "utilizador dono" falso.
+-- A tabela de associação regista **quem tem acesso a qual** residência, de forma
+-- normalizada, e alinha-se com o padrão habitual em sistemas multi-utilizador /
+-- multi-instalação.
+--
+-- Nota técnica: a PK de ``Utilizadores`` é ``id_administrador``; a coluna
+-- ``id_utilizador`` aqui referencia essa coluna (semântica: identificador do utilizador).
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `sistema_controlo_ambiental2`.`Casa_Administradores` (
   `id_casa` INT NOT NULL,
