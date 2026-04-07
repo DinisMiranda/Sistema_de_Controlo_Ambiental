@@ -302,8 +302,8 @@ def load_emails_from_existing_output(path: Path) -> set[str]:
         stripped = line.strip()
         if not stripped or stripped.startswith("#"):
             continue
-        parts = stripped.split(" | ", 4)
-        if len(parts) != 5:
+        parts = stripped.split(" | ")
+        if len(parts) < 2:
             continue
         emails.add(parts[1].strip())
     return emails
