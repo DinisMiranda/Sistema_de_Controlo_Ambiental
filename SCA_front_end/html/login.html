@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoControl - Login</title>
+  <link rel="stylesheet" href="/Sistema_de_Controlo_Ambiental/SCA_front_end/html/Css/style.css">
+  <script src="/Sistema_de_Controlo_Ambiental/SCA_front_end/html/Js/auth.js" defer></script>
+</head>
+<body>
+  <div class="login-page">
+    <div class="login-left">
+      <h1>Sistema de Controle Ambiental</h1>
+      <p>Edifícios Inteligentes</p>
+    </div>
+
+    <div class="login-right">
+      <div class="login-card">
+        <h2>Bem-vindo ao <span style="color:var(--accent-orange)">EcoControl</span></h2>
+        <form id="login-form">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="Email" required>
+          </div>
+          <div class="form-group">
+            <label for="password">Senha</label>
+            <input type="password" id="password" placeholder="Senha" required>
+          </div>
+          <button type="submit" class="btn-primary">Entrar</button>
+        </form>
+        <p id="login-error" class="error-msg hidden"></p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
