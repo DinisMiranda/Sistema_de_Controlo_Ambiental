@@ -69,13 +69,13 @@ const departmentsData = {
 // INICIALIZAÇÃO
 // ========================================
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   console.log('🏢 Página de Departamentos inicializando...');
-  
+
   renderDepartmentCards();
   setupFilters();
   updateStatistics();
-  
+
   console.log('✅ Departamentos carregados com sucesso!');
 });
 
@@ -86,38 +86,34 @@ document.addEventListener('DOMContentLoaded', function() {
 function renderDepartmentCards(filter = 'all') {
   const grid = document.getElementById('departments-grid');
   const noResults = document.getElementById('no-results');
-  
+
   if (!grid) {
     console.error('❌ Grid de departamentos não encontrado');
     return;
   }
-  
-  // Limpar grid
+
   grid.innerHTML = '';
-  
+
   let cardsRendered = 0;
-  
-  // Renderizar cada sala
+
   Object.values(departmentsData).forEach(room => {
-    // Verificar se deve mostrar baseado no filtro
     if (!shouldShowRoom(room, filter)) {
       return;
     }
-    
+
     const card = createDepartmentCard(room);
     grid.appendChild(card);
     cardsRendered++;
   });
-  
-  // Mostrar/ocultar mensagem "sem resultados"
+
   if (cardsRendered === 0) {
-    noResults.style.display = 'flex';
+    if (noResults) noResults.style.display = 'flex';
     grid.style.display = 'none';
   } else {
-    noResults.style.display = 'none';
+    if (noResults) noResults.style.display = 'none';
     grid.style.display = 'grid';
   }
-  
+
   console.log(`📊 ${cardsRendered} cards renderizados (filtro: ${filter})`);
 }
 
@@ -126,25 +122,20 @@ function renderDepartmentCards(filter = 'all') {
 // ========================================
 
 function shouldShowRoom(room, filter) {
-  if (filter === 'all') {
-    return true;
-  }
-  
+  if (filter === 'all') return true;
+
   if (filter === 'temperature') {
-    // Mostra apenas se temperatura fora da faixa ideal (20-24°C)
     return room.temperature < 20 || room.temperature > 24;
   }
-  
+
   if (filter === 'humidity') {
-    // Mostra apenas se umidade fora da faixa ideal (40-60%)
     return room.humidity < 40 || room.humidity > 60;
   }
-  
+
   if (filter === 'light') {
-    // Mostra todas as salas (para controle de iluminação)
     return true;
   }
-  
+
   return true;
 }
 
@@ -158,26 +149,18 @@ function createDepartmentCard(room) {
   card.setAttribute('data-room-id', room.id);
   card.setAttribute('data-temperature', room.temperature);
   card.setAttribute('data-humidity', room.humidity);
-  
-  // Calcular percentual de iluminação
+
   const lightPercentage = Math.round((room.lightingOn / room.lightingTotal) * 100);
-  
-  // Determinar classes de alerta para métricas
   const tempClass = getTempAlertClass(room.temperature);
   const humidityClass = getHumidityAlertClass(room.humidity);
-  
+
   card.innerHTML = `
-    <!-- Header do Card -->
     <div class="card-header-dept">
-      <h3 class="room-name">
-        📍 ${room.name}
-      </h3>
+      <h3 class="room-name">📍 ${room.name}</h3>
       <span class="room-badge">${room.badge}</span>
     </div>
-    
-    <!-- Métricas -->
+
     <div class="card-metrics">
-      <!-- Temperatura -->
       <div class="metric-row">
         <div class="metric-info">
           <svg class="metric-icon-small temp-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -187,8 +170,7 @@ function createDepartmentCard(room) {
         </div>
         <span class="metric-data ${tempClass}">${room.temperature}°C</span>
       </div>
-      
-      <!-- Umidade -->
+
       <div class="metric-row">
         <div class="metric-info">
           <svg class="metric-icon-small humidity-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -198,8 +180,7 @@ function createDepartmentCard(room) {
         </div>
         <span class="metric-data ${humidityClass}">${room.humidity}%</span>
       </div>
-      
-      <!-- Iluminação -->
+
       <div class="metric-row">
         <div class="metric-info">
           <svg class="metric-icon-small light-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -218,21 +199,18 @@ function createDepartmentCard(room) {
         <span class="metric-data">${room.lightingOn}/${room.lightingTotal} (${lightPercentage}%)</span>
       </div>
     </div>
-    
-    <!-- Status -->
+
     <div class="card-status status-${room.status}">
       ${getStatusIcon(room.status)}
       <span>${room.statusText}</span>
     </div>
-    
-    <!-- Última Atualização -->
+
     <div class="card-updated">
       Atualizado ${room.lastUpdate}
     </div>
-    
-    <!-- Botões de Ação -->
+
     <div class="card-actions">
-      <button class="btn-details" data-room-id="${room.id}">
+      <button class="btn-details" data-room-id="${room.id}" type="button">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="10"></circle>
           <line x1="12" y1="16" x2="12" y2="12"></line>
@@ -240,7 +218,8 @@ function createDepartmentCard(room) {
         </svg>
         Detalhes
       </button>
-      <button class="btn-control" data-room-id="${room.id}">
+
+      <button class="btn-control" data-room-id="${room.id}" type="button">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 20h9"></path>
           <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
@@ -249,14 +228,18 @@ function createDepartmentCard(room) {
       </button>
     </div>
   `;
-  
-  // Adicionar event listeners aos botões
+
   const btnDetails = card.querySelector('.btn-details');
   const btnControl = card.querySelector('.btn-control');
-  
-  btnDetails.addEventListener('click', () => goToRoomDetails(room.id));
-  btnControl.addEventListener('click', () => goToRoomControl(room.id));
-  
+
+  btnDetails.addEventListener('click', function () {
+    goToRoomDetails(room.id);
+  });
+
+  btnControl.addEventListener('click', function () {
+    goToRoomControl(room.id);
+  });
+
   return card;
 }
 
@@ -299,7 +282,7 @@ function getStatusIcon(status) {
       </svg>
     `
   };
-  
+
   return icons[status] || icons.normal;
 }
 
@@ -309,25 +292,21 @@ function getStatusIcon(status) {
 
 function setupFilters() {
   const filterBtns = document.querySelectorAll('.filter-btn');
-  
+
   if (filterBtns.length === 0) {
     console.warn('⚠️ Botões de filtro não encontrados');
     return;
   }
-  
+
   filterBtns.forEach(btn => {
-    btn.addEventListener('click', function() {
+    btn.addEventListener('click', function () {
       const filter = this.getAttribute('data-filter');
-      
-      // Remover classe 'active' de todos os botões
+
       filterBtns.forEach(b => b.classList.remove('active'));
-      
-      // Adicionar classe 'active' ao botão clicado
       this.classList.add('active');
-      
-      // Renderizar cards com o filtro aplicado
+
       renderDepartmentCards(filter);
-      
+
       console.log('🔍 Filtro aplicado:', filter);
     });
   });
@@ -339,23 +318,22 @@ function setupFilters() {
 
 function updateStatistics() {
   const totalRooms = Object.keys(departmentsData).length;
-  
+
   let roomsOk = 0;
   let roomsWarning = 0;
   let roomsAlert = 0;
-  
+
   Object.values(departmentsData).forEach(room => {
     if (room.status === 'normal') roomsOk++;
     else if (room.status === 'attention') roomsWarning++;
     else if (room.status === 'alert') roomsAlert++;
   });
-  
-  // Atualizar elementos HTML
+
   const totalEl = document.getElementById('total-rooms');
   const okEl = document.getElementById('rooms-ok');
   const warningEl = document.getElementById('rooms-warning');
   const alertEl = document.getElementById('rooms-alert');
-  
+
   if (totalEl) totalEl.textContent = totalRooms;
   if (okEl) okEl.textContent = roomsOk;
   if (warningEl) warningEl.textContent = roomsWarning;
@@ -363,23 +341,15 @@ function updateStatistics() {
 }
 
 // ========================================
-// NAVEGAÇÃO - BOTÃO "DETALHES"
+// NAVEGAÇÃO
 // ========================================
 
 function goToRoomDetails(roomId) {
   console.log('📍 Navegando para detalhes da sala:', roomId);
-  
-  // Redirecionar para a página HOME com a sala selecionada
-  window.location.href = `dashboard.html?room=${roomId}`;
+  window.location.href = `detalhe_departamento.html?room=${encodeURIComponent(roomId)}`;
 }
-
-// ========================================
-// NAVEGAÇÃO - BOTÃO "CONTROLAR"
-// ========================================
 
 function goToRoomControl(roomId) {
   console.log('🎛️ Navegando para controle da sala:', roomId);
-  
-  // Redirecionar para a página HOME com a sala selecionada e scroll para controles
-  window.location.href = `dashboard.html?room=${roomId}&scroll=control`;
+  window.location.href = `detalhe_departamento.html?room=${encodeURIComponent(roomId)}&scroll=control`;
 }
