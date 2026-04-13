@@ -1,14 +1,22 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="/Sistema_de_Controlo_Ambiental/SCA_front_end/html/Css/style.css" />
-    <script src="/Sistema_de_Controlo_Ambiental/SCA_front_end/html/Js/admin.js" defer></script>
+    <link rel="stylesheet" href="Css/style.css" />
+    <script src="Js/admin.js" defer></script>
   </head>
   <body>
-    <header style="padding:1rem;border-bottom:1px solid var(--border);background:linear-gradient(90deg,#f97316,#3b82f6,#eab308);-webkit-background-clip:text;color:transparent;">
+    <header
+      style="
+        padding: 1rem;
+        border-bottom: 1px solid var(--border);
+        background: linear-gradient(90deg, #f97316, #3b82f6, #eab308);
+        -webkit-background-clip: text;
+        color: transparent;
+      "
+    >
       <h1>Admin Dashboard</h1>
       <small>Gestão completa do sistema</small>
     </header>
@@ -16,10 +24,32 @@
       <div class="card">
         <h2>Utilizadores</h2>
         <button class="btn-primary" id="add-user">Adicionar Utilizador</button>
-        <table style="width:100%;margin-top:1rem;color:var(--text-main);border-collapse:collapse;">
-          <tr><th>Nome</th><th>Email</th><th>Departamento</th><th>Status</th></tr>
-          <tr><td>João Silva</td><td>joao@edificio.com</td><td>Auditório</td><td style="color:var(--success);">Ativo</td></tr>
-          <tr><td>Maria Souza</td><td>maria@edificio.com</td><td>Lab A</td><td style="color:var(--error);">Inativo</td></tr>
+        <table
+          style="
+            width: 100%;
+            margin-top: 1rem;
+            color: var(--text-main);
+            border-collapse: collapse;
+          "
+        >
+          <tr>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Departamento</th>
+            <th>Status</th>
+          </tr>
+          <tr>
+            <td>João Silva</td>
+            <td>joao@edificio.com</td>
+            <td>Auditório</td>
+            <td style="color: var(--success)">Ativo</td>
+          </tr>
+          <tr>
+            <td>Maria Souza</td>
+            <td>maria@edificio.com</td>
+            <td>Lab A</td>
+            <td style="color: var(--error)">Inativo</td>
+          </tr>
         </table>
       </div>
     </main>
