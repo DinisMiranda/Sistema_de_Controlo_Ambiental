@@ -4,7 +4,7 @@
 const TEST_USERS = [
   { email: "admin@edificio.com", password: "admin123", name: "Administrador", role: "admin" },
   { email: "joao@empresa.com", password: "joao123", name: "João Silva", role: "user" },
-  { email: "maria@empresa.com", password: "maria123", name: "Maria Souza", role: "user" },
+  { email: "maria@empresa.com", password: "maria123", name: "Maria Sousa", role: "user" },
 ];
 
 // Garante que o código só corre após o DOM carregar
