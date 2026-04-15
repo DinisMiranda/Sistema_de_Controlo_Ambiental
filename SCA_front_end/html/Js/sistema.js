@@ -82,6 +82,8 @@ const eventsData = [
 ];
 
 document.addEventListener("DOMContentLoaded", () => {
+  checkAdminAccess();
+  setupLogout();
   renderModules();
   renderHealth();
   renderEvents();
@@ -89,6 +91,27 @@ document.addEventListener("DOMContentLoaded", () => {
   setupActions();
   updateHeaderMeta();
 });
+
+// ========================================
+// CONTROLO DE ACESSO ADMIN
+// ========================================
+
+function checkAdminAccess() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const adminLink = document.querySelector(".admin-link");
+
+  if (adminLink) {
+    if (
+      user &&
+      user.email === "admin@edificio.com" &&
+      user.password === "admin123"
+    ) {
+      adminLink.style.display = "block";
+    } else {
+      adminLink.style.display = "none";
+    }
+  }
+}
 
 function renderModules() {
   const container = document.getElementById("modules-list");
@@ -285,5 +308,20 @@ function updateHeaderMeta() {
   const metaLastSync = document.getElementById("meta-last-sync");
   if (metaLastSync) {
     metaLastSync.textContent = new Date().toLocaleString("pt-PT");
+  }
+}
+
+// ========================================
+// LOGOUT
+// ========================================
+
+function setupLogout() {
+  const logoutBtn = document.getElementById("logout-btn");
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", function () {
+      localStorage.removeItem("user");
+      window.location.href = "login.html";
+    });
   }
 }

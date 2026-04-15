@@ -39,39 +39,49 @@ userForm.addEventListener("submit", (e) => {
   const name = document.getElementById("user-name").value.trim();
   const email = document.getElementById("user-email").value.trim();
   const department = document.getElementById("user-department").value.trim();
-  const status = document.getElementById("user-status").value;
+  const role = document.getElementById("user-role").value;
+  const password = document.getElementById("user-password").value;
 
   // Validate inputs
-  if (!name || !email || !department) {
+  if (!name || !email || !department || !password) {
     alert("Por favor, preencha todos os campos.");
     return;
   }
 
+  // Validate password strength
+  if (password.length < 6) {
+    alert("A password deve ter pelo menos 6 caracteres.");
+    return;
+  }
+
   // Add new user to table
-  addUserToTable(name, email, department, status);
+  addUserToTable(name, email, department, role, password);
 
   // Close modal and reset form
   userModal.style.display = "none";
   userForm.reset();
 
   // Optional: Send to backend API
-  // sendUserToBackend({ name, email, department, status });
+  // sendUserToBackend({ name, email, department, role, password });
 });
 
 // Function to add user to table
-function addUserToTable(name, email, department, status) {
+function addUserToTable(name, email, department, role, password) {
   const table = document.querySelector("table");
   const newRow = table.insertRow(-1);
 
-  const statusColor = status === "Ativo" ? "var(--success)" : "var(--error)";
+  const roleColor = role === "Admin" ? "var(--accent-orange)" : "var(--text-secondary)";
 
   newRow.innerHTML = `
     <td>${name}</td>
     <td>${email}</td>
     <td>${department}</td>
-    <td style="color: ${statusColor}">${status}</td>
+    <td style="color: ${roleColor}">${role}</td>
     <td style="text-align: center;"><button class="delete-btn" style="background: none; border: none; color: var(--error); font-size: 1.2rem; cursor: pointer; padding: 0;">✕</button></td>
   `;
+  
+  // Store password in data attribute (consider using secure method for production)
+  newRow.dataset.password = password;
   
   // Add delete button event listener
   const deleteBtn = newRow.querySelector(".delete-btn");
@@ -138,3 +148,12 @@ function sendUserToBackend(userData) {
   });
 }
 */
+
+// Color existing rows based on role
+document.querySelectorAll("table tr:not(:first-child)").forEach((row) => {
+  const roleCell = row.cells[3];
+  if (roleCell) {
+    const role = roleCell.textContent.trim();
+    roleCell.style.color = role === "Admin" ? "var(--accent-orange)" : "var(--text-secondary)";
+  }
+});

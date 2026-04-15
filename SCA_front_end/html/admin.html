@@ -15,10 +15,24 @@
         background: linear-gradient(90deg, #f97316, #3b82f6, #eab308);
         -webkit-background-clip: text;
         color: transparent;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
       "
     >
-      <h1>Admin Dashboard</h1>
-      <small>Gestão completa do sistema</small>
+      <div>
+        <h1>Admin Dashboard</h1>
+        <small>Gestão completa do sistema</small>
+      </div>
+      <a href="dashboard.html" style="
+        padding: 0.75rem 1.5rem;
+        background: var(--primary);
+        color: white;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: 600;
+        cursor: pointer;
+      ">🏠 Return to Dashboard</a>
     </header>
     <main class="content">
       <div class="card">
@@ -36,21 +50,29 @@
             <th>Nome</th>
             <th>Email</th>
             <th>Departamento</th>
-            <th>Status</th>
+            <th>Role</th>
           </tr>
           <tr>
             <td>João Silva</td>
             <td>joao@edificio.com</td>
             <td>Auditório</td>
-            <td style="color: var(--success)">Ativo</td>
+            <td style="color: var(--text-secondary)">User</td>
             <td style="text-align: center;"><button class="delete-btn" style="background: none; border: none; color: var(--error); font-size: 1.2rem; cursor: pointer; padding: 0;">✕</button></td>
           </tr>
           <tr>
             <td>Maria Sousa</td>
             <td>maria@edificio.com</td>
             <td>Lab A</td>
-            <td style="color: var(--error)">Inativo</td>
+            <td style="color: var(--text-secondary)">User</td>
             <td style="text-align: center;"><button class="delete-btn" style="background: none; border: none; color: var(--error); font-size: 1.2rem; cursor: pointer; padding: 0;">✕</button></td>
+          </tr>
+          <tr>
+            <td>Carlos Pereira</td>
+            <td>admin@edificio.com</td>
+            <td>Administração</td>
+            <td style="color: var(--accent-orange)">Admin</td>
+            <td style="text-align: center;"><button class="delete-btn" style="background: none; border: none; color: var(--error); font-size: 1.2rem; cursor: pointer; padding: 0;">✕</button></td>
+          </tr>
           </tr>
         </table>
       </div>
@@ -228,16 +250,16 @@
           </div>
           <div>
             <label
-              for="user-status"
+              for="user-role"
               style="
                 display: block;
                 margin-bottom: 0.5rem;
                 color: var(--text-main);
               "
-              >Status:</label
+              >Role:</label
             >
             <select
-              id="user-status"
+              id="user-role"
               required
               style="
                 width: 100%;
@@ -248,9 +270,33 @@
                 color: var(--text-main);
               "
             >
-              <option value="Ativo">Ativo</option>
-              <option value="Inativo">Inativo</option>
+              <option value="User">User</option>
+              <option value="Admin">Admin</option>
             </select>
+          </div>
+          <div>
+            <label
+              for="user-password"
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text-main);
+              "
+              >Palavra-passe:</label
+            >
+            <input
+              type="password"
+              id="user-password"
+              required
+              style="
+                width: 100%;
+                padding: 0.5rem;
+                border: 1px solid var(--border);
+                border-radius: 4px;
+                background: var(--bg-main);
+                color: var(--text-main);
+              "
+            />
           </div>
           <div style="display: flex; gap: 1rem; justify-content: flex-end">
             <button

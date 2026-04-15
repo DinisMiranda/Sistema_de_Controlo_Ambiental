@@ -2,10 +2,44 @@
    UTILIZADORES DE TESTE
 ================================ */
 const TEST_USERS = [
-  { email: "admin@edificio.com", password: "admin123", name: "Administrador", role: "admin" },
-  { email: "joao@empresa.com", password: "joao123", name: "João Silva", role: "user" },
-  { email: "maria@empresa.com", password: "maria123", name: "Maria Sousa", role: "user" },
+  {
+    email: "admin@edificio.com",
+    password: "admin123",
+    name: "Administrador",
+    role: "admin",
+  },
+  {
+    email: "joao@empresa.com",
+    password: "joao123",
+    name: "João Silva",
+    role: "user",
+  },
+  {
+    email: "maria@empresa.com",
+    password: "maria123",
+    name: "Maria Sousa",
+    role: "user",
+  },
+  {    
+    email: "admin@edificio.com",
+    password: "admin123",
+    name: "Administrador",
+    role: "admin",
+  }
 ];
+
+// Function to get all users (test + admin-added users)
+function getAllUsers() {
+  let allUsers = [...TEST_USERS];
+  
+  // Get users added from admin panel
+  const addedUsers = JSON.parse(localStorage.getItem("addedUsers")) || [];
+  
+  // Merge with test users
+  allUsers = allUsers.concat(addedUsers);
+  
+  return allUsers;
+}
 
 // Garante que o código só corre após o DOM carregar
 document.addEventListener("DOMContentLoaded", () => {
@@ -22,7 +56,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
 
-    const found = TEST_USERS.find((u) => u.email === email && u.password === password);
+    // Get all users (including ones added in admin panel)
+    const allUsers = getAllUsers();
+    
+    const found = allUsers.find(
+      (u) => u.email === email && u.password === password,
+    );
 
     if (!found) {
       showError("Email ou senha incorretos.");
@@ -31,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     localStorage.setItem("user", JSON.stringify(found));
 
-    if (found.role === "admin") window.location.href = "admin.html";
+    if (found.role === "login") window.location.href = "login.html";
     else window.location.href = "dashboard.html";
   });
 
@@ -43,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Redireciona apenas se estivermos na página de login
   const user = JSON.parse(localStorage.getItem("user"));
   if (user && window.location.pathname.includes("login.html")) {
-    if (user.role === "admin") window.location.href = "admin.html";
+    if (user.role === "login") window.location.href = "login.html";
     else window.location.href = "dashboard.html";
   }
 });

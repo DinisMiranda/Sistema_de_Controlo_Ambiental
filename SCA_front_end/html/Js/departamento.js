@@ -3,100 +3,123 @@
 // ========================================
 
 const departmentsData = {
-  'sala-101': {
-    id: 'sala-101',
-    name: 'Sala 101',
-    badge: 'Ativo',
+  "sala-101": {
+    id: "sala-101",
+    name: "Sala 101",
+    badge: "Ativo",
     temperature: 22.5,
     humidity: 45,
     lightingOn: 30,
     lightingTotal: 42,
-    status: 'normal',
-    statusText: 'Ambiente Normal',
-    lastUpdate: 'há 2 minutos'
+    status: "normal",
+    statusText: "Ambiente Normal",
+    lastUpdate: "há 2 minutos",
   },
-  'sala-102': {
-    id: 'sala-102',
-    name: 'Sala 102',
-    badge: 'Ativo',
+  "sala-102": {
+    id: "sala-102",
+    name: "Sala 102",
+    badge: "Ativo",
     temperature: 23.1,
     humidity: 42,
     lightingOn: 25,
     lightingTotal: 38,
-    status: 'normal',
-    statusText: 'Ambiente Normal',
-    lastUpdate: 'há 1 minuto'
+    status: "normal",
+    statusText: "Ambiente Normal",
+    lastUpdate: "há 1 minuto",
   },
-  'sala-201': {
-    id: 'sala-201',
-    name: 'Sala 201',
-    badge: 'Ativo',
+  "sala-201": {
+    id: "sala-201",
+    name: "Sala 201",
+    badge: "Ativo",
     temperature: 21.8,
     humidity: 48,
     lightingOn: 18,
     lightingTotal: 28,
-    status: 'normal',
-    statusText: 'Ambiente Normal',
-    lastUpdate: 'há 3 minutos'
+    status: "normal",
+    statusText: "Ambiente Normal",
+    lastUpdate: "há 3 minutos",
   },
-  'auditorio': {
-    id: 'auditorio',
-    name: 'Auditório Principal',
-    badge: 'Em Uso',
+  auditorio: {
+    id: "auditorio",
+    name: "Auditório Principal",
+    badge: "Em Uso",
     temperature: 26.5,
     humidity: 38,
     lightingOn: 42,
     lightingTotal: 42,
-    status: 'alert',
-    statusText: 'Temperatura Elevada',
-    lastUpdate: 'há 1 minuto'
+    status: "alert",
+    statusText: "Temperatura Elevada",
+    lastUpdate: "há 1 minuto",
   },
-  'laboratorio': {
-    id: 'laboratorio',
-    name: 'Laboratório A',
-    badge: 'Ativo',
+  laboratorio: {
+    id: "laboratorio",
+    name: "Laboratório A",
+    badge: "Ativo",
     temperature: 20.2,
     humidity: 52,
     lightingOn: 28,
     lightingTotal: 28,
-    status: 'attention',
-    statusText: 'Umidade Elevada',
-    lastUpdate: 'há 5 minutos'
-  }
+    status: "attention",
+    statusText: "Umidade Elevada",
+    lastUpdate: "há 5 minutos",
+  },
 };
 
 // ========================================
 // INICIALIZAÇÃO
 // ========================================
 
-document.addEventListener('DOMContentLoaded', function () {
-  console.log('🏢 Página de Departamentos inicializando...');
+document.addEventListener("DOMContentLoaded", function () {
+  console.log("🏢 Página de Departamentos inicializando...");
 
+  checkAdminAccess();
+  setupLogout();
   renderDepartmentCards();
   setupFilters();
   updateStatistics();
 
-  console.log('✅ Departamentos carregados com sucesso!');
+  console.log("✅ Departamentos carregados com sucesso!");
 });
+
+// ========================================
+// CONTROLO DE ACESSO ADMIN
+// ========================================
+
+function checkAdminAccess() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const adminLink = document.querySelector(".admin-link");
+
+  if (adminLink) {
+    if (
+      user &&
+      user.email === "admin@edificio.com" &&
+      user.password === "admin123"
+    ) {
+      adminLink.style.display = "block";
+    } else {
+      adminLink.style.display = "none";
+    }
+  }
+}
 
 // ========================================
 // RENDERIZAR CARDS DE DEPARTAMENTOS
 // ========================================
 
-function renderDepartmentCards(filter = 'all') {
-  const grid = document.getElementById('departments-grid');
-  const noResults = document.getElementById('no-results');
+function renderDepartmentCards(filter = "all") {
+  const grid = document.getElementById("departments-grid");
+  const noResults = document.getElementById("no-results");
 
   if (!grid) {
-    console.error('❌ Grid de departamentos não encontrado');
+    console.error("❌ Grid de departamentos não encontrado");
     return;
   }
 
-  grid.innerHTML = '';
+  grid.innerHTML = "";
 
   let cardsRendered = 0;
 
-  Object.values(departmentsData).forEach(room => {
+  Object.values(departmentsData).forEach((room) => {
     if (!shouldShowRoom(room, filter)) {
       return;
     }
@@ -107,11 +130,11 @@ function renderDepartmentCards(filter = 'all') {
   });
 
   if (cardsRendered === 0) {
-    if (noResults) noResults.style.display = 'flex';
-    grid.style.display = 'none';
+    if (noResults) noResults.style.display = "flex";
+    grid.style.display = "none";
   } else {
-    if (noResults) noResults.style.display = 'none';
-    grid.style.display = 'grid';
+    if (noResults) noResults.style.display = "none";
+    grid.style.display = "grid";
   }
 
   console.log(`📊 ${cardsRendered} cards renderizados (filtro: ${filter})`);
@@ -122,17 +145,17 @@ function renderDepartmentCards(filter = 'all') {
 // ========================================
 
 function shouldShowRoom(room, filter) {
-  if (filter === 'all') return true;
+  if (filter === "all") return true;
 
-  if (filter === 'temperature') {
+  if (filter === "temperature") {
     return room.temperature < 20 || room.temperature > 24;
   }
 
-  if (filter === 'humidity') {
+  if (filter === "humidity") {
     return room.humidity < 40 || room.humidity > 60;
   }
 
-  if (filter === 'light') {
+  if (filter === "light") {
     return true;
   }
 
@@ -144,13 +167,15 @@ function shouldShowRoom(room, filter) {
 // ========================================
 
 function createDepartmentCard(room) {
-  const card = document.createElement('div');
+  const card = document.createElement("div");
   card.className = `department-card status-${room.status}`;
-  card.setAttribute('data-room-id', room.id);
-  card.setAttribute('data-temperature', room.temperature);
-  card.setAttribute('data-humidity', room.humidity);
+  card.setAttribute("data-room-id", room.id);
+  card.setAttribute("data-temperature", room.temperature);
+  card.setAttribute("data-humidity", room.humidity);
 
-  const lightPercentage = Math.round((room.lightingOn / room.lightingTotal) * 100);
+  const lightPercentage = Math.round(
+    (room.lightingOn / room.lightingTotal) * 100,
+  );
   const tempClass = getTempAlertClass(room.temperature);
   const humidityClass = getHumidityAlertClass(room.humidity);
 
@@ -229,14 +254,14 @@ function createDepartmentCard(room) {
     </div>
   `;
 
-  const btnDetails = card.querySelector('.btn-details');
-  const btnControl = card.querySelector('.btn-control');
+  const btnDetails = card.querySelector(".btn-details");
+  const btnControl = card.querySelector(".btn-control");
 
-  btnDetails.addEventListener('click', function () {
+  btnDetails.addEventListener("click", function () {
     goToRoomDetails(room.id);
   });
 
-  btnControl.addEventListener('click', function () {
+  btnControl.addEventListener("click", function () {
     goToRoomControl(room.id);
   });
 
@@ -248,15 +273,15 @@ function createDepartmentCard(room) {
 // ========================================
 
 function getTempAlertClass(temp) {
-  if (temp < 18 || temp > 26) return 'alert';
-  if (temp < 20 || temp > 24) return 'warning';
-  return '';
+  if (temp < 18 || temp > 26) return "alert";
+  if (temp < 20 || temp > 24) return "warning";
+  return "";
 }
 
 function getHumidityAlertClass(humidity) {
-  if (humidity < 35 || humidity > 65) return 'alert';
-  if (humidity < 40 || humidity > 60) return 'warning';
-  return '';
+  if (humidity < 35 || humidity > 65) return "alert";
+  if (humidity < 40 || humidity > 60) return "warning";
+  return "";
 }
 
 function getStatusIcon(status) {
@@ -280,7 +305,7 @@ function getStatusIcon(status) {
         <line x1="12" y1="8" x2="12" y2="12"></line>
         <line x1="12" y1="16" x2="12.01" y2="16"></line>
       </svg>
-    `
+    `,
   };
 
   return icons[status] || icons.normal;
@@ -291,23 +316,23 @@ function getStatusIcon(status) {
 // ========================================
 
 function setupFilters() {
-  const filterBtns = document.querySelectorAll('.filter-btn');
+  const filterBtns = document.querySelectorAll(".filter-btn");
 
   if (filterBtns.length === 0) {
-    console.warn('⚠️ Botões de filtro não encontrados');
+    console.warn("⚠️ Botões de filtro não encontrados");
     return;
   }
 
-  filterBtns.forEach(btn => {
-    btn.addEventListener('click', function () {
-      const filter = this.getAttribute('data-filter');
+  filterBtns.forEach((btn) => {
+    btn.addEventListener("click", function () {
+      const filter = this.getAttribute("data-filter");
 
-      filterBtns.forEach(b => b.classList.remove('active'));
-      this.classList.add('active');
+      filterBtns.forEach((b) => b.classList.remove("active"));
+      this.classList.add("active");
 
       renderDepartmentCards(filter);
 
-      console.log('🔍 Filtro aplicado:', filter);
+      console.log("🔍 Filtro aplicado:", filter);
     });
   });
 }
@@ -323,16 +348,16 @@ function updateStatistics() {
   let roomsWarning = 0;
   let roomsAlert = 0;
 
-  Object.values(departmentsData).forEach(room => {
-    if (room.status === 'normal') roomsOk++;
-    else if (room.status === 'attention') roomsWarning++;
-    else if (room.status === 'alert') roomsAlert++;
+  Object.values(departmentsData).forEach((room) => {
+    if (room.status === "normal") roomsOk++;
+    else if (room.status === "attention") roomsWarning++;
+    else if (room.status === "alert") roomsAlert++;
   });
 
-  const totalEl = document.getElementById('total-rooms');
-  const okEl = document.getElementById('rooms-ok');
-  const warningEl = document.getElementById('rooms-warning');
-  const alertEl = document.getElementById('rooms-alert');
+  const totalEl = document.getElementById("total-rooms");
+  const okEl = document.getElementById("rooms-ok");
+  const warningEl = document.getElementById("rooms-warning");
+  const alertEl = document.getElementById("rooms-alert");
 
   if (totalEl) totalEl.textContent = totalRooms;
   if (okEl) okEl.textContent = roomsOk;
@@ -345,11 +370,26 @@ function updateStatistics() {
 // ========================================
 
 function goToRoomDetails(roomId) {
-  console.log('📍 Navegando para detalhes da sala:', roomId);
+  console.log("📍 Navegando para detalhes da sala:", roomId);
   window.location.href = `detalhe_departamento.html?room=${encodeURIComponent(roomId)}`;
 }
 
 function goToRoomControl(roomId) {
-  console.log('🎛️ Navegando para controle da sala:', roomId);
+  console.log("🎛️ Navegando para controle da sala:", roomId);
   window.location.href = `detalhe_departamento.html?room=${encodeURIComponent(roomId)}&scroll=control`;
+}
+
+// ========================================
+// LOGOUT
+// ========================================
+
+function setupLogout() {
+  const logoutBtn = document.getElementById("logout-btn");
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", function () {
+      localStorage.removeItem("user");
+      window.location.href = "login.html";
+    });
+  }
 }
