@@ -544,3 +544,12 @@ a:hover {
   color: var(--text-secondary);
   font-size: 0.9rem;
 }
+
+th {
+  bottom: 0.5rem;
+}
+
+td {
+  height: 1.5rem;
+  text-align: center;
+}
