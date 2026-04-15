@@ -44,6 +44,28 @@ ACOES_SISTEMA_FIELDNAMES = (
 TIPO_CLASSE_ACAO = "Acao_sistema"
 ACAO_TIPOS: list[str] = [row[1] for row in TIPOS_CATALOG if row[0] == TIPO_CLASSE_ACAO]
 
+# ``faker.sentence()`` usa texto Lorem (latim) mesmo com locale pt_PT; motivos são PT fixos.
+MOTIVOS_PT: tuple[str, ...] = (
+    "Comando manual na aplicação.",
+    "Agendamento (horário de conforto).",
+    "Regra automática por limiar de sensor.",
+    "Pedido após deteção de ausência.",
+    "Corte por proteção de circuito.",
+    "Restabelecimento após teste de segurança.",
+    "Ajuste por consigna de climatização.",
+    "Reforço de ventilação por humidade elevada.",
+    "Redução de iluminação por luz natural suficiente.",
+    "Aumento de iluminação por pouca luminosidade.",
+    "Modo noturno ativo.",
+    "Integração com sistema de presença.",
+    "Manutenção programada concluída.",
+    "Teste de atuador após intervenção.",
+    "Resposta a alerta de consumo.",
+    "Sincronização com calendário semanal.",
+    "Pedido do utilizador administrador.",
+    "Correção após leitura anómala.",
+)
+
 
 def clip(text: str, max_len: int) -> str:
     t = text.strip()
@@ -212,6 +234,10 @@ def _sample_tipo_acao_valor(tipos_tipo: str) -> tuple[str, str]:
     return ("CMD", "1")
 
 
+def _sample_motivo_pt() -> str:
+    return clip(random.choice(MOTIVOS_PT), 500)
+
+
 def build_acoes_rows(faker: Faker, n: int, max_atuador_id: int) -> list[list[str]]:
     rows: list[list[str]] = []
     for _ in range(n):
@@ -220,11 +246,7 @@ def build_acoes_rows(faker: Faker, n: int, max_atuador_id: int) -> list[list[str
         tipo_acao = clip(tipo_acao, 50)
         valor_aplicado = clip(valor_aplicado, 50)
         id_atuador = random.randint(1, max_atuador_id)
-        motivo = (
-            ""
-            if random.random() < 0.35
-            else clip(faker.sentence(nb_words=8), 500)
-        )
+        motivo = "" if random.random() < 0.35 else _sample_motivo_pt()
         ts = faker.date_time_between(start_date="-90d", end_date="now")
         ts_str = ts.strftime("%Y-%m-%d %H:%M:%S")
         rows.append(
