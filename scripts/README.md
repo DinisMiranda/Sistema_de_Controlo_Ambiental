@@ -120,6 +120,13 @@ cd /caminho/para/Sistema_de_Controlo_Ambiental/scripts
 
 Insert **`Tipos`** before **`sensores`**, **`atuadores`**, and **`acoes_sistema`** (FKs referenciam `Tipos.classe` / `Tipos.tipo`). Garante que existem linhas `Acao_sistema` / … antes de inserir `acoes_sistema`.
 
+### Import safety checklist
+
+1. **`Tipos`** — Use the **full** catalog (default or `NUM_TIPOS=15`) before loading `sensores`, `atuadores`, or future `acoes_sistema`. A partial export (`-n` too small) breaks foreign keys (see warnings from `seed_tipos.py` on stderr).
+2. **`Utilizadores.palavra_passe_hash`** — Values are **not** production password hashes (bcrypt/Argon2); only for demos and local DBs.
+3. **`Casa_Administradores`** — `id_casa` / `id_utilizador` must match real `AUTO_INCREMENT` values after you load **`casas`** and **`Utilizadores`** in order with **no gaps** you did not account for. Prefer `seed_casa_administradores.py --casas-csv` / `--utilizadores-csv` so bounds follow your CSV row counts.
+4. **Column names** — MySQL column `descrição` in `Tipos` may need backticks in `INSERT`; map CSV `descricao` accordingly.
+
 ### Related files
 
 - `.env.example` — template for `scripts/.env`
