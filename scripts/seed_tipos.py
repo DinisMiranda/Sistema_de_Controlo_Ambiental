@@ -284,8 +284,27 @@ def main() -> None:
         full = len(TIPOS_CATALOG)
         if len(selected) < full:
             print(
-                f"Note: CSV has only the first {len(selected)} of {full} catalog rows "
-                f"(sensors + actuators). Omit -n and NUM_TIPOS for the full Tipos file.",
+                f"Note: CSV has only the first {len(selected)} of {full} catalog rows.",
+                file=sys.stderr,
+            )
+            n = len(selected)
+            if n < 4:
+                print(
+                    "  Warning: n < 4 — missing Sensor Tipos; loading sensores will fail FK checks.",
+                    file=sys.stderr,
+                )
+            elif n < 8:
+                print(
+                    "  Warning: n < 8 — missing Atuador Tipos; loading atuadores will fail FK checks.",
+                    file=sys.stderr,
+                )
+            elif n < 15:
+                print(
+                    "  Warning: n < 15 — missing Acao_sistema Tipos; loading acoes_sistema will fail FK checks later.",
+                    file=sys.stderr,
+                )
+            print(
+                "  Omit -n / set NUM_TIPOS=15 for the full Tipos file.",
                 file=sys.stderr,
             )
 
