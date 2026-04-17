@@ -13,9 +13,16 @@ Execução (na pasta ``scripts/``)::
     .venv/bin/python seed_casa_administradores.py
     .venv/bin/python seed_casa_administradores.py -n 30
     .venv/bin/python seed_casa_administradores.py -n 15 --seed 42
+    .venv/bin/python seed_casa_administradores.py --casas-csv generated/casas_examination.csv \\
+        --utilizadores-csv generated/utilizadores_examination.csv
 
 Env opcional: ``NUM_CASA_ADMIN_PARES``, ``NUM_CASAS``, ``NUM_UTILIZADORES`` (limites dos
 IDs), ``CASA_ADMIN_OUTPUT``.
+
+``--casas-csv`` / ``--utilizadores-csv`` definem o maior ID como o número de linhas de
+dados (excluindo cabeçalho) nos CSV gerados por ``seed_casas.py`` / ``seed_utilizadores.py``,
+desde que importes na mesma ordem (id 1 = primeira linha). ``--max-casa-id`` /
+``--max-utilizador-id`` sobrepõem estes valores.
 """
 
 from __future__ import annotations
@@ -66,6 +73,20 @@ def parse_args() -> argparse.Namespace:
         help="maior id_utilizador válido (sobrepõe NUM_UTILIZADORES; default 20)",
     )
     parser.add_argument(
+        "--casas-csv",
+        type=Path,
+        default=None,
+        metavar="PATH",
+        help="CSV de casas: max id_casa = linhas de dados (sem cabeçalho); ignorado se --max-casa-id",
+    )
+    parser.add_argument(
+        "--utilizadores-csv",
+        type=Path,
+        default=None,
+        metavar="PATH",
+        help="CSV de utilizadores: max id = linhas de dados; ignorado se --max-utilizador-id",
+    )
+    parser.add_argument(
         "-o",
         "--output",
         type=Path,
@@ -94,6 +115,18 @@ def load_env_from_script_dir(base_dir: Path) -> None:
         load_dotenv(env_path)
 
 
+def count_csv_data_rows(path: Path) -> int:
+    """Número de linhas de dados após o cabeçalho (primeira linha)."""
+    if not path.is_file():
+        raise SystemExit(f"Ficheiro CSV não encontrado: {path}")
+    with path.open(encoding="utf-8", newline="") as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        if header is None:
+            return 0
+        return sum(1 for _ in reader)
+
+
 def parse_int_env(var_name: str, default: int) -> int:
     raw = os.getenv(var_name)
     if raw is None:
@@ -118,12 +151,19 @@ class CasaAdminConfig:
 
 
 def resolve_config(args: argparse.Namespace, base_dir: Path) -> CasaAdminConfig:
-    max_casa = args.max_casa_id if args.max_casa_id is not None else parse_int_env("NUM_CASAS", 10)
-    max_user = (
-        args.max_utilizador_id
-        if args.max_utilizador_id is not None
-        else parse_int_env("NUM_UTILIZADORES", 20)
-    )
+    if args.max_casa_id is not None:
+        max_casa = args.max_casa_id
+    elif args.casas_csv is not None:
+        max_casa = count_csv_data_rows(args.casas_csv)
+    else:
+        max_casa = parse_int_env("NUM_CASAS", 10)
+
+    if args.max_utilizador_id is not None:
+        max_user = args.max_utilizador_id
+    elif args.utilizadores_csv is not None:
+        max_user = count_csv_data_rows(args.utilizadores_csv)
+    else:
+        max_user = parse_int_env("NUM_UTILIZADORES", 20)
     if max_casa < 1 or max_user < 1:
         raise SystemExit("NUM_CASAS / NUM_UTILIZADORES (limites de id) têm de ser >= 1.")
 
