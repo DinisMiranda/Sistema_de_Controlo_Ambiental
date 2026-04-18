@@ -1,21 +1,21 @@
 nome,email,palavra_passe_hash,data_criacao,admin
-Luana Freitas,luana.freitas@example.pt,demo:a4b596c4d9d3c759f4f8f6215ea895f9f47586817f811370f152d3f5c87f2575,2025-05-30 17:46:23,0
-Violeta Fernandes,violeta.fernandes@example.pt,demo:557c8bd77f7254de91767e7214eb2bddfd3b2a2e7468efe6523a5f83c1c94fa1,2025-10-06 15:15:09,0
-Núria de Sousa,nuria.sousa@example.pt,demo:75c57f85cd7ad2d06fe997493a76dd9e3c6121a1e9e1e04194b736e536bec1f8,2026-01-25 04:45:56,0
-Érica Figueiredo,erica.figueiredo@example.pt,demo:ee3330312a8d03e432f1cf44dcdd4cb4e53e55bda23cd48e65040c85bf57d39e,2025-09-08 16:30:57,0
-Tomás da Correia,tomas.correia@example.pt,demo:e287b552ba71371c5b2b37b973eab71c399cb0f73a1c2e5975c309e6ac6bb223,2026-03-21 06:50:19,0
-Marco Anjos,marco.anjos@example.pt,demo:9f41811143eafd008a88c9d28e6a5eaf1c7c19a6c9dd4c2ce7a9c059cfae8120,2025-05-02 16:30:51,0
-Teresa Pacheco,teresa.pacheco@example.pt,demo:2a518a52f44311df0d53b1c6b57f0a6d5e55e8b17ae0fa65fe55defe2dade185,2025-05-01 02:25:30,0
-Lisandro Lopes-Brito,lisandro.lopesbrito@example.pt,demo:735662e78ebab2e053954465b763ac7be79f364012b6a4f2ea795df6b1ccfbcc,2025-09-08 13:17:51,0
-Ricardo Neves-Teixeira,ricardo.nevesteixeira@example.pt,demo:b264970a8c8c3830b75406d2319a4fe587e264ff42d35eec8e49f7e85604196a,2026-02-14 12:09:34,0
-Petra Silva,petra.silva@example.pt,demo:e209ea92b560a45b9f71a5ebbb71683ce8f8c7d75d43d3a62e81d3433da7bf0d,2025-04-21 04:03:54,0
-Nádia Macedo,nadia.macedo@example.pt,demo:7cdc796a51d92f71f5d8d4e3cc078118c586f7a6e63f174f8cdd15be011e4719,2025-12-20 17:50:48,0
-Leandro Vieira,leandro.vieira@example.pt,demo:c9c87e660237733440774dc1527e805912d302e71ca6a805c9f07a628e2950f1,2025-09-05 23:56:19,0
-Xavier Matos,xavier.matos@example.pt,demo:da2ba951163d2f4781d6c4f7accf2acc6043449f8f19281907f995c5f0e1ef4e,2025-12-03 16:28:51,0
-Ângelo Jesus,angelo.jesus@example.pt,demo:91881155c753d3f374642ab3bf102487163d7753095d6733daa5de54517465a8,2025-07-03 04:27:26,0
-Amélia do Pinheiro,amelia.pinheiro@example.pt,demo:ea95eb96e6915ffbaf0f969037a1a18f8e366fc1a330486af697008a06583228,2026-03-15 09:23:51,0
-Helena Lourenço,helena.lourenco@example.pt,demo:989ce5de0cf4265a1fad184b3d7f7625a88636e0cb3b3ebfe288fa484e600ae0,2025-06-29 22:08:52,0
-Vicente de Almeida,vicente.almeida@example.pt,demo:d88b84052b172f923befd9fb2b5dbc33419fe18ee070f6bd9764ddaf16b32c4e,2025-11-30 17:52:15,1
-Ismael Sá,ismael.sa@example.pt,demo:909671763de8366b30b705a073c35f8d058716b9c47eeb7a908e523734042197,2025-10-28 09:54:24,0
-Renata Lourenço,renata.lourenco@example.pt,demo:aa86dc1848527afb8c63d2259fce59016638455dbccaa7665056f95723fe76d0,2025-10-31 21:09:31,0
-Nicole Assunção,nicole.assuncao@example.pt,demo:0e319a8b7e7fd518a061ed72cc9817d8e27a1e4bbe8b77db8ca5c9b0f0a46dba,2025-07-27 14:13:09,0
+Vitória da Lopes,vitoria.lopes@example.pt,demo:595f92b2ae1c9ba0818e7a2398d1909d2580ec8573af852166c9cfbbdeda22dd,2025-06-18 18:45:26,0
+Isabela Baptista,isabela.baptista@example.pt,demo:8b010f43d76b73edb5eccd531ea15ce3ff27c01d979e7f6e81b3c4952e2318d1,2025-12-26 01:01:50,0
+Júlia Amaral-Monteiro,julia.amaralmonteiro@example.pt,demo:2b31eaabd0e43c7867b3c858b3613fa3c163374b9f2bb06b91689d5cb767827e,2025-11-29 00:45:20,0
+Iara-Jéssica Magalhães,iarajessica.magalhaes@example.pt,demo:fe060e78f525035f04c4745697270dbc2e46c763bd4bb6b0c9e35c567bb522dc,2026-02-09 18:46:19,0
+Andreia Vieira,andreia.vieira@example.pt,demo:12f0ecae59f8acba1f48bb0bbf239a1926014f0ffbc2a42dcd068dcbe29b1afd,2025-05-12 09:39:59,0
+Wilson Baptista,wilson.baptista@example.pt,demo:5d609b7989736a270eb61797a150bb9c90e3705a10f13861689131713342525c,2025-05-05 00:50:12,0
+Nicole do Fernandes,nicole.fernandes@example.pt,demo:4d4c112939adbf6bc4670c10d0ea4e95d7afcc589729bd3913c8611f823d7a96,2025-12-21 01:15:43,0
+Lucas Henriques,lucas.henriques@example.pt,demo:480115b89c2a3e0c432028acf6f31de7b51c4f21c8db105532f8634629745159,2025-08-20 22:51:07,0
+Carlos Pereira,carlos.pereira@example.pt,demo:82cd78dbcded8fe4bb70cd2602b87b2fcd414b36d52fd6d47b562b0cff500790,2025-06-04 02:32:03,0
+Erika Pinho,erika.pinho@example.pt,demo:24964f9c47d9b81a5411a3384108a0ac55c1c754d4e2427fe8154f280b2747de,2025-05-05 00:29:39,0
+Soraia-Bianca Lopes,soraiabianca.lopes@example.pt,demo:f757238255ed6a8d0e4377480e144eba1da185e772aa9aee19257da691ffcc12,2026-01-20 23:53:04,0
+Gabriela Henriques,gabriela.henriques@example.pt,demo:c29c3936cf4919a3951881410a7c2945d0871b7d2100751155c01000271919c1,2025-10-19 16:54:56,1
+Violeta Vaz,violeta.vaz@example.pt,demo:94eb8a5090ef25aa3ad1ac7f854dba83572afe90f47a12018cf9fa587ed158a1,2025-08-01 09:50:35,0
+Renata-Constança Neves,renataconstanca.neves@example.pt,demo:bc4be78e9f488e9d4537ae2888744c876983840ad3f44857b237107ea968489e,2026-02-20 14:49:34,0
+Andreia Figueiredo,andreia.figueiredo@example.pt,demo:e7a6c5a9103d01182ae799f3437f67735697da6bb67ddd0f34d4fafd7ae7c2fe,2025-12-06 07:00:07,0
+Matias da Mota,matias.mota@example.pt,demo:82973b34803e1be802b1e30d112f43955957e68117bbe19f2e336e5d0b2dba4d,2025-12-29 21:14:50,0
+Nair Costa,nair.costa@example.pt,demo:5ee5941b0181299b6d732d69a43d7b194bb2572023ea020a57239721c4d51f2b,2026-02-03 07:15:56,0
+Anita Magalhães,anita.magalhaes@example.pt,demo:6f3f6d28ad907cc9ba012812603b025e5d367a0d2ee734ea81d5bab0cd44a633,2026-04-14 19:49:56,0
+Renato Matias,renato.matias@example.pt,demo:c5e4af002664aad6b4112debf68b1fa104edfe06db25265595fe10f9b6c7c8fc,2025-07-16 10:31:28,0
+José Carneiro,jose.carneiro@example.pt,demo:934c656d1f547b11d2206d445d0f49b2381e847ea94ee0610841fced862e2ca2,2025-04-27 20:42:06,0

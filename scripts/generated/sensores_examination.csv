@@ -1,21 +1,21 @@
 nome,tipo_sensor,localizacao,estado,data_instalacao,Tipos_classe,Tipos_tipo
-Sensor — Consumo_energetico_kWh (Marquise),Consumo_energetico_kWh,Marquise,ativo,2023-05-19,Sensor,Consumo_energetico_kWh
-Sensor — Humidade_relativa (Sala de estar — Av Batista),Humidade_relativa,Sala de estar — Av Batista,manutenção,2022-11-07,Sensor,Humidade_relativa
-Sensor — Humidade_relativa (Marquise — Av do Sextante),Humidade_relativa,Marquise — Av do Sextante,ativo,2023-01-01,Sensor,Humidade_relativa
-Sensor — Luminosidade (Hall — Avenida de Antunes),Luminosidade,Hall — Avenida de Antunes,inativo,2024-01-14,Sensor,Luminosidade
-Sensor — Temperatura_ambiente (Escritório — Travessa de Ramos),Temperatura_ambiente,Escritório — Travessa de Ramos,ativo,2024-10-20,Sensor,Temperatura_ambiente
-Sensor — Luminosidade (Quarto — Avenida de Barros),Luminosidade,Quarto — Avenida de Barros,manutenção,2022-09-22,Sensor,Luminosidade
-Sensor — Humidade_relativa (Arrumos),Humidade_relativa,Arrumos,ativo,2022-12-14,Sensor,Humidade_relativa
-Sensor — Temperatura_ambiente (Garagem),Temperatura_ambiente,Garagem,ativo,2025-10-29,Sensor,Temperatura_ambiente
-Sensor — Luminosidade (Marquise — Travessa Mara Loureiro),Luminosidade,Marquise — Travessa Mara Loureiro,ativo,2022-05-09,Sensor,Luminosidade
-Sensor — Consumo_energetico_kWh (Ático),Consumo_energetico_kWh,Ático,manutenção,2024-04-10,Sensor,Consumo_energetico_kWh
-Sensor — Humidade_relativa (Cozinha — Praça de Castro),Humidade_relativa,Cozinha — Praça de Castro,manutenção,2025-03-16,Sensor,Humidade_relativa
-Sensor — Temperatura_ambiente (Sala de estar 3),Temperatura_ambiente,Sala de estar 3,manutenção,2025-09-30,Sensor,Temperatura_ambiente
-Sensor — Temperatura_ambiente (Cave — Praça do Cantábrico),Temperatura_ambiente,Cave — Praça do Cantábrico,ativo,,Sensor,Temperatura_ambiente
-Sensor — Humidade_relativa (Escritório),Humidade_relativa,Escritório,inativo,2023-04-14,Sensor,Humidade_relativa
-Sensor — Temperatura_ambiente (Ático 4),Temperatura_ambiente,Ático 4,ativo,2022-06-29,Sensor,Temperatura_ambiente
-Sensor — Consumo_energetico_kWh (Marquise 4),Consumo_energetico_kWh,Marquise 4,manutenção,2024-08-01,Sensor,Consumo_energetico_kWh
-Sensor — Temperatura_ambiente (Ático),Temperatura_ambiente,Ático,inativo,2025-06-09,Sensor,Temperatura_ambiente
-Sensor — Consumo_energetico_kWh (Cozinha),Consumo_energetico_kWh,Cozinha,inativo,2025-11-17,Sensor,Consumo_energetico_kWh
-Sensor — Consumo_energetico_kWh (Marquise — Avenida de Vieira),Consumo_energetico_kWh,Marquise — Avenida de Vieira,ativo,2024-09-21,Sensor,Consumo_energetico_kWh
-Sensor — Consumo_energetico_kWh (Sala de estar),Consumo_energetico_kWh,Sala de estar,manutenção,2023-12-13,Sensor,Consumo_energetico_kWh
+Sensor — Consumo_energetico_kWh (Hall),Consumo_energetico_kWh,Hall,inativo,2025-01-07,Sensor,Consumo_energetico_kWh
+Sensor — Humidade_relativa (Cozinha — Largo Gomes),Humidade_relativa,Cozinha — Largo Gomes,inativo,2022-10-19,Sensor,Humidade_relativa
+Sensor — Humidade_relativa (Casa de banho — Travessa Luísa Gonçalves),Humidade_relativa,Casa de banho — Travessa Luísa Gonçalves,ativo,2025-05-14,Sensor,Humidade_relativa
+Sensor — Luminosidade (Cozinha),Luminosidade,Cozinha,ativo,2024-05-04,Sensor,Luminosidade
+Sensor — Luminosidade (Casa de banho — Praça Guerreiro),Luminosidade,Casa de banho — Praça Guerreiro,manutenção,2023-07-06,Sensor,Luminosidade
+Sensor — Consumo_energetico_kWh (Cozinha — R. Pereira),Consumo_energetico_kWh,Cozinha — R. Pereira,inativo,2024-11-14,Sensor,Consumo_energetico_kWh
+Sensor — Humidade_relativa (Garagem),Humidade_relativa,Garagem,inativo,2026-03-27,Sensor,Humidade_relativa
+Sensor — Humidade_relativa (Cozinha),Humidade_relativa,Cozinha,ativo,2023-03-30,Sensor,Humidade_relativa
+Sensor — Humidade_relativa (Quarto),Humidade_relativa,Quarto,ativo,2025-10-28,Sensor,Humidade_relativa
+Sensor — Temperatura_ambiente (Cave),Temperatura_ambiente,Cave,inativo,2023-10-22,Sensor,Temperatura_ambiente
+Sensor — Temperatura_ambiente (Marquise),Temperatura_ambiente,Marquise,ativo,2024-05-23,Sensor,Temperatura_ambiente
+Sensor — Luminosidade (Arrumos),Luminosidade,Arrumos,ativo,2024-10-23,Sensor,Luminosidade
+Sensor — Humidade_relativa (Sala de estar — Alameda das Necessidades),Humidade_relativa,Sala de estar — Alameda das Necessidades,inativo,2024-07-12,Sensor,Humidade_relativa
+Sensor — Temperatura_ambiente (Arrumos — Avenida Leonardo Baptista),Temperatura_ambiente,Arrumos — Avenida Leonardo Baptista,manutenção,2022-10-07,Sensor,Temperatura_ambiente
+Sensor — Luminosidade (Ático — R. Márcio Anjos),Luminosidade,Ático — R. Márcio Anjos,inativo,2026-03-26,Sensor,Luminosidade
+Sensor — Consumo_energetico_kWh (Hall — Travessa Flor da Rosa),Consumo_energetico_kWh,Hall — Travessa Flor da Rosa,manutenção,2022-07-25,Sensor,Consumo_energetico_kWh
+Sensor — Consumo_energetico_kWh (Cozinha),Consumo_energetico_kWh,Cozinha,inativo,,Sensor,Consumo_energetico_kWh
+Sensor — Temperatura_ambiente (Sala de estar — Alameda do Olival),Temperatura_ambiente,Sala de estar — Alameda do Olival,inativo,2023-03-01,Sensor,Temperatura_ambiente
+Sensor — Consumo_energetico_kWh (Garagem),Consumo_energetico_kWh,Garagem,manutenção,2022-05-25,Sensor,Consumo_energetico_kWh
+Sensor — Luminosidade (Garagem — R. do Beato),Luminosidade,Garagem — R. do Beato,inativo,2023-05-11,Sensor,Luminosidade
