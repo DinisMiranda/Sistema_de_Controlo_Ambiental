@@ -58,7 +58,7 @@ This does **not** read other files or the database; use one canonical output pat
 |-------------|-----------------------------|
 | nome | `nome` |
 | email | `email` |
-| palavra_passe_hash | `palavra_passe_hash` (Faker `sha256()` — fake, not a real password hash) |
+| palavra_passe_hash | `palavra_passe_hash` (`demo:` + Faker `sha256()` — not a production hash) |
 | data_criacao | `data_criacao` |
 | admin | `admin` (0/1) |
 
