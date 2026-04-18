@@ -1,0 +1,21 @@
+nome,email,palavra_passe_hash,data_criacao,admin
+Luana Freitas,luana.freitas@example.pt,demo:a4b596c4d9d3c759f4f8f6215ea895f9f47586817f811370f152d3f5c87f2575,2025-05-30 17:46:23,0
+Violeta Fernandes,violeta.fernandes@example.pt,demo:557c8bd77f7254de91767e7214eb2bddfd3b2a2e7468efe6523a5f83c1c94fa1,2025-10-06 15:15:09,0
+Núria de Sousa,nuria.sousa@example.pt,demo:75c57f85cd7ad2d06fe997493a76dd9e3c6121a1e9e1e04194b736e536bec1f8,2026-01-25 04:45:56,0
+Érica Figueiredo,erica.figueiredo@example.pt,demo:ee3330312a8d03e432f1cf44dcdd4cb4e53e55bda23cd48e65040c85bf57d39e,2025-09-08 16:30:57,0
+Tomás da Correia,tomas.correia@example.pt,demo:e287b552ba71371c5b2b37b973eab71c399cb0f73a1c2e5975c309e6ac6bb223,2026-03-21 06:50:19,0
+Marco Anjos,marco.anjos@example.pt,demo:9f41811143eafd008a88c9d28e6a5eaf1c7c19a6c9dd4c2ce7a9c059cfae8120,2025-05-02 16:30:51,0
+Teresa Pacheco,teresa.pacheco@example.pt,demo:2a518a52f44311df0d53b1c6b57f0a6d5e55e8b17ae0fa65fe55defe2dade185,2025-05-01 02:25:30,0
+Lisandro Lopes-Brito,lisandro.lopesbrito@example.pt,demo:735662e78ebab2e053954465b763ac7be79f364012b6a4f2ea795df6b1ccfbcc,2025-09-08 13:17:51,0
+Ricardo Neves-Teixeira,ricardo.nevesteixeira@example.pt,demo:b264970a8c8c3830b75406d2319a4fe587e264ff42d35eec8e49f7e85604196a,2026-02-14 12:09:34,0
+Petra Silva,petra.silva@example.pt,demo:e209ea92b560a45b9f71a5ebbb71683ce8f8c7d75d43d3a62e81d3433da7bf0d,2025-04-21 04:03:54,0
+Nádia Macedo,nadia.macedo@example.pt,demo:7cdc796a51d92f71f5d8d4e3cc078118c586f7a6e63f174f8cdd15be011e4719,2025-12-20 17:50:48,0
+Leandro Vieira,leandro.vieira@example.pt,demo:c9c87e660237733440774dc1527e805912d302e71ca6a805c9f07a628e2950f1,2025-09-05 23:56:19,0
+Xavier Matos,xavier.matos@example.pt,demo:da2ba951163d2f4781d6c4f7accf2acc6043449f8f19281907f995c5f0e1ef4e,2025-12-03 16:28:51,0
+Ângelo Jesus,angelo.jesus@example.pt,demo:91881155c753d3f374642ab3bf102487163d7753095d6733daa5de54517465a8,2025-07-03 04:27:26,0
+Amélia do Pinheiro,amelia.pinheiro@example.pt,demo:ea95eb96e6915ffbaf0f969037a1a18f8e366fc1a330486af697008a06583228,2026-03-15 09:23:51,0
+Helena Lourenço,helena.lourenco@example.pt,demo:989ce5de0cf4265a1fad184b3d7f7625a88636e0cb3b3ebfe288fa484e600ae0,2025-06-29 22:08:52,0
+Vicente de Almeida,vicente.almeida@example.pt,demo:d88b84052b172f923befd9fb2b5dbc33419fe18ee070f6bd9764ddaf16b32c4e,2025-11-30 17:52:15,1
+Ismael Sá,ismael.sa@example.pt,demo:909671763de8366b30b705a073c35f8d058716b9c47eeb7a908e523734042197,2025-10-28 09:54:24,0
+Renata Lourenço,renata.lourenco@example.pt,demo:aa86dc1848527afb8c63d2259fce59016638455dbccaa7665056f95723fe76d0,2025-10-31 21:09:31,0
+Nicole Assunção,nicole.assuncao@example.pt,demo:0e319a8b7e7fd518a061ed72cc9817d8e27a1e4bbe8b77db8ca5c9b0f0a46dba,2025-07-27 14:13:09,0

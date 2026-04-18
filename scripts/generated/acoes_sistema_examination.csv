@@ -1,0 +1,41 @@
+id_atuador,tipo_acao,valor_aplicado,motivo,timestamp_acao,Tipos_classe,Tipos_tipo
+4,DOWN,25%,Sincronização com calendário semanal.,2026-04-17 03:44:41,Acao_sistema,Iluminacao_desligar_ou_reduzir
+19,DOWN,25%,Pedido após deteção de ausência.,2026-01-26 19:15:41,Acao_sistema,Iluminacao_desligar_ou_reduzir
+12,FAN,ON,Teste de atuador após intervenção.,2026-03-12 12:46:09,Acao_sistema,Ventilacao_reforco_ou_arranque
+16,OPEN,CUTOFF,Comando manual na aplicação.,2026-02-24 16:56:55,Acao_sistema,Circuito_energia_corte
+13,SETPOINT,23.9,,2026-03-24 18:12:33,Acao_sistema,Climatizacao_definir_consigna
+6,OPEN,CUTOFF,Reforço de ventilação por humidade elevada.,2026-03-16 09:54:13,Acao_sistema,Circuito_energia_corte
+4,DOWN,25%,Pedido após deteção de ausência.,2026-02-16 00:18:08,Acao_sistema,Iluminacao_desligar_ou_reduzir
+17,RULE,T>26,Comando manual na aplicação.,2026-04-12 02:00:31,Acao_sistema,Controlo_automatico_por_limite
+12,CLOSE,ON,Integração com sistema de presença.,2026-02-23 04:17:12,Acao_sistema,Circuito_energia_restabelecer
+1,CLOSE,ON,Resposta a alerta de consumo.,2026-04-03 01:48:25,Acao_sistema,Circuito_energia_restabelecer
+4,ON,100%,,2026-01-30 08:56:21,Acao_sistema,Iluminacao_ligar_ou_aumentar
+5,OPEN,CUTOFF,Comando manual na aplicação.,2026-02-19 04:27:07,Acao_sistema,Circuito_energia_corte
+11,RULE,T>26,Redução de iluminação por luz natural suficiente.,2026-02-21 13:06:38,Acao_sistema,Controlo_automatico_por_limite
+9,OFF,0%,Comando manual na aplicação.,2026-03-30 06:40:04,Acao_sistema,Iluminacao_desligar_ou_reduzir
+16,SETPOINT,22.8,Redução de iluminação por luz natural suficiente.,2026-01-28 18:36:06,Acao_sistema,Climatizacao_definir_consigna
+5,CLOSE,ON,Aumento de iluminação por pouca luminosidade.,2026-04-01 18:39:06,Acao_sistema,Circuito_energia_restabelecer
+4,MIN,5%,,2026-02-17 09:22:44,Acao_sistema,Iluminacao_desligar_ou_reduzir
+9,CLOSE,ON,,2026-03-19 23:25:50,Acao_sistema,Circuito_energia_restabelecer
+3,ON,100%,Manutenção programada concluída.,2026-02-11 21:15:49,Acao_sistema,Iluminacao_ligar_ou_aumentar
+2,OFF,0%,Correção após leitura anómala.,2026-04-14 02:57:05,Acao_sistema,Iluminacao_desligar_ou_reduzir
+14,VENT,HIGH,Modo noturno ativo.,2026-02-11 19:32:28,Acao_sistema,Ventilacao_reforco_ou_arranque
+19,AUTO,LUX<200,Ajuste por consigna de climatização.,2026-02-14 07:30:02,Acao_sistema,Controlo_automatico_por_limite
+12,DOWN,25%,Integração com sistema de presença.,2026-01-21 00:15:35,Acao_sistema,Iluminacao_desligar_ou_reduzir
+4,OPEN,CUTOFF,Integração com sistema de presença.,2026-04-04 01:10:36,Acao_sistema,Circuito_energia_corte
+12,OPEN,CUTOFF,Integração com sistema de presença.,2026-03-11 11:10:01,Acao_sistema,Circuito_energia_corte
+15,SETPOINT,21.1,Sincronização com calendário semanal.,2026-03-27 16:26:43,Acao_sistema,Climatizacao_definir_consigna
+5,OPEN,CUTOFF,,2026-04-09 10:55:43,Acao_sistema,Circuito_energia_corte
+8,FAN,ON,Reforço de ventilação por humidade elevada.,2026-02-25 00:46:47,Acao_sistema,Ventilacao_reforco_ou_arranque
+11,DOWN,25%,Sincronização com calendário semanal.,2026-02-10 09:02:57,Acao_sistema,Iluminacao_desligar_ou_reduzir
+17,DIM_UP,75%,Modo noturno ativo.,2026-04-08 06:45:49,Acao_sistema,Iluminacao_ligar_ou_aumentar
+16,DIM_UP,75%,Sincronização com calendário semanal.,2026-03-30 23:26:41,Acao_sistema,Iluminacao_ligar_ou_aumentar
+17,FAN,ON,Modo noturno ativo.,2026-03-14 02:56:43,Acao_sistema,Ventilacao_reforco_ou_arranque
+17,ON,100%,,2026-02-08 12:02:16,Acao_sistema,Iluminacao_ligar_ou_aumentar
+16,VENT,HIGH,,2026-03-15 13:28:41,Acao_sistema,Ventilacao_reforco_ou_arranque
+10,SETPOINT,23.2,,2026-02-15 02:16:15,Acao_sistema,Climatizacao_definir_consigna
+20,OPEN,CUTOFF,,2026-03-07 08:51:00,Acao_sistema,Circuito_energia_corte
+11,UP,90%,Manutenção programada concluída.,2026-01-22 15:56:31,Acao_sistema,Iluminacao_ligar_ou_aumentar
+19,SCHED,NIGHT,Manutenção programada concluída.,2026-03-01 04:17:40,Acao_sistema,Controlo_automatico_por_limite
+18,ON,100%,Restabelecimento após teste de segurança.,2026-03-11 03:09:21,Acao_sistema,Iluminacao_ligar_ou_aumentar
+14,OPEN,CUTOFF,,2026-01-23 09:12:04,Acao_sistema,Circuito_energia_corte
