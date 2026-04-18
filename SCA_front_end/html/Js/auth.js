@@ -6,25 +6,25 @@ const TEST_USERS = [
     email: "admin@edificio.com",
     password: "admin123",
     name: "Administrador",
-    role: "admin",
+    role: "Admin",
   },
   {
     email: "joao@empresa.com",
     password: "joao123",
     name: "João Silva",
-    role: "user",
+    role: "User",
   },
   {
     email: "maria@empresa.com",
     password: "maria123",
     name: "Maria Sousa",
-    role: "user",
+    role: "User",
   },
   {    
     email: "admin@edificio.com",
     password: "admin123",
     name: "Administrador",
-    role: "admin",
+    role: "Admin",
   }
 ];
 

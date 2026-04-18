@@ -1,8 +1,7 @@
 const user = JSON.parse(localStorage.getItem("user"));
 if (
   !user ||
-  user.email !== "admin@edificio.com" ||
-  user.password !== "admin123"
+  user.role !== "Admin"
 ) {
   location.href = "login.html";
 }
