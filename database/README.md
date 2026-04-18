@@ -12,15 +12,14 @@ Schema: **sistema_controlo_ambiental2** (MySQL 8+).
 |------------------------|-------------|
 | Tipos                  | Type catalogue (classe, tipo, descrição). Referenced by sensores, atuadores, and acoes_sistema. |
 | Utilizadores           | System users (nome, email, palavra_passe_hash, admin). |
-| administradores        | Administrators (nome, email, palavra_passe_hash). |
 | sensores               | Sensors; FK to Tipos (Tipos_classe, Tipos_tipo). |
 | atuadores              | Actuators; FK to Tipos. |
 | acoes_sistema          | Actions on actuators; FK to atuadores and Tipos. |
 | leituras_sensor        | Sensor readings (valor, unidade, timestamp). |
-| parametros_automaticos  | Configuration parameters; FK to acoes_sistema. |
-| registos_consumo        | Consumption per period; FK to **sensores** (id_sensor). |
+| parametros_automaticos  | Configuration parameters; FK to **atuadores**. |
+| registos_consumo        | Consumption per period; FK to **leituras_sensor**. |
 
-**Note:** `registos_consumo` references `sensores`, not atuadores. The columns `Tipos_id_administrador` in sensores/atuadores/acoes_sistema are not part of the FK to Tipos (only `Tipos_classe` and `Tipos_tipo` are).
+**Note:** `sensores` / `atuadores` / `acoes_sistema` reference **Tipos** only via `Tipos_classe` and `Tipos_tipo`.
 
 ## How to apply
 

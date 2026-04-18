@@ -58,7 +58,7 @@ This does **not** read other files or the database; use one canonical output pat
 |-------------|-----------------------------|
 | nome | `nome` |
 | email | `email` |
-| palavra_passe_hash | `palavra_passe_hash` (Faker `sha256()` — fake, not a real password hash) |
+| palavra_passe_hash | `palavra_passe_hash` (`demo:` + Faker `sha256()` — not a production hash) |
 | data_criacao | `data_criacao` |
 | admin | `admin` (0/1) |
 
@@ -119,6 +119,32 @@ cd /caminho/para/Sistema_de_Controlo_Ambiental/scripts
 ### Load order
 
 Insert **`Tipos`** before **`sensores`**, **`atuadores`**, and **`acoes_sistema`** (FKs referenciam `Tipos.classe` / `Tipos.tipo`). Garante que existem linhas `Acao_sistema` / … antes de inserir `acoes_sistema`.
+
+### Import safety checklist
+
+1. **`Tipos`** — Use the **full** catalog (default or `NUM_TIPOS=15`) before loading `sensores`, `atuadores`, or `acoes_sistema`. A partial export (`-n` too small) breaks foreign keys (see warnings from `seed_tipos.py` on stderr).
+2. **`Utilizadores.palavra_passe_hash`** — Values are **not** production password hashes (bcrypt/Argon2); only for demos and local DBs.
+3. **`Casa_Administradores`** — `id_casa` / `id_utilizador` must match real `AUTO_INCREMENT` values after you load **`casas`** and **`Utilizadores`** in order with **no gaps** you did not account for. Prefer `seed_casa_administradores.py --casas-csv` / `--utilizadores-csv` so bounds follow your CSV row counts.
+4. **Column names** — MySQL column `descrição` in `Tipos` may need backticks in `INSERT`; map CSV `descricao` accordingly.
+
+## `seed_acoes_sistema.py`
+
+Gera linhas para **`acoes_sistema`**: `id_atuador`, `tipo_acao`, `valor_aplicado`, `motivo`, `timestamp_acao`, `Tipos_classe`, `Tipos_tipo`. A coluna `Tipos_tipo` usa apenas tipos com `classe=Acao_sistema` do catálogo em `seed_tipos.py` (importa **Tipos** completo e **atuadores** antes desta tabela).
+
+```bash
+cd /caminho/para/Sistema_de_Controlo_Ambiental/scripts
+.venv/bin/python seed_acoes_sistema.py
+.venv/bin/python seed_acoes_sistema.py -n 50 --seed 42
+.venv/bin/python seed_acoes_sistema.py --atuadores-csv generated/atuadores_examination.csv
+```
+
+| Variable | Meaning |
+|----------|---------|
+| `NUM_ACOES_SISTEMA` | Row count if you omit `-n` (default **40**). |
+| `NUM_ATUADORES` | Max `id_atuador` when not using `--atuadores-csv` / `--max-atuador-id` (default **20**). |
+| `ACOES_SISTEMA_OUTPUT` | Output path. Default: `generated/acoes_sistema_examination.csv`. |
+
+Primary key `id_acao` is not in the CSV; MySQL assigns it on `INSERT`.
 
 ### Related files
 

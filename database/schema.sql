@@ -143,22 +143,6 @@ COLLATE = utf8mb4_0900_ai_ci;
 
 
 -- -----------------------------------------------------
--- Table `sistema_controlo_ambiental2`.`administradores`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `sistema_controlo_ambiental2`.`administradores` (
-  `id_administrador` INT NOT NULL AUTO_INCREMENT,
-  `nome` VARCHAR(100) NOT NULL,
-  `email` VARCHAR(150) NOT NULL,
-  `palavra_passe_hash` VARCHAR(255) NOT NULL,
-  `data_criacao` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id_administrador`),
-  UNIQUE INDEX `email` (`email` ASC) VISIBLE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
-
-
--- -----------------------------------------------------
 -- Table `sistema_controlo_ambiental2`.`acoes_sistema`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `sistema_controlo_ambiental2`.`acoes_sistema` (

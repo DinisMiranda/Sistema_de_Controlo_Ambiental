@@ -102,7 +102,7 @@ Schema: **sistema_controlo_ambiental2**
 | Entity | Description |
 |--------|-------------|
 | **Tipos** | Type catalogue (referenced by sensors, actuators, actions). |
-| **Utilizadores** / **administradores** | Users and administrators. |
+| **Utilizadores** | System users (including admin flag). |
 | **sensores** / **atuadores** | Sensors and actuators (FK to Tipos). |
 | **leituras_sensor** | Sensor readings over time. |
 | **acoes_sistema** | Actions performed on actuators. |
