@@ -2,6 +2,17 @@
 
 Utilities that generate **CSV files** (UTF-8, header row) for reviewing fake rows before loading them into MySQL (or for spreadsheets). They do **not** connect to the database by default.
 
+## Gerar todos os CSVs de uma vez
+
+A partir da pasta **`scripts/`** (com venv e dependências já instaladas):
+
+```bash
+chmod +x generate_seed_csvs.sh
+./generate_seed_csvs.sh
+```
+
+Isto corre os seeds pela ordem de dependências e escreve em **`generated/`** (ex.: `tipos_examination.csv`, `casas_examination.csv`, … até `leituras_sensor_examination.csv` e `acoes_sistema_examination.csv`). Os defaults de contagem vêm de cada script e de `scripts/.env` se existir.
+
 ## `seed_utilizadores.py`
 
 Generates rows shaped like the **`Utilizadores`** table in schema `sistema_controlo_ambiental2`.
