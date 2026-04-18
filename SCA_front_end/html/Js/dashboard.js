@@ -352,9 +352,7 @@ function checkAdminAccess() {
   // Mostrar admin link apenas se o utilizador for admin
   if (adminLink) {
     if (
-      user &&
-      user.email === "admin@edificio.com" &&
-      user.password === "admin123"
+      user.role === "Admin"
     ) {
       adminLink.style.display = "block";
     } else {

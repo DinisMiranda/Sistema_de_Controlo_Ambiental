@@ -7,11 +7,50 @@ if (
   location.href = "login.html";
 }
 
+// Define the initial test users (matching auth.js for consistency)
+const TEST_USERS = [
+  { name: "João Silva", email: "joao@empresa.com", department: "Auditório", role: "User", password: "joao123" },
+  { name: "Maria Sousa", email: "maria@empresa.com", department: "Lab A", role: "User", password: "maria123" },
+  { name: "Administrador", email: "admin@edificio.com", department: "Administração", role: "Admin", password: "admin123" }
+];
+
+// Function to get all users (test + admin-added users)
+function getAllUsers() {
+  let allUsers = [...TEST_USERS];
+  const addedUsers = JSON.parse(localStorage.getItem("addedUsers")) || [];
+  allUsers = allUsers.concat(addedUsers);
+  return allUsers;
+}
+
+// Initialize users array using the shared function
+let users = getAllUsers();
+
+// Function to save only added users to localStorage
+function saveUsers() {
+  const addedUsers = users.filter(user => !TEST_USERS.some(testUser => testUser.email === user.email));
+  localStorage.setItem("addedUsers", JSON.stringify(addedUsers));
+}
+
+// Function to populate table
+function populateTable() {
+  const table = document.querySelector("table");
+  // Clear existing rows except header
+  const rows = table.querySelectorAll("tr");
+  for (let i = 1; i < rows.length; i++) {
+    rows[i].remove();
+  }
+  // Add users
+  users.forEach(user => addUserToTable(user.name, user.email, user.department, user.role, user.password));
+}
+
 // Get modal and form elements
 const userModal = document.getElementById("user-modal");
 const userForm = document.getElementById("user-form");
 const addUserBtn = document.getElementById("add-user");
 const cancelBtn = document.getElementById("cancel-btn");
+
+// Populate table on load
+populateTable();
 
 // Open modal when button is clicked
 addUserBtn.addEventListener("click", () => {
@@ -54,7 +93,17 @@ userForm.addEventListener("submit", (e) => {
     return;
   }
 
-  // Add new user to table
+  // Check if email already exists
+  if (users.some(u => u.email === email)) {
+    alert("Este email já está registado.");
+    return;
+  }
+
+  // Add new user to users array
+  users.push({ name, email, department, role, password });
+  saveUsers();
+
+  // Add to table
   addUserToTable(name, email, department, role, password);
 
   // Close modal and reset form
@@ -103,6 +152,12 @@ function deleteUserWithConfirmation(row) {
 // Confirm delete
 confirmDeleteBtn.addEventListener("click", () => {
   if (rowToDelete) {
+    // Get email from row
+    const email = rowToDelete.cells[1].textContent;
+    // Remove from users array
+    users = users.filter(u => u.email !== email);
+    saveUsers();
+    // Remove row
     rowToDelete.remove();
     deleteModal.style.display = "none";
     rowToDelete = null;
