@@ -133,9 +133,6 @@ userForm.addEventListener("submit", (e) => {
   // Close modal and reset form
   userModal.style.display = "none";
   userForm.reset();
-
-  // Optional: Send to backend API
-  // sendUserToBackend({ name, email, department, role, password });
 });
 
 // Function to add user to table
@@ -210,27 +207,6 @@ document.querySelectorAll(".delete-btn").forEach((btn) => {
   );
 });
 
-// Optional: Function to send user data to backend
-/*
-function sendUserToBackend(userData) {
-  fetch("/api/users", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(userData)
-  })
-  .then(response => response.json())
-  .then(data => {
-    console.log("User added successfully:", data);
-  })
-  .catch(error => {
-    console.error("Error adding user:", error);
-    alert("Erro ao adicionar utilizador.");
-  });
-}
-*/
-
 // Color existing rows based on role
 document.querySelectorAll("table tr:not(:first-child)").forEach((row) => {
   const roleCell = row.cells[3];
@@ -286,6 +262,304 @@ if (firstTabBtn) {
 }
 
 // ============================================
+// MODAL FUNCTIONS
+// ============================================
+
+// Home Modal
+const homeModal = document.getElementById("home-modal");
+const homeForm = document.getElementById("home-form");
+const homeModalTitle = document.getElementById("home-modal-title");
+const homeCancelBtn = document.getElementById("home-cancel-btn");
+let editingHomeId = null;
+
+function openHomeModal(homeId = null) {
+  editingHomeId = homeId;
+  if (homeId) {
+    const home = homes.find((h) => h.id === homeId);
+    if (home) {
+      homeModalTitle.textContent = "Editar Casa";
+      document.getElementById("home-name").value = home.name;
+      document.getElementById("home-location").value = home.location;
+      document.getElementById("home-type").value = home.type;
+    }
+  } else {
+    homeModalTitle.textContent = "Adicionar Casa";
+    homeForm.reset();
+  }
+  homeModal.style.display = "flex";
+}
+
+homeForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const name = document.getElementById("home-name").value.trim();
+  const location = document.getElementById("home-location").value.trim();
+  const type = document.getElementById("home-type").value.trim();
+
+  if (!name || !location || !type) {
+    alert("Por favor, preencha todos os campos.");
+    return;
+  }
+
+  if (editingHomeId) {
+    const home = homes.find((h) => h.id === editingHomeId);
+    if (home) {
+      home.name = name;
+      home.location = location;
+      home.type = type;
+      updateHomeRow(editingHomeId);
+    }
+  } else {
+    const newHome = {
+      id: Math.max(...homes.map((h) => h.id), 0) + 1,
+      name,
+      location,
+      type,
+    };
+    homes.push(newHome);
+    addHomeRow(newHome);
+  }
+
+  homeModal.style.display = "none";
+  homeForm.reset();
+});
+
+homeCancelBtn.addEventListener("click", () => {
+  homeModal.style.display = "none";
+});
+
+homeModal.addEventListener("click", (e) => {
+  if (e.target === homeModal) {
+    homeModal.style.display = "none";
+  }
+});
+
+// Device Modal
+const deviceModal = document.getElementById("device-modal");
+const deviceForm = document.getElementById("device-form");
+const deviceModalTitle = document.getElementById("device-modal-title");
+const deviceCancelBtn = document.getElementById("device-cancel-btn");
+let editingDeviceId = null;
+let deviceType = "sensor"; // sensor or actuator
+
+function openDeviceModal(deviceId = null, type = "sensor") {
+  editingDeviceId = deviceId;
+  deviceType = type;
+  if (deviceId) {
+    const device = devices.find((d) => d.id === deviceId);
+    if (device) {
+      deviceModalTitle.textContent =
+        "Editar " + (type === "sensor" ? "Sensor" : "Atuador");
+      document.getElementById("device-name").value = device.name;
+      document.getElementById("device-type").value = device.type;
+      document.getElementById("device-home").value = device.home;
+    }
+  } else {
+    deviceModalTitle.textContent =
+      "Adicionar " + (type === "sensor" ? "Sensor" : "Atuador");
+    deviceForm.reset();
+  }
+  deviceModal.style.display = "flex";
+}
+
+deviceForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const name = document.getElementById("device-name").value.trim();
+  const type = document.getElementById("device-type").value.trim();
+  const home = document.getElementById("device-home").value.trim();
+
+  if (!name || !type || !home) {
+    alert("Por favor, preencha todos os campos.");
+    return;
+  }
+
+  if (editingDeviceId) {
+    const device = devices.find((d) => d.id === editingDeviceId);
+    if (device) {
+      device.name = name;
+      device.type = type;
+      device.home = home;
+      updateDeviceRow(editingDeviceId);
+    }
+  } else {
+    const prefix = deviceType === "sensor" ? "S" : "A";
+    const newDevice = {
+      id:
+        prefix +
+        String(
+          Math.max(
+            ...devices
+              .filter((d) => d.id.startsWith(prefix))
+              .map((d) => parseInt(d.id.substring(1))),
+            0,
+          ) + 1,
+        ).padStart(3, "0"),
+      name,
+      type,
+      home,
+      status: "Ativo",
+    };
+    devices.push(newDevice);
+    addDeviceRow(newDevice);
+  }
+
+  deviceModal.style.display = "none";
+  deviceForm.reset();
+});
+
+deviceCancelBtn.addEventListener("click", () => {
+  deviceModal.style.display = "none";
+});
+
+deviceModal.addEventListener("click", (e) => {
+  if (e.target === deviceModal) {
+    deviceModal.style.display = "none";
+  }
+});
+
+// Parameter Modal
+const parameterModal = document.getElementById("parameter-modal");
+const parameterForm = document.getElementById("parameter-form");
+const parameterModalTitle = document.getElementById("parameter-modal-title");
+const parameterCancelBtn = document.getElementById("parameter-cancel-btn");
+let editingParameterId = null;
+
+function openParameterModal(parameterId = null) {
+  editingParameterId = parameterId;
+  if (parameterId) {
+    const param = parameters.find((p) => p.id === parameterId);
+    if (param) {
+      parameterModalTitle.textContent = "Editar Parâmetro";
+      document.getElementById("parameter-name").value = param.name;
+      document.getElementById("parameter-description").value =
+        param.description;
+      document.getElementById("parameter-minValue").value = param.minValue;
+      document.getElementById("parameter-maxValue").value = param.maxValue;
+    }
+  } else {
+    parameterModalTitle.textContent = "Adicionar Parâmetro";
+    parameterForm.reset();
+  }
+  parameterModal.style.display = "flex";
+}
+
+parameterForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const name = document.getElementById("parameter-name").value.trim();
+  const description = document
+    .getElementById("parameter-description")
+    .value.trim();
+  const minValue = document.getElementById("parameter-minValue").value.trim();
+  const maxValue = document.getElementById("parameter-maxValue").value.trim();
+
+  if (!name || !description || !minValue || !maxValue) {
+    alert("Por favor, preencha todos os campos.");
+    return;
+  }
+
+  if (editingParameterId) {
+    const param = parameters.find((p) => p.id === editingParameterId);
+    if (param) {
+      param.name = name;
+      param.description = description;
+      param.minValue = minValue;
+      param.maxValue = maxValue;
+      updateParameterRow(editingParameterId);
+    }
+  } else {
+    const newParam = {
+      id: Math.max(...parameters.map((p) => p.id), 0) + 1,
+      name,
+      description,
+      minValue,
+      maxValue,
+    };
+    parameters.push(newParam);
+    addParameterRow(newParam);
+  }
+
+  parameterModal.style.display = "none";
+  parameterForm.reset();
+});
+
+parameterCancelBtn.addEventListener("click", () => {
+  parameterModal.style.display = "none";
+});
+
+parameterModal.addEventListener("click", (e) => {
+  if (e.target === parameterModal) {
+    parameterModal.style.display = "none";
+  }
+});
+
+// Type Modal
+const typeModal = document.getElementById("type-modal");
+const typeForm = document.getElementById("type-form");
+const typeModalTitle = document.getElementById("type-modal-title");
+const typeCancelBtn = document.getElementById("type-cancel-btn");
+let editingTypeId = null;
+
+function openTypeModal(typeId = null) {
+  editingTypeId = typeId;
+  if (typeId) {
+    const type = types.find((t) => t.id === typeId);
+    if (type) {
+      typeModalTitle.textContent = "Editar Tipo";
+      document.getElementById("type-name").value = type.name;
+      document.getElementById("type-description").value = type.description;
+      document.getElementById("type-category").value = type.category;
+    }
+  } else {
+    typeModalTitle.textContent = "Adicionar Tipo";
+    typeForm.reset();
+  }
+  typeModal.style.display = "flex";
+}
+
+typeForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const name = document.getElementById("type-name").value.trim();
+  const description = document.getElementById("type-description").value.trim();
+  const category = document.getElementById("type-category").value;
+
+  if (!name || !description || !category) {
+    alert("Por favor, preencha todos os campos.");
+    return;
+  }
+
+  if (editingTypeId) {
+    const type = types.find((t) => t.id === editingTypeId);
+    if (type) {
+      type.name = name;
+      type.description = description;
+      type.category = category;
+      updateTypeRow(editingTypeId);
+    }
+  } else {
+    const newType = {
+      id: Math.max(...types.map((t) => t.id), 0) + 1,
+      name,
+      description,
+      category,
+    };
+    types.push(newType);
+    addTypeRow(newType);
+  }
+
+  typeModal.style.display = "none";
+  typeForm.reset();
+});
+
+typeCancelBtn.addEventListener("click", () => {
+  typeModal.style.display = "none";
+});
+
+typeModal.addEventListener("click", (e) => {
+  if (e.target === typeModal) {
+    typeModal.style.display = "none";
+  }
+});
+
+// ============================================
 // HOMES MANAGEMENT
 // ============================================
 
@@ -301,24 +575,7 @@ let homes = [
 ];
 
 document.getElementById("add-home")?.addEventListener("click", () => {
-  const name = prompt("Nome da casa:");
-  if (!name) return;
-
-  const location = prompt("Localização:");
-  if (!location) return;
-
-  const type = prompt("Tipo:");
-  if (!type) return;
-
-  const newHome = {
-    id: Math.max(...homes.map((h) => h.id), 0) + 1,
-    name,
-    location,
-    type,
-  };
-
-  homes.push(newHome);
-  addHomeRow(newHome);
+  openHomeModal();
 });
 
 function addHomeRow(home) {
@@ -343,19 +600,21 @@ function addHomeRow(home) {
   });
 
   editBtn.addEventListener("click", () => {
-    const newName = prompt("Novo nome:", home.name);
-    if (newName) home.name = newName;
-
-    const newLocation = prompt("Nova localização:", home.location);
-    if (newLocation) home.location = newLocation;
-
-    const newType = prompt("Novo tipo:", home.type);
-    if (newType) home.type = newType;
-
-    newRow.cells[1].textContent = home.name;
-    newRow.cells[2].textContent = home.location;
-    newRow.cells[3].textContent = home.type;
+    openHomeModal(home.id);
   });
+}
+
+function updateHomeRow(homeId) {
+  const rows = homesTable.querySelectorAll("tr");
+  for (let i = 1; i < rows.length; i++) {
+    if (parseInt(rows[i].cells[0].textContent) === homeId) {
+      const home = homes.find((h) => h.id === homeId);
+      rows[i].cells[1].textContent = home.name;
+      rows[i].cells[2].textContent = home.location;
+      rows[i].cells[3].textContent = home.type;
+      break;
+    }
+  }
 }
 
 // ============================================
@@ -381,65 +640,11 @@ let devices = [
 ];
 
 document.getElementById("add-sensor")?.addEventListener("click", () => {
-  const name = prompt("Nome do sensor:");
-  if (!name) return;
-
-  const type = prompt("Tipo (ex: Temperatura, Umidade, Luminosidade):");
-  if (!type) return;
-
-  const home = prompt("Casa/Localização:");
-  if (!home) return;
-
-  const newDevice = {
-    id:
-      "S" +
-      String(
-        Math.max(
-          ...devices
-            .filter((d) => d.id.startsWith("S"))
-            .map((d) => parseInt(d.id.substring(1))),
-          0,
-        ) + 1,
-      ).padStart(3, "0"),
-    name,
-    type,
-    home,
-    status: "Ativo",
-  };
-
-  devices.push(newDevice);
-  addDeviceRow(newDevice);
+  openDeviceModal(null, "sensor");
 });
 
 document.getElementById("add-actuator")?.addEventListener("click", () => {
-  const name = prompt("Nome do atuador:");
-  if (!name) return;
-
-  const type = prompt("Tipo (ex: Ar Condicionado, Luz, Bomba):");
-  if (!type) return;
-
-  const home = prompt("Casa/Localização:");
-  if (!home) return;
-
-  const newDevice = {
-    id:
-      "A" +
-      String(
-        Math.max(
-          ...devices
-            .filter((d) => d.id.startsWith("A"))
-            .map((d) => parseInt(d.id.substring(1))),
-          0,
-        ) + 1,
-      ).padStart(3, "0"),
-    name,
-    type,
-    home,
-    status: "Ativo",
-  };
-
-  devices.push(newDevice);
-  addDeviceRow(newDevice);
+  openDeviceModal(null, "actuator");
 });
 
 function addDeviceRow(device) {
@@ -468,19 +673,22 @@ function addDeviceRow(device) {
   });
 
   editBtn.addEventListener("click", () => {
-    const newName = prompt("Novo nome:", device.name);
-    if (newName) device.name = newName;
-
-    const newType = prompt("Novo tipo:", device.type);
-    if (newType) device.type = newType;
-
-    const newHome = prompt("Nova localização:", device.home);
-    if (newHome) device.home = newHome;
-
-    newRow.cells[1].textContent = device.name;
-    newRow.cells[2].textContent = device.type;
-    newRow.cells[3].textContent = device.home;
+    const type = device.id.startsWith("S") ? "sensor" : "actuator";
+    openDeviceModal(device.id, type);
   });
+}
+
+function updateDeviceRow(deviceId) {
+  const rows = sensorsTable.querySelectorAll("tr");
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i].cells[0].textContent === deviceId) {
+      const device = devices.find((d) => d.id === deviceId);
+      rows[i].cells[1].textContent = device.name;
+      rows[i].cells[2].textContent = device.type;
+      rows[i].cells[3].textContent = device.home;
+      break;
+    }
+  }
 }
 
 // ============================================
@@ -506,28 +714,7 @@ let parameters = [
 ];
 
 document.getElementById("add-parameter")?.addEventListener("click", () => {
-  const name = prompt("Nome do parâmetro:");
-  if (!name) return;
-
-  const description = prompt("Descrição:");
-  if (!description) return;
-
-  const minValue = prompt("Valor mínimo:");
-  if (!minValue) return;
-
-  const maxValue = prompt("Valor máximo:");
-  if (!maxValue) return;
-
-  const newParam = {
-    id: Math.max(...parameters.map((p) => p.id), 0) + 1,
-    name,
-    description,
-    minValue,
-    maxValue,
-  };
-
-  parameters.push(newParam);
-  addParameterRow(newParam);
+  openParameterModal();
 });
 
 function addParameterRow(param) {
@@ -553,23 +740,22 @@ function addParameterRow(param) {
   });
 
   editBtn.addEventListener("click", () => {
-    const newName = prompt("Novo nome:", param.name);
-    if (newName) param.name = newName;
-
-    const newDesc = prompt("Nova descrição:", param.description);
-    if (newDesc) param.description = newDesc;
-
-    const newMin = prompt("Novo valor mínimo:", param.minValue);
-    if (newMin) param.minValue = newMin;
-
-    const newMax = prompt("Novo valor máximo:", param.maxValue);
-    if (newMax) param.maxValue = newMax;
-
-    newRow.cells[1].textContent = param.name;
-    newRow.cells[2].textContent = param.description;
-    newRow.cells[3].textContent = param.minValue;
-    newRow.cells[4].textContent = param.maxValue;
+    openParameterModal(param.id);
   });
+}
+
+function updateParameterRow(parameterId) {
+  const rows = parametersTable.querySelectorAll("tr");
+  for (let i = 1; i < rows.length; i++) {
+    if (parseInt(rows[i].cells[0].textContent) === parameterId) {
+      const param = parameters.find((p) => p.id === parameterId);
+      rows[i].cells[1].textContent = param.name;
+      rows[i].cells[2].textContent = param.description;
+      rows[i].cells[3].textContent = param.minValue;
+      rows[i].cells[4].textContent = param.maxValue;
+      break;
+    }
+  }
 }
 
 // ============================================
@@ -593,24 +779,7 @@ let types = [
 ];
 
 document.getElementById("add-type")?.addEventListener("click", () => {
-  const name = prompt("Nome do tipo:");
-  if (!name) return;
-
-  const description = prompt("Descrição:");
-  if (!description) return;
-
-  const category = prompt("Categoria (Sensor/Atuador):");
-  if (!category) return;
-
-  const newType = {
-    id: Math.max(...types.map((t) => t.id), 0) + 1,
-    name,
-    description,
-    category,
-  };
-
-  types.push(newType);
-  addTypeRow(newType);
+  openTypeModal();
 });
 
 function addTypeRow(type) {
@@ -635,17 +804,123 @@ function addTypeRow(type) {
   });
 
   editBtn.addEventListener("click", () => {
-    const newName = prompt("Novo nome:", type.name);
-    if (newName) type.name = newName;
-
-    const newDesc = prompt("Nova descrição:", type.description);
-    if (newDesc) type.description = newDesc;
-
-    const newCat = prompt("Nova categoria:", type.category);
-    if (newCat) type.category = newCat;
-
-    newRow.cells[1].textContent = type.name;
-    newRow.cells[2].textContent = type.description;
-    newRow.cells[3].textContent = type.category;
+    openTypeModal(type.id);
   });
 }
+
+function updateTypeRow(typeId) {
+  const rows = typesTable.querySelectorAll("tr");
+  for (let i = 1; i < rows.length; i++) {
+    if (parseInt(rows[i].cells[0].textContent) === typeId) {
+      const type = types.find((t) => t.id === typeId);
+      rows[i].cells[1].textContent = type.name;
+      rows[i].cells[2].textContent = type.description;
+      rows[i].cells[3].textContent = type.category;
+      break;
+    }
+  }
+}
+
+// ============================================
+// ATTACH EDIT/DELETE TO INITIAL ROWS
+// ============================================
+
+// Homes initial rows
+const homesInitialRows = document.querySelectorAll(
+  "#tab-homes table tbody tr, #tab-homes table tr:not(:first-child)",
+);
+homesInitialRows.forEach((row) => {
+  const editBtn = row.querySelector(".edit-btn");
+  const deleteBtn = row.querySelector(".delete-btn");
+
+  if (editBtn) {
+    editBtn.addEventListener("click", () => {
+      const id = parseInt(row.cells[0].textContent);
+      openHomeModal(id);
+    });
+  }
+
+  if (deleteBtn) {
+    deleteBtn.addEventListener("click", () => {
+      const id = parseInt(row.cells[0].textContent);
+      homes = homes.filter((h) => h.id !== id);
+      row.remove();
+    });
+  }
+});
+
+// Sensors/Actuators initial rows
+const devicesInitialRows = document.querySelectorAll(
+  "#tab-sensors-actuators table tbody tr, #tab-sensors-actuators table tr:not(:first-child)",
+);
+devicesInitialRows.forEach((row) => {
+  const editBtn = row.querySelector(".edit-btn");
+  const deleteBtn = row.querySelector(".delete-btn");
+
+  if (editBtn) {
+    editBtn.addEventListener("click", () => {
+      const id = row.cells[0].textContent;
+      const device = devices.find((d) => d.id === id);
+      if (device) {
+        const type = device.id.startsWith("S") ? "sensor" : "actuator";
+        openDeviceModal(id, type);
+      }
+    });
+  }
+
+  if (deleteBtn) {
+    deleteBtn.addEventListener("click", () => {
+      const id = row.cells[0].textContent;
+      devices = devices.filter((d) => d.id !== id);
+      row.remove();
+    });
+  }
+});
+
+// Parameters initial rows
+const parametersInitialRows = document.querySelectorAll(
+  "#tab-parameters table tbody tr, #tab-parameters table tr:not(:first-child)",
+);
+parametersInitialRows.forEach((row) => {
+  const editBtn = row.querySelector(".edit-btn");
+  const deleteBtn = row.querySelector(".delete-btn");
+
+  if (editBtn) {
+    editBtn.addEventListener("click", () => {
+      const id = parseInt(row.cells[0].textContent);
+      openParameterModal(id);
+    });
+  }
+
+  if (deleteBtn) {
+    deleteBtn.addEventListener("click", () => {
+      const id = parseInt(row.cells[0].textContent);
+      parameters = parameters.filter((p) => p.id !== id);
+      row.remove();
+    });
+  }
+});
+
+// Types initial rows
+const typesInitialRows = document.querySelectorAll(
+  "#tab-types table tbody tr, #tab-types table tr:not(:first-child)",
+);
+typesInitialRows.forEach((row) => {
+  const editBtn = row.querySelector(".edit-btn");
+  const deleteBtn = row.querySelector(".delete-btn");
+
+  if (editBtn) {
+    editBtn.addEventListener("click", () => {
+      const id = parseInt(row.cells[0].textContent);
+      openTypeModal(id);
+    });
+  }
+
+  if (deleteBtn) {
+    deleteBtn.addEventListener("click", () => {
+      const id = parseInt(row.cells[0].textContent);
+      types = types.filter((t) => t.id !== id);
+      row.remove();
+    });
+  }
+});

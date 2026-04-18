@@ -335,12 +335,11 @@
       <div id="tab-sensors-actuators" class="tab-content" style="display: none">
         <div class="card">
           <h2>Sensores e Atuadores</h2>
-          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-            <button class="btn-primary" id="add-sensor">Adicionar Sensor</button>
-            <button
-              class="btn-primary"
-              id="add-actuator"
-            >
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap">
+            <button class="btn-primary" id="add-sensor">
+              Adicionar Sensor
+            </button>
+            <button class="btn-primary" id="add-actuator">
               Adicionar Atuador
             </button>
           </div>
@@ -939,6 +938,528 @@
             </button>
             <button type="submit" class="btn-primary" style="cursor: pointer">
               Adicionar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal for adding/editing Home -->
+    <div
+      id="home-modal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+      "
+    >
+      <div
+        style="
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: var(--bg-secondary);
+          padding: 2rem;
+          border-radius: 8px;
+          width: 90%;
+          max-width: 400px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        "
+      >
+        <h2
+          style="margin-top: 0; color: var(--text-main)"
+          id="home-modal-title"
+        >
+          Adicionar Casa
+        </h2>
+        <form
+          id="home-form"
+          style="display: flex; flex-direction: column; gap: 1rem"
+        >
+          <div>
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text-main);
+              "
+              >Nome:</label
+            >
+            <input
+              type="text"
+              id="home-name"
+              required
+              style="
+                width: 100%;
+                padding: 0.5rem;
+                border: 1px solid var(--border);
+                border-radius: 4px;
+                background: var(--bg-main);
+                color: var(--text-main);
+              "
+            />
+          </div>
+          <div>
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text-main);
+              "
+              >Localização:</label
+            >
+            <input
+              type="text"
+              id="home-location"
+              required
+              style="
+                width: 100%;
+                padding: 0.5rem;
+                border: 1px solid var(--border);
+                border-radius: 4px;
+                background: var(--bg-main);
+                color: var(--text-main);
+              "
+            />
+          </div>
+          <div>
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text-main);
+              "
+              >Tipo:</label
+            >
+            <input
+              type="text"
+              id="home-type"
+              required
+              style="
+                width: 100%;
+                padding: 0.5rem;
+                border: 1px solid var(--border);
+                border-radius: 4px;
+                background: var(--bg-main);
+                color: var(--text-main);
+              "
+            />
+          </div>
+          <div style="display: flex; gap: 1rem; justify-content: flex-end">
+            <button
+              type="button"
+              id="home-cancel-btn"
+              class="btn-primary"
+              style="background: var(--border); cursor: pointer"
+            >
+              Cancelar
+            </button>
+            <button type="submit" class="btn-primary" style="cursor: pointer">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal for adding/editing Device (Sensor/Actuator) -->
+    <div
+      id="device-modal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+      "
+    >
+      <div
+        style="
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: var(--bg-secondary);
+          padding: 2rem;
+          border-radius: 8px;
+          width: 90%;
+          max-width: 400px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        "
+      >
+        <h2
+          style="margin-top: 0; color: var(--text-main)"
+          id="device-modal-title"
+        >
+          Adicionar Sensor
+        </h2>
+        <form
+          id="device-form"
+          style="display: flex; flex-direction: column; gap: 1rem"
+        >
+          <div>
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text-main);
+              "
+              >Nome:</label
+            >
+            <input
+              type="text"
+              id="device-name"
+              required
+              style="
+                width: 100%;
+                padding: 0.5rem;
+                border: 1px solid var(--border);
+                border-radius: 4px;
+                background: var(--bg-main);
+                color: var(--text-main);
+              "
+            />
+          </div>
+          <div>
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text-main);
+              "
+              >Tipo:</label
+            >
+            <input
+              type="text"
+              id="device-type"
+              required
+              style="
+                width: 100%;
+                padding: 0.5rem;
+                border: 1px solid var(--border);
+                border-radius: 4px;
+                background: var(--bg-main);
+                color: var(--text-main);
+              "
+            />
+          </div>
+          <div>
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text-main);
+              "
+              >Casa/Localização:</label
+            >
+            <input
+              type="text"
+              id="device-home"
+              required
+              style="
+                width: 100%;
+                padding: 0.5rem;
+                border: 1px solid var(--border);
+                border-radius: 4px;
+                background: var(--bg-main);
+                color: var(--text-main);
+              "
+            />
+          </div>
+          <div style="display: flex; gap: 1rem; justify-content: flex-end">
+            <button
+              type="button"
+              id="device-cancel-btn"
+              class="btn-primary"
+              style="background: var(--border); cursor: pointer"
+            >
+              Cancelar
+            </button>
+            <button type="submit" class="btn-primary" style="cursor: pointer">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal for adding/editing Parameter -->
+    <div
+      id="parameter-modal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+      "
+    >
+      <div
+        style="
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: var(--bg-secondary);
+          padding: 2rem;
+          border-radius: 8px;
+          width: 90%;
+          max-width: 400px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        "
+      >
+        <h2
+          style="margin-top: 0; color: var(--text-main)"
+          id="parameter-modal-title"
+        >
+          Adicionar Parâmetro
+        </h2>
+        <form
+          id="parameter-form"
+          style="display: flex; flex-direction: column; gap: 1rem"
+        >
+          <div>
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text-main);
+              "
+              >Nome:</label
+            >
+            <input
+              type="text"
+              id="parameter-name"
+              required
+              style="
+                width: 100%;
+                padding: 0.5rem;
+                border: 1px solid var(--border);
+                border-radius: 4px;
+                background: var(--bg-main);
+                color: var(--text-main);
+              "
+            />
+          </div>
+          <div>
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text-main);
+              "
+              >Descrição:</label
+            >
+            <input
+              type="text"
+              id="parameter-description"
+              required
+              style="
+                width: 100%;
+                padding: 0.5rem;
+                border: 1px solid var(--border);
+                border-radius: 4px;
+                background: var(--bg-main);
+                color: var(--text-main);
+              "
+            />
+          </div>
+          <div>
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text-main);
+              "
+              >Valor Mínimo:</label
+            >
+            <input
+              type="text"
+              id="parameter-minValue"
+              required
+              style="
+                width: 100%;
+                padding: 0.5rem;
+                border: 1px solid var(--border);
+                border-radius: 4px;
+                background: var(--bg-main);
+                color: var(--text-main);
+              "
+            />
+          </div>
+          <div>
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text-main);
+              "
+              >Valor Máximo:</label
+            >
+            <input
+              type="text"
+              id="parameter-maxValue"
+              required
+              style="
+                width: 100%;
+                padding: 0.5rem;
+                border: 1px solid var(--border);
+                border-radius: 4px;
+                background: var(--bg-main);
+                color: var(--text-main);
+              "
+            />
+          </div>
+          <div style="display: flex; gap: 1rem; justify-content: flex-end">
+            <button
+              type="button"
+              id="parameter-cancel-btn"
+              class="btn-primary"
+              style="background: var(--border); cursor: pointer"
+            >
+              Cancelar
+            </button>
+            <button type="submit" class="btn-primary" style="cursor: pointer">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal for adding/editing Type -->
+    <div
+      id="type-modal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+      "
+    >
+      <div
+        style="
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: var(--bg-secondary);
+          padding: 2rem;
+          border-radius: 8px;
+          width: 90%;
+          max-width: 400px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        "
+      >
+        <h2
+          style="margin-top: 0; color: var(--text-main)"
+          id="type-modal-title"
+        >
+          Adicionar Tipo
+        </h2>
+        <form
+          id="type-form"
+          style="display: flex; flex-direction: column; gap: 1rem"
+        >
+          <div>
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text-main);
+              "
+              >Nome:</label
+            >
+            <input
+              type="text"
+              id="type-name"
+              required
+              style="
+                width: 100%;
+                padding: 0.5rem;
+                border: 1px solid var(--border);
+                border-radius: 4px;
+                background: var(--bg-main);
+                color: var(--text-main);
+              "
+            />
+          </div>
+          <div>
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text-main);
+              "
+              >Descrição:</label
+            >
+            <input
+              type="text"
+              id="type-description"
+              required
+              style="
+                width: 100%;
+                padding: 0.5rem;
+                border: 1px solid var(--border);
+                border-radius: 4px;
+                background: var(--bg-main);
+                color: var(--text-main);
+              "
+            />
+          </div>
+          <div>
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text-main);
+              "
+              >Categoria:</label
+            >
+            <select
+              id="type-category"
+              required
+              style="
+                width: 100%;
+                padding: 0.5rem;
+                border: 1px solid var(--border);
+                border-radius: 4px;
+                background: var(--bg-main);
+                color: var(--text-main);
+              "
+            >
+              <option value="">Selecione uma categoria</option>
+              <option value="Sensor">Sensor</option>
+              <option value="Atuador">Atuador</option>
+            </select>
+          </div>
+          <div style="display: flex; gap: 1rem; justify-content: flex-end">
+            <button
+              type="button"
+              id="type-cancel-btn"
+              class="btn-primary"
+              style="background: var(--border); cursor: pointer"
+            >
+              Cancelar
+            </button>
+            <button type="submit" class="btn-primary" style="cursor: pointer">
+              Guardar
             </button>
           </div>
         </form>
