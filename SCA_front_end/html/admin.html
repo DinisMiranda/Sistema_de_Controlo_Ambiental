@@ -24,57 +24,685 @@
         <h1>Admin Dashboard</h1>
         <small>Gestão completa do sistema</small>
       </div>
-      <a href="dashboard.html" style="
-        padding: 0.75rem 1.5rem;
-        background: var(--primary);
-        color: white;
-        border-radius: 4px;
-        text-decoration: none;
-        font-weight: 600;
-        cursor: pointer;
-      ">🏠 Return to Dashboard</a>
+      <a
+        href="dashboard.html"
+        style="
+          padding: 0.75rem 1.5rem;
+          background: var(--primary);
+          color: white;
+          border-radius: 4px;
+          text-decoration: none;
+          font-weight: 600;
+          cursor: pointer;
+        "
+        >🏠 Return to Dashboard</a
+      >
     </header>
     <main class="content">
-      <div class="card">
-        <h2>Utilizadores</h2>
-        <button class="btn-primary" id="add-user">Adicionar Utilizador</button>
-        <table
+      <!-- Tab Navigation -->
+      <div
+        style="
+          display: flex;
+          gap: 0.5rem;
+          margin-bottom: 2rem;
+          border-bottom: 2px solid var(--border);
+          overflow-x: auto;
+          padding-bottom: 0;
+        "
+      >
+        <button
+          class="tab-btn active"
+          data-tab="users"
           style="
-            width: 100%;
-            margin-top: 1rem;
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
             color: var(--text-main);
-            border-collapse: collapse;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
           "
         >
-          <tr>
-            <th>Nome</th>
-            <th>Email</th>
-            <th>Departamento</th>
-            <th>Role</th>
-          </tr>
-          <tr>
-            <td>João Silva</td>
-            <td>joao@edificio.com</td>
-            <td>Auditório</td>
-            <td style="color: var(--text-secondary)">User</td>
-            <td style="text-align: center;"><button class="delete-btn" style="background: none; border: none; color: var(--error); font-size: 1.2rem; cursor: pointer; padding: 0;">✕</button></td>
-          </tr>
-          <tr>
-            <td>Maria Sousa</td>
-            <td>maria@edificio.com</td>
-            <td>Lab A</td>
-            <td style="color: var(--text-secondary)">User</td>
-            <td style="text-align: center;"><button class="delete-btn" style="background: none; border: none; color: var(--error); font-size: 1.2rem; cursor: pointer; padding: 0;">✕</button></td>
-          </tr>
-          <tr>
-            <td>Carlos Pereira</td>
-            <td>admin@edificio.com</td>
-            <td>Administração</td>
-            <td style="color: var(--accent-orange)">Admin</td>
-            <td style="text-align: center;"><button class="delete-btn" style="background: none; border: none; color: var(--error); font-size: 1.2rem; cursor: pointer; padding: 0;">✕</button></td>
-          </tr>
-          </tr>
-        </table>
+          👥 Utilizadores
+        </button>
+        <button
+          class="tab-btn"
+          data-tab="homes"
+          style="
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--text-main);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+          "
+        >
+          🏠 Casas
+        </button>
+        <button
+          class="tab-btn"
+          data-tab="sensors-actuators"
+          style="
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--text-main);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+          "
+        >
+          📡 Sensores & Atuadores
+        </button>
+        <button
+          class="tab-btn"
+          data-tab="parameters"
+          style="
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--text-main);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+          "
+        >
+          ⚙️ Parâmetros
+        </button>
+        <button
+          class="tab-btn"
+          data-tab="types"
+          style="
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--text-main);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+          "
+        >
+          📋 Tipos
+        </button>
+        <button
+          class="tab-btn"
+          data-tab="history"
+          style="
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--text-main);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+          "
+        >
+          📜 Histórico
+        </button>
+      </div>
+
+      <!-- USERS TAB -->
+      <div id="tab-users" class="tab-content active" style="display: block">
+        <div class="card">
+          <h2>Utilizadores</h2>
+          <button class="btn-primary" id="add-user">
+            Adicionar Utilizador
+          </button>
+          <table
+            style="
+              width: 100%;
+              margin-top: 1rem;
+              color: var(--text-main);
+              border-collapse: collapse;
+            "
+          >
+            <tr>
+              <th>Nome</th>
+              <th>Email</th>
+              <th>Departamento</th>
+              <th>Role</th>
+              <th>Ações</th>
+            </tr>
+            <tr>
+              <td>João Silva</td>
+              <td>joao@edificio.com</td>
+              <td>Auditório</td>
+              <td style="color: var(--text-secondary)">User</td>
+              <td style="text-align: center">
+                <button
+                  class="delete-btn"
+                  style="
+                    background: none;
+                    border: none;
+                    color: var(--error);
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                    padding: 0;
+                  "
+                >
+                  ✕
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>Maria Sousa</td>
+              <td>maria@edificio.com</td>
+              <td>Lab A</td>
+              <td style="color: var(--text-secondary)">User</td>
+              <td style="text-align: center">
+                <button
+                  class="delete-btn"
+                  style="
+                    background: none;
+                    border: none;
+                    color: var(--error);
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                    padding: 0;
+                  "
+                >
+                  ✕
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>Carlos Pereira</td>
+              <td>admin@edificio.com</td>
+              <td>Administração</td>
+              <td style="color: var(--accent-orange)">Admin</td>
+              <td style="text-align: center">
+                <button
+                  class="delete-btn"
+                  style="
+                    background: none;
+                    border: none;
+                    color: var(--error);
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                    padding: 0;
+                  "
+                >
+                  ✕
+                </button>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- HOMES TAB -->
+      <div id="tab-homes" class="tab-content" style="display: none">
+        <div class="card">
+          <h2>Gestão de Casas</h2>
+          <button class="btn-primary" id="add-home">Adicionar Casa</button>
+          <table
+            style="
+              width: 100%;
+              margin-top: 1rem;
+              color: var(--text-main);
+              border-collapse: collapse;
+            "
+          >
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th>Localização</th>
+              <th>Tipo</th>
+              <th>Ações</th>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>Auditório</td>
+              <td>Andar 1</td>
+              <td>Sala de Conferências</td>
+              <td style="text-align: center">
+                <button
+                  class="edit-btn"
+                  style="
+                    background: none;
+                    border: none;
+                    color: var(--primary);
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                    padding: 0;
+                    margin-right: 0.5rem;
+                  "
+                >
+                  ✎
+                </button>
+                <button
+                  class="delete-btn"
+                  style="
+                    background: none;
+                    border: none;
+                    color: var(--error);
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                    padding: 0;
+                  "
+                >
+                  ✕
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Laboratório A</td>
+              <td>Andar 2</td>
+              <td>Laboratório</td>
+              <td style="text-align: center">
+                <button
+                  class="edit-btn"
+                  style="
+                    background: none;
+                    border: none;
+                    color: var(--primary);
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                    padding: 0;
+                    margin-right: 0.5rem;
+                  "
+                >
+                  ✎
+                </button>
+                <button
+                  class="delete-btn"
+                  style="
+                    background: none;
+                    border: none;
+                    color: var(--error);
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                    padding: 0;
+                  "
+                >
+                  ✕
+                </button>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- SENSORS & ACTUATORS TAB -->
+      <div id="tab-sensors-actuators" class="tab-content" style="display: none">
+        <div class="card">
+          <h2>Sensores e Atuadores</h2>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button class="btn-primary" id="add-sensor">Adicionar Sensor</button>
+            <button
+              class="btn-primary"
+              id="add-actuator"
+            >
+              Adicionar Atuador
+            </button>
+          </div>
+          <table
+            style="
+              width: 100%;
+              margin-top: 1rem;
+              color: var(--text-main);
+              border-collapse: collapse;
+            "
+          >
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th>Tipo</th>
+              <th>Casa</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+            <tr>
+              <td>S001</td>
+              <td>Sensor Temperatura 1</td>
+              <td>Temperatura</td>
+              <td>Auditório</td>
+              <td>
+                <span style="color: var(--success); font-weight: bold"
+                  >● Ativo</span
+                >
+              </td>
+              <td style="text-align: center">
+                <button
+                  class="edit-btn"
+                  style="
+                    background: none;
+                    border: none;
+                    color: var(--primary);
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                    padding: 0;
+                    margin-right: 0.5rem;
+                  "
+                >
+                  ✎
+                </button>
+                <button
+                  class="delete-btn"
+                  style="
+                    background: none;
+                    border: none;
+                    color: var(--error);
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                    padding: 0;
+                  "
+                >
+                  ✕
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>A001</td>
+              <td>Ar Condicionado 1</td>
+              <td>Atuador</td>
+              <td>Auditório</td>
+              <td>
+                <span style="color: var(--success); font-weight: bold"
+                  >● Ativo</span
+                >
+              </td>
+              <td style="text-align: center">
+                <button
+                  class="edit-btn"
+                  style="
+                    background: none;
+                    border: none;
+                    color: var(--primary);
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                    padding: 0;
+                    margin-right: 0.5rem;
+                  "
+                >
+                  ✎
+                </button>
+                <button
+                  class="delete-btn"
+                  style="
+                    background: none;
+                    border: none;
+                    color: var(--error);
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                    padding: 0;
+                  "
+                >
+                  ✕
+                </button>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- PARAMETERS TAB -->
+      <div id="tab-parameters" class="tab-content" style="display: none">
+        <div class="card">
+          <h2>Parâmetros Automáticos</h2>
+          <button class="btn-primary" id="add-parameter">
+            Adicionar Parâmetro
+          </button>
+          <table
+            style="
+              width: 100%;
+              margin-top: 1rem;
+              color: var(--text-main);
+              border-collapse: collapse;
+            "
+          >
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th>Descrição</th>
+              <th>Valor Min</th>
+              <th>Valor Max</th>
+              <th>Ações</th>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>Temperatura Ideal</td>
+              <td>Temperatura recomendada para conforto</td>
+              <td>18°C</td>
+              <td>24°C</td>
+              <td style="text-align: center">
+                <button
+                  class="edit-btn"
+                  style="
+                    background: none;
+                    border: none;
+                    color: var(--primary);
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                    padding: 0;
+                    margin-right: 0.5rem;
+                  "
+                >
+                  ✎
+                </button>
+                <button
+                  class="delete-btn"
+                  style="
+                    background: none;
+                    border: none;
+                    color: var(--error);
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                    padding: 0;
+                  "
+                >
+                  ✕
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Humidade Ideal</td>
+              <td>Umidade recomendada para ambiente</td>
+              <td>40%</td>
+              <td>60%</td>
+              <td style="text-align: center">
+                <button
+                  class="edit-btn"
+                  style="
+                    background: none;
+                    border: none;
+                    color: var(--primary);
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                    padding: 0;
+                    margin-right: 0.5rem;
+                  "
+                >
+                  ✎
+                </button>
+                <button
+                  class="delete-btn"
+                  style="
+                    background: none;
+                    border: none;
+                    color: var(--error);
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                    padding: 0;
+                  "
+                >
+                  ✕
+                </button>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- TYPES TAB -->
+      <div id="tab-types" class="tab-content" style="display: none">
+        <div class="card">
+          <h2>Gestão de Tipos</h2>
+          <button class="btn-primary" id="add-type">Adicionar Tipo</button>
+          <table
+            style="
+              width: 100%;
+              margin-top: 1rem;
+              color: var(--text-main);
+              border-collapse: collapse;
+            "
+          >
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th>Descrição</th>
+              <th>Categoria</th>
+              <th>Ações</th>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>Temperatura</td>
+              <td>Sensor de temperatura ambiente</td>
+              <td>Sensor</td>
+              <td style="text-align: center">
+                <button
+                  class="edit-btn"
+                  style="
+                    background: none;
+                    border: none;
+                    color: var(--primary);
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                    padding: 0;
+                    margin-right: 0.5rem;
+                  "
+                >
+                  ✎
+                </button>
+                <button
+                  class="delete-btn"
+                  style="
+                    background: none;
+                    border: none;
+                    color: var(--error);
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                    padding: 0;
+                  "
+                >
+                  ✕
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Umidade</td>
+              <td>Sensor de umidade do ar</td>
+              <td>Sensor</td>
+              <td style="text-align: center">
+                <button
+                  class="edit-btn"
+                  style="
+                    background: none;
+                    border: none;
+                    color: var(--primary);
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                    padding: 0;
+                    margin-right: 0.5rem;
+                  "
+                >
+                  ✎
+                </button>
+                <button
+                  class="delete-btn"
+                  style="
+                    background: none;
+                    border: none;
+                    color: var(--error);
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                    padding: 0;
+                  "
+                >
+                  ✕
+                </button>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- HISTORY TAB -->
+      <div id="tab-history" class="tab-content" style="display: none">
+        <div class="card">
+          <h2>Histórico de Ações do Sistema</h2>
+          <div style="margin-bottom: 1rem">
+            <input
+              type="search"
+              id="history-search"
+              placeholder="Procurar no histórico..."
+              style="
+                width: 100%;
+                max-width: 300px;
+                padding: 0.5rem;
+                border: 1px solid var(--border);
+                border-radius: 4px;
+                background: var(--bg-main);
+                color: var(--text-main);
+              "
+            />
+          </div>
+          <table
+            style="
+              width: 100%;
+              margin-top: 1rem;
+              color: var(--text-main);
+              border-collapse: collapse;
+              font-size: 0.9rem;
+            "
+          >
+            <tr>
+              <th>Data/Hora</th>
+              <th>Utilizador</th>
+              <th>Ação</th>
+              <th>Tipo</th>
+              <th>Detalhes</th>
+            </tr>
+            <tr>
+              <td>2024-01-15 10:30:45</td>
+              <td>Carlos Pereira</td>
+              <td>Criar</td>
+              <td>Utilizador</td>
+              <td>Novo utilizador: João Silva</td>
+            </tr>
+            <tr>
+              <td>2024-01-15 09:15:22</td>
+              <td>Maria Sousa</td>
+              <td>Modificar</td>
+              <td>Sensor</td>
+              <td>Atualizado: Sensor Temperatura 1</td>
+            </tr>
+            <tr>
+              <td>2024-01-14 16:45:10</td>
+              <td>Carlos Pereira</td>
+              <td>Eliminar</td>
+              <td>Parâmetro</td>
+              <td>Removido: Parâmetro de Iluminação</td>
+            </tr>
+            <tr>
+              <td>2024-01-14 14:20:33</td>
+              <td>João Silva</td>
+              <td>Visualizar</td>
+              <td>Casa</td>
+              <td>Acesso ao Auditório</td>
+            </tr>
+          </table>
+        </div>
       </div>
     </main>
 
@@ -104,7 +732,9 @@
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         "
       >
-        <h3 style="color: var(--text-main); margin-top: 0">Confirmar Eliminação</h3>
+        <h3 style="color: var(--text-main); margin-top: 0">
+          Confirmar Eliminação
+        </h3>
         <p style="color: var(--text-main); margin: 1rem 0">
           Tem certeza de que deseja eliminar este utilizador?
         </p>
