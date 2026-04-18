@@ -118,7 +118,7 @@ cd /caminho/para/Sistema_de_Controlo_Ambiental/scripts
 
 ### Load order
 
-Insert **`Tipos`** before **`sensores`**, **`atuadores`**, and **`acoes_sistema`** (FKs referenciam `Tipos.classe` / `Tipos.tipo`). Garante que existem linhas `Acao_sistema` / … antes de inserir `acoes_sistema`.
+Insert **`Tipos`** before **`sensores`**, **`atuadores`**, and **`acoes_sistema`** (FKs referenciam `Tipos.classe` / `Tipos.tipo`). Carrega **`atuadores`** antes de **`parametros_automaticos`**. Para **`registos_consumo`**, importa **`leituras_sensor`** primeiro (FK para `id_leitura`).
 
 ### Import safety checklist
 
@@ -145,6 +145,25 @@ cd /caminho/para/Sistema_de_Controlo_Ambiental/scripts
 | `ACOES_SISTEMA_OUTPUT` | Output path. Default: `generated/acoes_sistema_examination.csv`. |
 
 Primary key `id_acao` is not in the CSV; MySQL assigns it on `INSERT`.
+
+## `seed_parametros_automaticos.py`
+
+Gera linhas para **`parametros_automaticos`**: `nome_parametro`, `valor_parametro`, `descricao`, `data_atualizacao`, `atuadores_id_atuador` (FK a `atuadores.id_atuador`).
+
+```bash
+cd /caminho/para/Sistema_de_Controlo_Ambiental/scripts
+.venv/bin/python seed_parametros_automaticos.py
+.venv/bin/python seed_parametros_automaticos.py -n 40 --seed 42
+.venv/bin/python seed_parametros_automaticos.py --atuadores-csv generated/atuadores_examination.csv
+```
+
+| Variable | Meaning |
+|----------|---------|
+| `NUM_PARAMETROS_AUTOMATICOS` | Row count if you omit `-n` (default **35**). |
+| `NUM_ATUADORES` | Max `atuadores_id_atuador` when not using `--atuadores-csv` / `--max-atuador-id` (default **20**). |
+| `PARAMETROS_AUTOMATICOS_OUTPUT` | Output path. Default: `generated/parametros_automaticos_examination.csv`. |
+
+Primary key `id_parametro` is not in the CSV; MySQL assigns it on `INSERT`.
 
 ### Related files
 
