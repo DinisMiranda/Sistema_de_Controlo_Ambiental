@@ -1,0 +1,555 @@
+:root {
+  --bg-main: #09090b;
+  --bg-secondary: #000000;
+  --bg-card: #18181b;
+  --border: #27272a;
+  --border-light: #3f3f46;
+
+  --text-main: #ffffff;
+  --text-secondary: #a1a1aa;
+  --text-disabled: #52525b;
+
+  --accent-orange: #f97316;
+  --accent-blue: #3b82f6;
+  --accent-yellow: #eab308;
+  --success: #22c55e;
+  --error: #ef4444;
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  min-height: 100vh;
+}
+
+/* ===== Login Page ===== */
+.login-page {
+  display: flex;
+  height: 100vh;
+}
+
+.login-left {
+  flex: 1;
+  background: linear-gradient(
+    135deg,
+    rgba(249, 115, 22, 0.1),
+    rgba(59, 130, 246, 0.1),
+    rgba(234, 179, 8, 0.1)
+  );
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--bg-secondary);
+}
+
+.login-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 2rem;
+  border-radius: 0.75rem;
+  width: 320px;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(0,0,0,0.25);
+}
+
+input[type="email"],
+input[type="password"] {
+  background: var(--bg-main);
+  color: var(--text-main);
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  padding: 0.75rem;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.btn-primary {
+  background-color: var(--accent-orange);
+  border: none;
+  color: white;
+  padding: 0.8rem;
+  border-radius: 6px;
+  width: 100%;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+a {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ===== Sidebar Dashboard ===== */
+.dashboard {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 280px;
+  background-color: var(--bg-card);
+  border-right: 10px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.nav-item {
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.nav-item.active {
+  border-left: 4px solid var(--accent-orange);
+  background: rgba(249, 115, 22, 0.1);
+  color: var(--text-main);
+}
+
+.nav-item:hover {
+  background-color: var(--border);
+  color: var(--text-main);
+}
+
+.content {
+  flex: 1;
+  padding: 2rem;
+  background-color: var(--bg-main);
+  overflow-y: auto;
+}
+
+/* ===== Cards ===== */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  border-radius: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.card h2 {
+  margin: 0 0 1rem;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 33%;
+}
+.metric-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .login-page {
+    flex-direction: column;
+  }
+  .sidebar {
+    display: none;
+  }
+}
+
+.error-msg {
+  color: var(--error);
+  margin-top: 1rem;
+  background: rgba(239,68,68,0.1);
+  border: 1px solid var(--error);
+  padding: 0.5rem;
+  border-radius: 6px;
+}
+
+.hidden {
+  display: none;
+}
+
+
+/* ========================================
+   CARD DE CONDIÇÕES ATUAIS
+   ======================================== */
+
+.conditions-card {
+  margin-bottom: 2rem;
+}
+
+.card-header {
+  margin-bottom: 1.5rem;
+}
+
+.card-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+/* ========================================
+   GRID DE MÉTRICAS
+   ======================================== */
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* ========================================
+   CARDS DE MÉTRICA INDIVIDUAIS
+   ======================================== */
+
+.metric-card {
+  background-color: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: currentColor;
+  opacity: 0.6;
+}
+
+.metric-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+
+/* Temperatura - Laranja */
+.temperature-card {
+  color: #f97316;
+  background: linear-gradient(135deg, rgba(249,115,22,0.05) 0%, rgba(249,115,22,0.15) 100%);
+  border-color: rgba(249,115,22,0.2);
+}
+
+/* Umidade - Azul */
+.humidity-card {
+  color: #3b82f6;
+  background: linear-gradient(135deg, rgba(59,130,246,0.05) 0%, rgba(59,130,246,0.15) 100%);
+  border-color: rgba(59,130,246,0.2);
+}
+
+/* Qualidade do Ar - Amarelo */
+.air-quality-card {
+  color: #eab308;
+  background: linear-gradient(135deg, rgba(234,179,8,0.05) 0%, rgba(234,179,8,0.15) 100%);
+  border-color: rgba(234,179,8,0.2);
+}
+
+/* ========================================
+   ELEMENTOS DA MÉTRICA
+   ======================================== */
+
+.metric-icon {
+  margin-bottom: 1rem;
+  opacity: 0.9;
+}
+
+.metric-icon svg {
+  width: 40px;
+  height: 40px;
+  stroke: currentColor;
+}
+
+.metric-value {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+
+.air-quality-text {
+  font-size: 2rem;
+}
+
+.metric-unit {
+  font-size: 1.5rem;
+  color: currentColor;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  min-height: 2rem;
+}
+
+.metric-label {
+  font-size: 0.875rem;
+  color: #a1a1aa;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ========================================
+   STATUS DE CONFORTO
+   ======================================== */
+
+.comfort-status {
+  display: flex;
+  justify-content: center;
+  padding-top: 1rem;
+  border-top: 1px solid #27272a;
+}
+
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+}
+
+.status-indicator:hover {
+  transform: scale(1.05);
+}
+
+/* Status: Confortável (Verde) */
+.status-comfortable {
+  background-color: rgba(34,197,94,0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34,197,94,0.3);
+}
+
+/* Status: Atenção (Amarelo) */
+.status-attention {
+  background-color: rgba(234,179,8,0.15);
+  color: #eab308;
+  border: 1px solid rgba(234,179,8,0.3);
+}
+
+/* Status: Alerta (Vermelho) */
+.status-alert {
+  background-color: rgba(239,68,68,0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239,68,68,0.3);
+}
+
+.status-icon {
+  flex-shrink: 0;
+}
+
+.status-text {
+  white-space: nowrap;
+}
+
+/* ========================================
+   ANIMAÇÕES
+   ======================================== */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.metric-card {
+  animation: fadeInUp 0.4s ease backwards;
+}
+
+.metric-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.metric-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.metric-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+/* ========================================
+   RESPONSIVIDADE
+   ======================================== */
+
+@media (max-width: 768px) {
+  .metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .metric-value {
+    font-size: 2.5rem;
+  }
+  
+  .air-quality-text {
+    font-size: 1.75rem;
+  }
+  
+  .metric-unit {
+    font-size: 1.25rem;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .metrics-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ===== Botões específicos de métricas ===== */
+
+/* Temperatura - laranja */
+.btn-temperature {
+  background-color: transparent;
+  color: var(--accent-orange);
+  border: 1px solid var(--accent-orange);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.75rem;
+  transition: all 0.2s ease;
+}
+.btn-temperature:hover {
+  background-color: var(--accent-orange);
+  color: #fff;
+  transform: translateY(-1px);
+}
+.btn-temperature:active {
+  transform: translateY(0);
+  opacity: 0.9;
+}
+
+/* Umidade - azul */
+.btn-humidity {
+  background-color: transparent;
+  color: var(--accent-blue);
+  border: 1px solid var(--accent-blue);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.75rem;
+  transition: all 0.2s ease;
+}
+.btn-humidity:hover {
+  background-color: var(--accent-blue);
+  color: #fff;
+  transform: translateY(-1px);
+}
+.btn-humidity:active {
+  transform: translateY(0);
+  opacity: 0.9;
+}
+
+/* Qualidade do ar - amarelo */
+.btn-air {
+  background-color: transparent;
+  color: var(--accent-yellow);
+  border: 1px solid var(--accent-yellow);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.75rem;
+  transition: all 0.2s ease;
+}
+.btn-air:hover {
+  background-color: var(--accent-yellow);
+  color: #000;
+  transform: translateY(-1px);
+}
+.btn-air:active {
+  transform: translateY(0);
+  opacity: 0.9;
+}
+
+/* Layout de cada métrica (ajuste opcional) */
+.metric-card {
+  text-align: center;
+  padding: 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-card);
+  box-shadow: 0 0 8px rgba(0,0,0,0.25);
+}
+
+/* Botão amarelo (Iluminação) */
+.btn-light {
+  background-color: transparent;
+  color: var(--accent-yellow);
+  border: 1px solid var(--accent-yellow);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.btn-light:hover {
+  background-color: var(--accent-yellow);
+  color: #000;
+  transform: translateY(-1px);
+}
+
+.btn-light:active {
+  transform: translateY(0);
+  opacity: 0.9;
+}
+
+/* Caixa de informação das luzes */
+.light-info {
+  margin-top: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+th {
+  bottom: 0.5rem;
+}
+
+td {
+  height: 1.5rem;
+  text-align: center;
+}

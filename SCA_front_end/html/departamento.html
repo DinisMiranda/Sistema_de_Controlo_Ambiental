@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Departamentos - Sistema de Controlo Ambiental</title>
+  <link rel="stylesheet" href="Css/style.css">
+  <link rel="stylesheet" href="Css/departamento.css">
+  <script src="Js/departamento.js" defer></script>
+</head>
+<body>
+  <div class="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <h2>Sistema de Controlo Ambiental</h2>
+        <a href="dashboard.html" class="nav-item">🏠 Home</a>
+        <a href="#" class="nav-item active">📈 Departamentos</a>
+        <a href="relatorio.html" class="nav-item">📄 Relatórios</a>
+        <a href="sistema.html" class="nav-item">⚙️ Sistema</a>
+        <a href="admin.html" class="nav-item admin-link">🛡️ Admin</a>
+      </div>
+      <div class="sidebar-bottom">
+          <p id="user-info"></p>
+          <button id="logout-btn" class="btn-primary">Sair</button>
+      </div>
+    </aside>
+
+    <!-- Conteúdo Principal -->
+    <main class="content">
+      <!-- Header da Página -->
+      <header class="page-header">
+        <div class="header-content">
+          <h1 class="page-title">Departamentos</h1>
+          <p class="page-subtitle">Visão geral de todas as salas e ambientes</p>
+        </div>
+        <div class="header-stats">
+          <div class="stat-item">
+            <span class="stat-value" id="total-rooms">5</span>
+            <span class="stat-label">Salas</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value status-ok" id="rooms-ok">3</span>
+            <span class="stat-label">Normal</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value status-warning" id="rooms-warning">1</span>
+            <span class="stat-label">Atenção</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value status-alert" id="rooms-alert">1</span>
+            <span class="stat-label">Alerta</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Filtros -->
+      <div class="filters-container">
+        <button class="filter-btn active" data-filter="all">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          Todos
+        </button>
+        <button class="filter-btn filter-temperature" data-filter="temperature">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"></path>
+          </svg>
+          Temperatura
+        </button>
+        <button class="filter-btn filter-humidity" data-filter="humidity">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+          </svg>
+          Humidade
+        </button>
+        <button class="filter-btn filter-light" data-filter="light">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          Iluminação
+        </button>
+      </div>
+
+      <!-- Grid de Cards de Departamentos -->
+      <div class="departments-grid" id="departments-grid">
+        <!-- Os cards serão gerados dinamicamente pelo JavaScript -->
+      </div>
+
+      <!-- Mensagem quando não há resultados -->
+      <div class="no-results" id="no-results" style="display: none;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <h3>Nenhuma sala encontrada</h3>
+        <p>Não há salas com alertas nesta categoria</p>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

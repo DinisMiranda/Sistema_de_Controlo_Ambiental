@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sistema de Controlo Ambiental</title>
+    <link rel="stylesheet" href="Css/style.css" />
+    <script src="Js/dashboard.js" defer></script>
+  </head>
+  <body>
+    <div class="dashboard">
+      <aside class="sidebar">
+        <div class="sidebar-top">
+          <h2>Sistema de Controlo Ambiental</h2>
+          <a href="#" class="nav-item active">🏠 Home</a>
+          <a href="departamento.html" class="nav-item">📈 Departamentos</a>
+          <a href="relatorio.html" class="nav-item">📄 Relatórios</a>
+          <a href="sistema.html" class="nav-item">⚙️ Sistema</a>
+          <a href="admin.html" class="nav-item admin-link">🛡️ Admin</a>
+        </div>
+        <div class="sidebar-bottom">
+          <p id="user-info"></p>
+          <button id="logout-btn" class="btn-primary">Sair</button>
+        </div>
+      </aside>
+
+      <main class="content">
+  <!-- NOVO: Header Superior -->
+  <header class="dashboard-header">
+    <div class="header-left">
+      <div class="header-logo"></div>
+      <div class="header-titles">
+        <h1 class="header-title">Dashboard de Controlo</h1>
+        <p class="header-subtitle">Monitoramento em tempo real</p>
+      </div>
+    </div>
+    
+    <div class="header-right">
+      <div class="room-selector">
+        <label for="room-select" class="visually-hidden">Selecionar Sala</label>
+        <select id="room-select" class="room-select">
+          <option value="sala-101">Sala 101</option>
+          <option value="sala-102">Sala 102</option>
+          <option value="sala-201">Sala 201</option>
+          <option value="auditorio">Auditório Principal</option>
+          <option value="laboratorio">Laboratório A</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <!-- Card: Condições Atuais -->
+<div class="card conditions-card">
+  <div class="card-header">
+    <h2 id="current-room-title">Condições Atuais - Sala 101</h2>
+  </div>
+  
+  <div class="metrics-grid">
+<!-- Métrica: Temperatura -->
+<div class="metric-card temperature-card">
+  <div class="metric-icon">
+    <svg xmlns="[w3.org](http://www.w3.org/2000/svg)" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"></path>
+    </svg>
+  </div>
+  <div class="metric-value" id="temperature-value">22.5</div>
+  <div class="metric-unit">°C</div>
+  <div class="metric-label">Temperatura</div>
+
+  <button class="btn-temperature" id="btn-temp">Ver Temperatura</button>
+</div>
+
+<!-- Métrica: Umidade -->
+<div class="metric-card humidity-card">
+  <div class="metric-icon">
+    <svg xmlns="[w3.org](http://www.w3.org/2000/svg)" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+    </svg>
+  </div>
+  <div class="metric-value" id="humidity-value">45</div>
+  <div class="metric-unit">%</div>
+  <div class="metric-label">Humidade</div>
+
+  <button class="btn-humidity" id="btn-humidity">Ver Humidade</button>
+</div>
+
+<!-- Métrica: Iluminação -->
+<div class="metric-card light-card">
+  <div class="metric-icon">
+    <svg xmlns="[w3.org](http://www.w3.org/2000/svg)" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 18a6 6 0 0 0 6-6h3a9 9 0 1 1-18 0h3a6 6 0 0 0 6 6z"></path>
+      <line x1="12" y1="2" x2="12" y2="6"></line>
+      <line x1="4.22" y1="4.22" x2="6.34" y2="6.34"></line>
+      <line x1="2" y1="12" x2="6" y2="12"></line>
+      <line x1="17.66" y1="6.34" x2="19.78" y2="4.22"></line>
+      <line x1="18" y1="12" x2="22" y2="12"></line>
+    </svg>
+  </div>
+
+  <div class="metric-value" id="light-percentage">71</div>
+  <div class="metric-unit">%</div>
+  <div class="metric-label">Iluminação</div>
+
+  <!-- Extra Info -->
+  <div class="light-info">
+    <strong>30</strong> de <strong>42</strong> luzes ligadas
+  </div>
+
+  <button class="btn-light" id="btn-light">Ver Iluminação</button>
+</div>
+
+
+
+  <!-- Status de Conforto -->
+  <div class="comfort-status" id="comfort-status">
+    <div class="status-indicator status-comfortable">
+      <svg class="status-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+      <span class="status-text">Ambiente Confortável</span>
+    </div>
+  </div>
+</div>
+
+  <!-- Card: Painel de Controlo -->
+  <div class="card">
+    <h2>Painel de Controle</h2>
+    <p>Modo: <span id="control-mode">Automático</span></p>
+    <button id="toggle-mode" class="btn-primary">Alternar Modo</button>
+  </div>
+</main>
+    </div>
+  </body>
+</html>
