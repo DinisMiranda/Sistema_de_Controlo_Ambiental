@@ -33,6 +33,9 @@ coverage/
 # Misc
 *.local
 .cache
+# Microsoft Word lock file while a document is open
+~$*
+
 .cursor/
 .cursor/rules/
 scripts/.venv/
