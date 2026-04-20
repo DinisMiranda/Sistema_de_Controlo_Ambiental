@@ -1,0 +1,21 @@
+nome,tipo_atuador,localizacao,estado,Tipos_classe,Tipos_tipo
+Atuador — Climatizacao_Temperatura_ambiente (Quarto — Travessa de Pinheiro),Climatizacao_Temperatura_ambiente,Quarto — Travessa de Pinheiro,inativo,Atuador,Climatizacao_Temperatura_ambiente
+Atuador — Climatizacao_Temperatura_ambiente (Escritório — Avenida Correia),Climatizacao_Temperatura_ambiente,Escritório — Avenida Correia,ativo,Atuador,Climatizacao_Temperatura_ambiente
+Atuador — Rele_circuito_Consumo_energetico_kWh (Sala — Largo Figueiredo),Rele_circuito_Consumo_energetico_kWh,Sala — Largo Figueiredo,ativo,Atuador,Rele_circuito_Consumo_energetico_kWh
+Atuador — Climatizacao_Temperatura_ambiente (Escritório — Av Henrique Carvalho),Climatizacao_Temperatura_ambiente,Escritório — Av Henrique Carvalho,inativo,Atuador,Climatizacao_Temperatura_ambiente
+Atuador — Iluminacao_regulatoria_Luminosidade (Hall — Av Noah Coelho),Iluminacao_regulatoria_Luminosidade,Hall — Av Noah Coelho,manutenção,Atuador,Iluminacao_regulatoria_Luminosidade
+Atuador — Ventilacao_Humidade_relativa (Hall),Ventilacao_Humidade_relativa,Hall,inativo,Atuador,Ventilacao_Humidade_relativa
+Atuador — Ventilacao_Humidade_relativa (Cave 2),Ventilacao_Humidade_relativa,Cave 2,inativo,Atuador,Ventilacao_Humidade_relativa
+Atuador — Ventilacao_Humidade_relativa (Hall 2),Ventilacao_Humidade_relativa,Hall 2,inativo,Atuador,Ventilacao_Humidade_relativa
+Atuador — Rele_circuito_Consumo_energetico_kWh (Hall 4),Rele_circuito_Consumo_energetico_kWh,Hall 4,ativo,Atuador,Rele_circuito_Consumo_energetico_kWh
+Atuador — Rele_circuito_Consumo_energetico_kWh (Hall 4),Rele_circuito_Consumo_energetico_kWh,Hall 4,inativo,Atuador,Rele_circuito_Consumo_energetico_kWh
+Atuador — Rele_circuito_Consumo_energetico_kWh (Cozinha 1),Rele_circuito_Consumo_energetico_kWh,Cozinha 1,ativo,Atuador,Rele_circuito_Consumo_energetico_kWh
+Atuador — Rele_circuito_Consumo_energetico_kWh (Cave),Rele_circuito_Consumo_energetico_kWh,Cave,ativo,Atuador,Rele_circuito_Consumo_energetico_kWh
+Atuador — Ventilacao_Humidade_relativa (Casa de banho — Av Matos),Ventilacao_Humidade_relativa,Casa de banho — Av Matos,manutenção,Atuador,Ventilacao_Humidade_relativa
+Atuador — Rele_circuito_Consumo_energetico_kWh (Marquise),Rele_circuito_Consumo_energetico_kWh,Marquise,inativo,Atuador,Rele_circuito_Consumo_energetico_kWh
+Atuador — Ventilacao_Humidade_relativa (Marquise),Ventilacao_Humidade_relativa,Marquise,inativo,Atuador,Ventilacao_Humidade_relativa
+Atuador — Climatizacao_Temperatura_ambiente (Sala — Rua Flor da Rosa),Climatizacao_Temperatura_ambiente,Sala — Rua Flor da Rosa,manutenção,Atuador,Climatizacao_Temperatura_ambiente
+Atuador — Iluminacao_regulatoria_Luminosidade (Ático),Iluminacao_regulatoria_Luminosidade,Ático,ativo,Atuador,Iluminacao_regulatoria_Luminosidade
+Atuador — Iluminacao_regulatoria_Luminosidade (Cozinha — Avenida César Barros),Iluminacao_regulatoria_Luminosidade,Cozinha — Avenida César Barros,ativo,Atuador,Iluminacao_regulatoria_Luminosidade
+Atuador — Rele_circuito_Consumo_energetico_kWh (Sala de estar — R. Renato Miranda),Rele_circuito_Consumo_energetico_kWh,Sala de estar — R. Renato Miranda,inativo,Atuador,Rele_circuito_Consumo_energetico_kWh
+Atuador — Ventilacao_Humidade_relativa (Cozinha),Ventilacao_Humidade_relativa,Cozinha,ativo,Atuador,Ventilacao_Humidade_relativa
