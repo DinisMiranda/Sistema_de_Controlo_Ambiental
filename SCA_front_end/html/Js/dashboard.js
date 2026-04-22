@@ -51,8 +51,8 @@ document.addEventListener("DOMContentLoaded", function () {
   loadUserInfo();
   setupLogout();
   checkAdminAccess();
+  initializeControlMode();
 });
-
 // ========================================
 // HEADER E SELETOR DE SALA
 // ========================================
@@ -360,17 +360,43 @@ function checkAdminAccess() {
     }
   }
 }
-
 // ========================================
-// CONTROLE DE MODO (já existente)
+// CONTROLE DE MODO
 // ========================================
 
-const toggleModeBtn = document.getElementById("toggle-mode");
-const controlModeSpan = document.getElementById("control-mode");
+function initializeControlMode() {
+  const toggleModeBtn = document.getElementById("toggle-mode");
+  const controlModeSpan = document.getElementById("control-mode");
+  const modeDescription = document.getElementById("mode-description");
 
-if (toggleModeBtn && controlModeSpan) {
+  if (!toggleModeBtn || !controlModeSpan || !modeDescription) return;
+
+  // Buscar modo guardado ou usar Automático por defeito
+  let currentMode = localStorage.getItem("controlMode") || "Automático";
+
+  function updateModeUI(mode) {
+    controlModeSpan.textContent = mode;
+    controlModeSpan.classList.remove("automatic", "manual");
+
+    if (mode === "Automático") {
+      controlModeSpan.classList.add("automatic");
+      modeDescription.textContent =
+        "O sistema ajusta automaticamente as condições ambientais.";
+      toggleModeBtn.textContent = "Alterar para Manual";
+    } else {
+      controlModeSpan.classList.add("manual");
+      modeDescription.textContent =
+        "O utilizador passa a controlar manualmente as definições do sistema.";
+      toggleModeBtn.textContent = "Alterar para Automático";
+    }
+  }
+
+  updateModeUI(currentMode);
+
   toggleModeBtn.addEventListener("click", function () {
-    const isAutomatic = controlModeSpan.textContent === "Automático";
-    controlModeSpan.textContent = isAutomatic ? "Manual" : "Automático";
+    currentMode = currentMode === "Automático" ? "Manual" : "Automático";
+    localStorage.setItem("controlMode", currentMode);
+    updateModeUI(currentMode);
   });
 }
+
