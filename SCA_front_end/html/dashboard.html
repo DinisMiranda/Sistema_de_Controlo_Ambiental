@@ -124,11 +124,21 @@
 </div>
 
   <!-- Card: Painel de Controlo -->
-  <div class="card">
-    <h2>Painel de Controle</h2>
-    <p>Modo: <span id="control-mode">Automático</span></p>
-    <button id="toggle-mode" class="btn-primary">Alternar Modo</button>
+  <div class="card control-panel-card">
+  <h2>Painel de Controle</h2>
+
+  <div class="mode-row">
+    <p class="mode-text">
+      Modo atual:
+      <span id="control-mode" class="mode-badge automatic">Automático</span>
+    </p>
+    <button id="toggle-mode" class="btn-primary">Alterar modo</button>
   </div>
+
+  <p id="mode-description" class="mode-description">
+    O sistema ajusta automaticamente as condições ambientais.
+  </p>
+</div>
 </main>
     </div>
   </body>

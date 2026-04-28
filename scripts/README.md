@@ -2,6 +2,17 @@
 
 Utilities that generate **CSV files** (UTF-8, header row) for reviewing fake rows before loading them into MySQL (or for spreadsheets). They do **not** connect to the database by default.
 
+## Gerar todos os CSVs de uma vez
+
+A partir da pasta **`scripts/`** (com venv e dependências já instaladas):
+
+```bash
+chmod +x generate_seed_csvs.sh
+./generate_seed_csvs.sh
+```
+
+Isto corre os seeds pela ordem de dependências e escreve em **`generated/`** (ex.: `tipos_examination.csv`, `casas_examination.csv`, … até `leituras_sensor_examination.csv` e `acoes_sistema_examination.csv`). Os defaults de contagem vêm de cada script e de `scripts/.env` se existir.
+
 ## `seed_utilizadores.py`
 
 Generates rows shaped like the **`Utilizadores`** table in schema `sistema_controlo_ambiental2`.
@@ -118,7 +129,7 @@ cd /caminho/para/Sistema_de_Controlo_Ambiental/scripts
 
 ### Load order
 
-Insert **`Tipos`** before **`sensores`**, **`atuadores`**, and **`acoes_sistema`** (FKs referenciam `Tipos.classe` / `Tipos.tipo`). Garante que existem linhas `Acao_sistema` / … antes de inserir `acoes_sistema`. Carrega **`leituras_sensor`** antes de **`registos_consumo`** (FK para `id_leitura`).
+Insert **`Tipos`** before **`sensores`**, **`atuadores`**, **`acoes_sistema`**, and **`leituras_sensor`** (FKs referenciam `Tipos` ou `sensores`). Carrega **`sensores`** antes de **`leituras_sensor`**.
 
 ### Import safety checklist
 
@@ -126,6 +137,25 @@ Insert **`Tipos`** before **`sensores`**, **`atuadores`**, and **`acoes_sistema`
 2. **`Utilizadores.palavra_passe_hash`** — Values are **not** production password hashes (bcrypt/Argon2); only for demos and local DBs.
 3. **`Casa_Administradores`** — `id_casa` / `id_utilizador` must match real `AUTO_INCREMENT` values after you load **`casas`** and **`Utilizadores`** in order with **no gaps** you did not account for. Prefer `seed_casa_administradores.py --casas-csv` / `--utilizadores-csv` so bounds follow your CSV row counts.
 4. **Column names** — MySQL column `descrição` in `Tipos` may need backticks in `INSERT`; map CSV `descricao` accordingly.
+
+## `seed_leituras_sensor.py`
+
+Gera linhas para **`leituras_sensor`**: `id_sensor`, `valor`, `unidade`, `timestamp_leitura`. Com **`--sensores-csv`**, cada `id_sensor` usa o `Tipos_tipo` da mesma linha no CSV de sensores (primeira linha de dados → `id_sensor` = 1) para intervalos plausíveis (lx, °C, %, kWh). Sem esse ficheiro, o script avisa no stderr e escolhe um tipo de leitura aleatório por linha (pode não coincidir com o sensor na BD).
+
+```bash
+cd /caminho/para/Sistema_de_Controlo_Ambiental/scripts
+.venv/bin/python seed_leituras_sensor.py
+.venv/bin/python seed_leituras_sensor.py -n 200 --seed 42
+.venv/bin/python seed_leituras_sensor.py --sensores-csv generated/sensores_examination.csv
+```
+
+| Variable | Meaning |
+|----------|---------|
+| `NUM_LEITURAS_SENSOR` | Row count if you omit `-n` (default **120**). |
+| `NUM_SENSORES` | Max `id_sensor` when not using `--sensores-csv` / `--max-sensor-id` (default **20**). |
+| `LEITURAS_SENSOR_OUTPUT` | Output path. Default: `generated/leituras_sensor_examination.csv`. |
+
+Primary key `id_leitura` is not in the CSV; MySQL assigns it on `INSERT`.
 
 ## `seed_acoes_sistema.py`
 

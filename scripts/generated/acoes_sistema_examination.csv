@@ -1,0 +1,41 @@
+id_atuador,tipo_acao,valor_aplicado,motivo,timestamp_acao,Tipos_classe,Tipos_tipo
+2,SETPOINT,23.9,,2026-03-20 11:50:22,Acao_sistema,Climatizacao_definir_consigna
+7,CLOSE,ON,,2026-04-15 03:28:03,Acao_sistema,Circuito_energia_restabelecer
+5,SETPOINT,23.4,,2026-02-06 16:54:18,Acao_sistema,Climatizacao_definir_consigna
+6,OPEN,CUTOFF,,2026-02-25 05:21:05,Acao_sistema,Circuito_energia_corte
+12,BOOST,15min,Modo noturno ativo.,2026-03-31 21:00:30,Acao_sistema,Ventilacao_reforco_ou_arranque
+11,SETPOINT,20.5,,2026-03-28 05:24:22,Acao_sistema,Climatizacao_definir_consigna
+6,RULE,T>26,,2026-02-26 18:22:48,Acao_sistema,Controlo_automatico_por_limite
+16,RULE,T>26,Reforço de ventilação por humidade elevada.,2026-03-25 22:36:29,Acao_sistema,Controlo_automatico_por_limite
+2,ON,100%,Resposta a alerta de consumo.,2026-02-14 04:06:44,Acao_sistema,Iluminacao_ligar_ou_aumentar
+4,ON,100%,Resposta a alerta de consumo.,2026-02-25 13:39:51,Acao_sistema,Iluminacao_ligar_ou_aumentar
+1,VENT,HIGH,Resposta a alerta de consumo.,2026-03-25 10:05:30,Acao_sistema,Ventilacao_reforco_ou_arranque
+20,OPEN,CUTOFF,Comando manual na aplicação.,2026-03-18 15:32:12,Acao_sistema,Circuito_energia_corte
+4,AUTO,LUX<200,Sincronização com calendário semanal.,2026-02-26 04:29:25,Acao_sistema,Controlo_automatico_por_limite
+4,FAN,ON,Restabelecimento após teste de segurança.,2026-02-03 14:42:06,Acao_sistema,Ventilacao_reforco_ou_arranque
+18,CLOSE,ON,Aumento de iluminação por pouca luminosidade.,2026-02-03 19:46:18,Acao_sistema,Circuito_energia_restabelecer
+12,OFF,0%,Manutenção programada concluída.,2026-01-25 19:47:07,Acao_sistema,Iluminacao_desligar_ou_reduzir
+15,FAN,ON,,2026-03-03 09:22:23,Acao_sistema,Ventilacao_reforco_ou_arranque
+11,DIM_UP,75%,,2026-03-09 02:05:41,Acao_sistema,Iluminacao_ligar_ou_aumentar
+2,UP,90%,Correção após leitura anómala.,2026-02-11 03:08:33,Acao_sistema,Iluminacao_ligar_ou_aumentar
+9,BOOST,15min,,2026-01-29 09:13:19,Acao_sistema,Ventilacao_reforco_ou_arranque
+14,FAN,ON,,2026-02-18 03:03:55,Acao_sistema,Ventilacao_reforco_ou_arranque
+6,DOWN,25%,Integração com sistema de presença.,2026-03-23 21:46:43,Acao_sistema,Iluminacao_desligar_ou_reduzir
+8,SETPOINT,23.9,,2026-02-24 20:03:32,Acao_sistema,Climatizacao_definir_consigna
+8,RULE,T>26,Comando manual na aplicação.,2026-04-16 19:47:56,Acao_sistema,Controlo_automatico_por_limite
+12,SETPOINT,23.6,Teste de atuador após intervenção.,2026-02-18 21:47:18,Acao_sistema,Climatizacao_definir_consigna
+6,AUTO,LUX<200,Redução de iluminação por luz natural suficiente.,2026-02-26 02:35:21,Acao_sistema,Controlo_automatico_por_limite
+4,OPEN,CUTOFF,Correção após leitura anómala.,2026-03-06 07:15:26,Acao_sistema,Circuito_energia_corte
+12,DOWN,25%,Manutenção programada concluída.,2026-02-01 04:28:04,Acao_sistema,Iluminacao_desligar_ou_reduzir
+9,CLOSE,ON,Resposta a alerta de consumo.,2026-04-11 05:44:19,Acao_sistema,Circuito_energia_restabelecer
+6,CLOSE,ON,,2026-01-26 15:44:26,Acao_sistema,Circuito_energia_restabelecer
+6,UP,90%,Aumento de iluminação por pouca luminosidade.,2026-03-28 20:23:25,Acao_sistema,Iluminacao_ligar_ou_aumentar
+7,SCHED,NIGHT,Pedido após deteção de ausência.,2026-03-22 14:47:32,Acao_sistema,Controlo_automatico_por_limite
+4,OFF,0%,Ajuste por consigna de climatização.,2026-02-06 06:06:23,Acao_sistema,Iluminacao_desligar_ou_reduzir
+20,CLOSE,ON,,2026-02-04 11:42:39,Acao_sistema,Circuito_energia_restabelecer
+19,BOOST,15min,Pedido após deteção de ausência.,2026-01-29 11:50:19,Acao_sistema,Ventilacao_reforco_ou_arranque
+10,MIN,5%,Correção após leitura anómala.,2026-04-17 09:01:58,Acao_sistema,Iluminacao_desligar_ou_reduzir
+17,OFF,0%,,2026-04-03 13:32:19,Acao_sistema,Iluminacao_desligar_ou_reduzir
+16,UP,90%,,2026-04-03 07:15:00,Acao_sistema,Iluminacao_ligar_ou_aumentar
+6,SCHED,NIGHT,Comando manual na aplicação.,2026-02-01 08:49:13,Acao_sistema,Controlo_automatico_por_limite
+10,OPEN,CUTOFF,Teste de atuador após intervenção.,2026-03-25 11:23:19,Acao_sistema,Circuito_energia_corte

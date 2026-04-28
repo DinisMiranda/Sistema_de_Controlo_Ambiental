@@ -1,0 +1,16 @@
+classe,tipo,descricao
+Sensor,Luminosidade,Nível de luminosidade ambiente.
+Sensor,Temperatura_ambiente,"Medição de temperatura do ar interior, habitualmente em °C."
+Sensor,Humidade_relativa,Humidade relativa do ar em percentagem.
+Sensor,Consumo_energetico_kWh,"Medidor de consumo ou energia elétrica acumulada, habitualmente em kWh."
+Atuador,Iluminacao_regulatoria_Luminosidade,Regulação de iluminação (ex.: LED) associada ao sensor tipo Luminosidade.
+Atuador,Climatizacao_Temperatura_ambiente,Climatização / aquecimento-arrefecimento associado ao sensor Temperatura_ambiente.
+Atuador,Ventilacao_Humidade_relativa,Ventilação ou tratamento de ar associado ao sensor Humidade_relativa.
+Atuador,Rele_circuito_Consumo_energetico_kWh,Relé ou contactor para comutação de circuito associado ao medidor Consumo_energetico_kWh.
+Acao_sistema,Iluminacao_ligar_ou_aumentar,Ação de ligar ou aumentar iluminação (baixa luminosidade ou comando).
+Acao_sistema,Iluminacao_desligar_ou_reduzir,Ação de desligar ou reduzir iluminação (excesso de luz ou poupança).
+Acao_sistema,Climatizacao_definir_consigna,Ação de alterar consigna ou modo de climatização (temperatura alvo).
+Acao_sistema,Ventilacao_reforco_ou_arranque,"Ação de ativar ou intensificar ventilação (humidade, renovação de ar)."
+Acao_sistema,Circuito_energia_corte,Ação de corte: relé aberto ou circuito desenergizado (proteção ou gestão de carga).
+Acao_sistema,Circuito_energia_restabelecer,Ação de restabelecer alimentação ao circuito (relé fechado).
+Acao_sistema,Controlo_automatico_por_limite,Ação disparada automaticamente por regra ou limiar (parametrização automática).
