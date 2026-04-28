@@ -196,7 +196,7 @@ def resolve_config(args: argparse.Namespace, base_dir: Path) -> ParametrosConfig
     return ParametrosConfig(num_rows=num, max_atuador_id=max_aid, output_path=out)
 
 
-def _valor_para_nome(nome: str) -> str:
+def _valor_para_nome(nome: str, atuador_id: int) -> str:
     if "temperatura" in nome or "graus" in nome or "histerese" in nome:
         return f"{random.uniform(18.0, 24.0):.1f}"
     if "lux" in nome or "luminosidade" in nome:
@@ -204,7 +204,8 @@ def _valor_para_nome(nome: str) -> str:
     if "min" in nome or "intervalo" in nome or "tempo" in nome or "s" in nome[-1:]:
         return str(random.choice([5, 10, 15, 30, 60]))
     if "kwh" in nome or "consumo" in nome:
-        return f"{random.uniform(1.0, 50.0):.2f}"
+        consumo = f"{random.uniform(1.0, 50.0):.2f}"
+        return f"atuador_{atuador_id}:{consumo}_kwh"
     if "umidade" in nome:
         return str(random.randint(55, 75))
     return clip(str(random.uniform(0.5, 99.9)), 100)
@@ -214,12 +215,12 @@ def build_parametros_rows(faker: Faker, n: int, max_atuador_id: int) -> list[lis
     rows: list[list[str]] = []
     for _ in range(n):
         nome_raw = random.choice(NOMES_PARAMETRO)
-        valor = clip(_valor_para_nome(nome_raw), 100)
+        aid = random.randint(1, max_atuador_id)
+        valor = clip(_valor_para_nome(nome_raw, aid), 100)
         nome = clip(nome_raw, 100)
         desc = "" if random.random() < 0.25 else clip(random.choice(DESCRICOES_PT), 2000)
         ts = faker.date_time_between(start_date="-180d", end_date="now")
         ts_str = ts.strftime("%Y-%m-%d %H:%M:%S")
-        aid = random.randint(1, max_atuador_id)
         rows.append([nome, valor, desc, ts_str, str(aid)])
     return rows
 
