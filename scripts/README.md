@@ -176,6 +176,25 @@ cd /caminho/para/Sistema_de_Controlo_Ambiental/scripts
 
 Primary key `id_acao` is not in the CSV; MySQL assigns it on `INSERT`.
 
+## `seed_registros_consumo.py`
+
+Gera linhas para **`registos_consumo`**: `consumo`, `unidade`, `periodo_inicio`, `periodo_fim`, `leituras_sensor_id_leitura`. O período de fim é sempre posterior ao de início.
+
+```bash
+cd /caminho/para/Sistema_de_Controlo_Ambiental/scripts
+.venv/bin/python seed_registros_consumo.py
+.venv/bin/python seed_registros_consumo.py -n 50 --seed 42
+.venv/bin/python seed_registros_consumo.py --leituras-csv generated/leituras_sensor_examination.csv
+```
+
+| Variable | Meaning |
+|----------|---------|
+| `NUM_REGISTOS_CONSUMO` | Row count if you omit `-n` (default **50**). |
+| `REGISTROS_MAX_LEITURA_ID` | Max `leituras_sensor_id_leitura` when not using `--leituras-csv` / `--max-leitura-id` (default **120**). |
+| `REGISTOS_CONSUMO_OUTPUT` | Output path. Default: `generated/registos_consumo_examination.csv`. |
+
+Primary key `id_registo` is not in the CSV; MySQL assigns it on `INSERT`.
+
 ### Related files
 
 - `.env.example` — template for `scripts/.env`
