@@ -11,7 +11,7 @@ chmod +x generate_seed_csvs.sh
 ./generate_seed_csvs.sh
 ```
 
-Isto corre os seeds pela ordem de dependências e escreve em **`generated/`** (ex.: `tipos_examination.csv`, `casas_examination.csv`, … até `leituras_sensor_examination.csv` e `acoes_sistema_examination.csv`). Os defaults de contagem vêm de cada script e de `scripts/.env` se existir.
+Isto corre os seeds pela ordem de dependências e escreve em **`generated/`** (ex.: `tipos_examination.csv`, `casas_examination.csv`, … incluindo `leituras_sensor_examination.csv`, `acoes_sistema_examination.csv`, `parametros_automaticos_examination.csv` e `registos_consumo_examination.csv`). Os defaults de contagem vêm de cada script e de `scripts/.env` se existir.
 
 ## `seed_utilizadores.py`
 

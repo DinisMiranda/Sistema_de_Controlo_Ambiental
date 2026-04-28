@@ -27,5 +27,7 @@ mkdir -p generated
 "${PY}" seed_atuadores.py
 "${PY}" seed_leituras_sensor.py --sensores-csv generated/sensores_examination.csv
 "${PY}" seed_acoes_sistema.py --atuadores-csv generated/atuadores_examination.csv
+"${PY}" seed_parametros_automaticos.py --atuadores-csv generated/atuadores_examination.csv
+"${PY}" seed_registros_consumo.py --leituras-csv generated/leituras_sensor_examination.csv
 
 echo "Concluído. CSVs em ${SCRIPT_DIR}/generated/"

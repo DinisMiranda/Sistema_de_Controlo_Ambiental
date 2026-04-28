@@ -19,6 +19,7 @@ logs/
 *.log
 npm-debug.log*
 .DS_Store
+**/.DS_Store
 
 # IDE / Editor
 .idea/
@@ -35,11 +36,13 @@ coverage/
 .cache
 # Microsoft Word lock file while a document is open
 ~$*
+~$*.docx
 
 .cursor/
 .cursor/rules/
 scripts/.venv/
 scripts/.env
+scripts/generated/
 
 # Python
 __pycache__/
