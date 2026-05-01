@@ -6,6 +6,7 @@ import { tiposRouter } from "./tipos.routes.js";
 import { leiturasRouter } from "./leituras.routes.js";
 import { acoesRouter } from "./acoes.routes.js";
 import { consumoRouter } from "./consumo.routes.js";
+import { parametrosRouter } from "./parametros.routes.js";
 
 export const apiRouter = Router();
 
@@ -16,3 +17,4 @@ apiRouter.use("/atuadores", atuadoresRouter);
 apiRouter.use("/sensors", leiturasRouter);
 apiRouter.use("/actuators", acoesRouter);
 apiRouter.use("/", consumoRouter);
+apiRouter.use("/automatic-parameters", parametrosRouter);
