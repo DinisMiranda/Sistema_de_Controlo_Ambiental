@@ -14,7 +14,7 @@ REST API in Node.js + Express + TypeScript for the Environmental Control System.
 Copy `.env.example` to `.env` and set:
 
 - `PORT` – server port (default 3001)
-- `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` – MySQL connection
+- `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_DIALECT` – MySQL/Sequelize connection
 
 ## Endpoints (examples)
 
