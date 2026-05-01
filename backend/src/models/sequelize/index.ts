@@ -39,3 +39,7 @@ export const models = {
   RegistoConsumo,
   ParametroAutomatico,
 };
+
+export async function syncModels() {
+  await sequelize.sync({ alter: true });
+}
