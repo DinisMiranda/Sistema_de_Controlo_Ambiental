@@ -3,6 +3,7 @@ import cors from "cors";
 import { db } from "./lib/db.js";
 import { apiRouter } from "./routes/index.js";
 import { requestLogger } from "./middlewares/request-logger.js";
+import { errorHandler, notFoundHandler } from "./middlewares/error.middleware.js";
 
 export const app = express();
 
@@ -24,3 +25,5 @@ app.get("/health/db", async (_req, res) => {
 });
 
 app.use("/api", apiRouter);
+app.use(notFoundHandler);
+app.use(errorHandler);
