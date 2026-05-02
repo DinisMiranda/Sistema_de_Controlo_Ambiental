@@ -81,7 +81,10 @@ const eventsData = [
   },
 ];
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  const user = await requireAuth();
+  if (!user) return;
+
   checkAdminAccess();
   setupLogout();
   renderModules();
@@ -101,9 +104,7 @@ function checkAdminAccess() {
   const adminLink = document.querySelector(".admin-link");
 
   if (adminLink) {
-    if (
-      user.role === "Admin"
-    ) {
+    if (user.role === "Admin") {
       adminLink.style.display = "block";
     } else {
       adminLink.style.display = "none";

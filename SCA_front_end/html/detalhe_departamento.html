@@ -1,334 +1,475 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Detalhes da Sala - Sistema de Controlo Ambiental</title>
-  <link rel="stylesheet" href="Css/style.css">
-  <link rel="stylesheet" href="Css/detalhe_departamento.css">
-  <script src="Js/detalhe_departamento.js" defer></script>
-</head>
-<body>
-  <div class="dashboard">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="sidebar-top">
-        <h2>Sistema de Controlo Ambiental</h2>
-        <a href="dashboard.html" class="nav-item">🏠 Home</a>
-        <a href="departamento.html" class="nav-item">📈 Departamentos</a>
-        <a href="relatorio.html" class="nav-item">📈 Relatórios</a>
-        <a href="sistema.html" class="nav-item">⚙️ Sistema</a>
-        <a href="admin.html" class="nav-item admin-link">🛡️ Admin</a>
-      </div>
-      <div class="sidebar-bottom">
-        <p id="user-info"></p>
-        <button id="logout-btn" class="btn-primary">Sair</button>
-      </div>
-    </aside>
-
-    <!-- Conteúdo Principal -->
-    <main class="content">
-      <!-- Breadcrumb e Botão Voltar -->
-      <div class="breadcrumb-section">
-        <button class="btn-back" onclick="window.location.href='departamento.html'">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-          Voltar aos Departamentos
-        </button>
-        <div class="breadcrumb">
-          <span>Departamentos</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="9 18 15 12 9 6"></polyline>
-          </svg>
-          <span id="breadcrumb-room">Sala</span>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detalhes da Sala - Sistema de Controlo Ambiental</title>
+    <link rel="stylesheet" href="Css/style.css" />
+    <link rel="stylesheet" href="Css/detalhe_departamento.css" />
+    <script src="Js/session.js" defer></script>
+    <script src="Js/detalhe_departamento.js" defer></script>
+  </head>
+  <body>
+    <div class="dashboard">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-top">
+          <h2>Sistema de Controlo Ambiental</h2>
+          <a href="dashboard.html" class="nav-item">🏠 Home</a>
+          <a href="departamento.html" class="nav-item">📈 Departamentos</a>
+          <a href="relatorio.html" class="nav-item">📈 Relatórios</a>
+          <a href="sistema.html" class="nav-item">⚙️ Sistema</a>
+          <a href="admin.html" class="nav-item admin-link">🛡️ Admin</a>
         </div>
-      </div>
-
-      <!-- Header da Sala -->
-      <header class="room-header" id="room-header">
-        <div class="room-header-top">
-          <div class="room-title-section">
-            <h1 class="room-title" id="room-title">📍 Sala 101</h1>
-            <span class="room-badge" id="room-badge">Ativo</span>
-          </div>
-          <div class="room-status-badge" id="room-status-badge">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-              <polyline points="22 4 12 14.01 9 11.01"></polyline>
-            </svg>
-            <span id="room-status-text">Ambiente Normal</span>
-          </div>
+        <div class="sidebar-bottom">
+          <p id="user-info"></p>
+          <button id="logout-btn" class="btn-primary">Sair</button>
         </div>
+      </aside>
 
-        <div class="room-header-stats">
-          <div class="stat-box stat-temperature">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"></path>
+      <!-- Conteúdo Principal -->
+      <main class="content">
+        <!-- Breadcrumb e Botão Voltar -->
+        <div class="breadcrumb-section">
+          <button
+            class="btn-back"
+            onclick="window.location.href = 'departamento.html'"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
             </svg>
-            <div class="stat-data">
-              <span class="stat-value" id="stat-temp">22.5°C</span>
-              <span class="stat-label">Temperatura</span>
-              <span class="stat-range">Ideal: 20-24°C</span>
-            </div>
-          </div>
-
-          <div class="stat-box stat-humidity">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+            Voltar aos Departamentos
+          </button>
+          <div class="breadcrumb">
+            <span>Departamentos</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="9 18 15 12 9 6"></polyline>
             </svg>
-            <div class="stat-data">
-              <span class="stat-value" id="stat-humidity">45%</span>
-              <span class="stat-label">Umidade</span>
-              <span class="stat-range">Ideal: 40-60%</span>
-            </div>
-          </div>
-
-          <div class="stat-box stat-light">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="5"></circle>
-              <line x1="12" y1="1" x2="12" y2="3"></line>
-              <line x1="12" y1="21" x2="12" y2="23"></line>
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-              <line x1="1" y1="12" x2="3" y2="12"></line>
-              <line x1="21" y1="12" x2="23" y2="12"></line>
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-            </svg>
-            <div class="stat-data">
-              <span class="stat-value" id="stat-light">30/42</span>
-              <span class="stat-label">Iluminação Ativa</span>
-              <span class="stat-range" id="stat-light-percent">71% acesas</span>
-            </div>
-          </div>
-
-          <div class="stat-box stat-co2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
-            </svg>
-            <div class="stat-data">
-              <span class="stat-value" id="stat-co2">420 ppm</span>
-              <span class="stat-label">Qualidade do Ar</span>
-              <span class="stat-range">Ideal: < 800 ppm</span>
-            </div>
+            <span id="breadcrumb-room">Sala</span>
           </div>
         </div>
-      </header>
 
-      <!-- Seção de Gráficos de Histórico -->
-      <section class="section-container">
-        <h2 class="section-title">📊 Histórico de Monitoramento</h2>
-        <div class="charts-grid">
-          <!-- Gráfico de Temperatura -->
-          <div class="chart-card">
-            <div class="chart-header">
-              <h3 class="chart-title">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"></path>
-                </svg>
-                Temperatura (Últimas 24h)
-              </h3>
-              <div class="chart-legend">
-                <span class="legend-item">
-                  <span class="legend-dot" style="background-color: #f97316;"></span>
-                  Atual: <strong id="chart-temp-current">22.5°C</strong>
-                </span>
+        <!-- Header da Sala -->
+        <header class="room-header" id="room-header">
+          <div class="room-header-top">
+            <div class="room-title-section">
+              <h1 class="room-title" id="room-title">📍 Sala 101</h1>
+              <span class="room-badge" id="room-badge">Ativo</span>
+            </div>
+            <div class="room-status-badge" id="room-status-badge">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              <span id="room-status-text">Ambiente Normal</span>
+            </div>
+          </div>
+
+          <div class="room-header-stats">
+            <div class="stat-box stat-temperature">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"></path>
+              </svg>
+              <div class="stat-data">
+                <span class="stat-value" id="stat-temp">22.5°C</span>
+                <span class="stat-label">Temperatura</span>
+                <span class="stat-range">Ideal: 20-24°C</span>
               </div>
             </div>
-            <div class="chart-canvas" id="temp-chart-canvas"></div>
-          </div>
 
-          <!-- Gráfico de Umidade -->
-          <div class="chart-card">
-            <div class="chart-header">
-              <h3 class="chart-title">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
-                </svg>
-                Umidade (Últimas 24h)
-              </h3>
-              <div class="chart-legend">
-                <span class="legend-item">
-                  <span class="legend-dot" style="background-color: #3b82f6;"></span>
-                  Atual: <strong id="chart-humidity-current">45%</strong>
-                </span>
+            <div class="stat-box stat-humidity">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+              </svg>
+              <div class="stat-data">
+                <span class="stat-value" id="stat-humidity">45%</span>
+                <span class="stat-label">Umidade</span>
+                <span class="stat-range">Ideal: 40-60%</span>
               </div>
             </div>
-            <div class="chart-canvas" id="humidity-chart-canvas"></div>
-          </div>
-        </div>
-      </section>
 
-      <!-- Seção de Controles -->
-      <section class="section-container">
-        <h2 class="section-title">🎛️ Controles de Ambiente</h2>
-        <div class="controls-grid">
-          <!-- Controle de Climatização -->
-          <div class="control-card">
-            <div class="control-header">
-              <h3 class="control-title">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"></path>
-                </svg>
-                Climatização
-              </h3>
-              <label class="toggle-switch">
-                <input type="checkbox" id="toggle-climate" checked>
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-            <div class="control-body">
-              <div class="control-mode">
-                <span class="mode-label">Modo:</span>
-                <select class="mode-select" id="climate-mode">
-                  <option value="auto">Automático</option>
-                  <option value="manual">Manual</option>
-                  <option value="eco">Eco</option>
-                </select>
+            <div class="stat-box stat-light">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+              <div class="stat-data">
+                <span class="stat-value" id="stat-light">30/42</span>
+                <span class="stat-label">Iluminação Ativa</span>
+                <span class="stat-range" id="stat-light-percent"
+                  >71% acesas</span
+                >
               </div>
-              <div class="control-slider-group">
-                <label class="slider-label">
-                  Temperatura Alvo: <strong id="target-temp-value">22°C</strong>
+            </div>
+
+            <div class="stat-box stat-co2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+              </svg>
+              <div class="stat-data">
+                <span class="stat-value" id="stat-co2">420 ppm</span>
+                <span class="stat-label">Qualidade do Ar</span>
+                <span class="stat-range">Ideal: < 800 ppm</span>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- Seção de Gráficos de Histórico -->
+        <section class="section-container">
+          <h2 class="section-title">📊 Histórico de Monitoramento</h2>
+          <div class="charts-grid">
+            <!-- Gráfico de Temperatura -->
+            <div class="chart-card">
+              <div class="chart-header">
+                <h3 class="chart-title">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"></path>
+                  </svg>
+                  Temperatura (Últimas 24h)
+                </h3>
+                <div class="chart-legend">
+                  <span class="legend-item">
+                    <span
+                      class="legend-dot"
+                      style="background-color: #f97316"
+                    ></span>
+                    Atual: <strong id="chart-temp-current">22.5°C</strong>
+                  </span>
+                </div>
+              </div>
+              <div class="chart-canvas" id="temp-chart-canvas"></div>
+            </div>
+
+            <!-- Gráfico de Umidade -->
+            <div class="chart-card">
+              <div class="chart-header">
+                <h3 class="chart-title">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+                  </svg>
+                  Umidade (Últimas 24h)
+                </h3>
+                <div class="chart-legend">
+                  <span class="legend-item">
+                    <span
+                      class="legend-dot"
+                      style="background-color: #3b82f6"
+                    ></span>
+                    Atual: <strong id="chart-humidity-current">45%</strong>
+                  </span>
+                </div>
+              </div>
+              <div class="chart-canvas" id="humidity-chart-canvas"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Seção de Controles -->
+        <section class="section-container">
+          <h2 class="section-title">🎛️ Controles de Ambiente</h2>
+          <div class="controls-grid">
+            <!-- Controle de Climatização -->
+            <div class="control-card">
+              <div class="control-header">
+                <h3 class="control-title">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"></path>
+                  </svg>
+                  Climatização
+                </h3>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="toggle-climate" checked />
+                  <span class="toggle-slider"></span>
                 </label>
-                <input type="range" min="18" max="28" value="22" step="0.5" class="control-slider" id="target-temp-slider">
-                <div class="slider-range">
-                  <span>18°C</span>
-                  <span>28°C</span>
+              </div>
+              <div class="control-body">
+                <div class="control-mode">
+                  <span class="mode-label">Modo:</span>
+                  <select class="mode-select" id="climate-mode">
+                    <option value="auto">Automático</option>
+                    <option value="manual">Manual</option>
+                    <option value="eco">Eco</option>
+                  </select>
+                </div>
+                <div class="control-slider-group">
+                  <label class="slider-label">
+                    Temperatura Alvo:
+                    <strong id="target-temp-value">22°C</strong>
+                  </label>
+                  <input
+                    type="range"
+                    min="18"
+                    max="28"
+                    value="22"
+                    step="0.5"
+                    class="control-slider"
+                    id="target-temp-slider"
+                  />
+                  <div class="slider-range">
+                    <span>18°C</span>
+                    <span>28°C</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Controle de Iluminação -->
-          <div class="control-card">
-            <div class="control-header">
-              <h3 class="control-title">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="5"></circle>
-                  <line x1="12" y1="1" x2="12" y2="3"></line>
-                  <line x1="12" y1="21" x2="12" y2="23"></line>
-                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                  <line x1="1" y1="12" x2="3" y2="12"></line>
-                  <line x1="21" y1="12" x2="23" y2="12"></line>
-                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                </svg>
-                Iluminação
-              </h3>
-              <label class="toggle-switch">
-                <input type="checkbox" id="toggle-lights" checked>
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-            <div class="control-body">
-              <div class="control-slider-group">
-                <label class="slider-label">
-                  Intensidade: <strong id="light-intensity-value">71%</strong>
+            <!-- Controle de Iluminação -->
+            <div class="control-card">
+              <div class="control-header">
+                <h3 class="control-title">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                  </svg>
+                  Iluminação
+                </h3>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="toggle-lights" checked />
+                  <span class="toggle-slider"></span>
                 </label>
-                <input type="range" min="0" max="100" value="71" step="5" class="control-slider" id="light-intensity-slider">
-                <div class="slider-range">
-                  <span>0%</span>
-                  <span>100%</span>
-                </div>
               </div>
-              <div class="light-zones">
-                <p class="zones-label">Zonas de Iluminação:</p>
-                <div class="zone-toggles">
-                  <label class="zone-toggle">
-                    <input type="checkbox" checked>
-                    <span>Zona Norte</span>
+              <div class="control-body">
+                <div class="control-slider-group">
+                  <label class="slider-label">
+                    Intensidade: <strong id="light-intensity-value">71%</strong>
                   </label>
-                  <label class="zone-toggle">
-                    <input type="checkbox" checked>
-                    <span>Zona Sul</span>
-                  </label>
-                  <label class="zone-toggle">
-                    <input type="checkbox">
-                    <span>Zona Central</span>
-                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value="71"
+                    step="5"
+                    class="control-slider"
+                    id="light-intensity-slider"
+                  />
+                  <div class="slider-range">
+                    <span>0%</span>
+                    <span>100%</span>
+                  </div>
+                </div>
+                <div class="light-zones">
+                  <p class="zones-label">Zonas de Iluminação:</p>
+                  <div class="zone-toggles">
+                    <label class="zone-toggle">
+                      <input type="checkbox" checked />
+                      <span>Zona Norte</span>
+                    </label>
+                    <label class="zone-toggle">
+                      <input type="checkbox" checked />
+                      <span>Zona Sul</span>
+                    </label>
+                    <label class="zone-toggle">
+                      <input type="checkbox" />
+                      <span>Zona Central</span>
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Controle de Ventilação -->
-          <div class="control-card">
-            <div class="control-header">
-              <h3 class="control-title">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
-                </svg>
-                Ventilação
-              </h3>
-              <label class="toggle-switch">
-                <input type="checkbox" id="toggle-ventilation" checked>
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-            <div class="control-body">
-              <div class="control-slider-group">
-                <label class="slider-label">
-                  Velocidade: <strong id="vent-speed-value">Média</strong>
+            <!-- Controle de Ventilação -->
+            <div class="control-card">
+              <div class="control-header">
+                <h3 class="control-title">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"
+                    ></path>
+                  </svg>
+                  Ventilação
+                </h3>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="toggle-ventilation" checked />
+                  <span class="toggle-slider"></span>
                 </label>
-                <input type="range" min="1" max="3" value="2" step="1" class="control-slider" id="vent-speed-slider">
-                <div class="slider-range">
-                  <span>Baixa</span>
-                  <span>Alta</span>
+              </div>
+              <div class="control-body">
+                <div class="control-slider-group">
+                  <label class="slider-label">
+                    Velocidade: <strong id="vent-speed-value">Média</strong>
+                  </label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="3"
+                    value="2"
+                    step="1"
+                    class="control-slider"
+                    id="vent-speed-slider"
+                  />
+                  <div class="slider-range">
+                    <span>Baixa</span>
+                    <span>Alta</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- Seção de Alertas e Notificações -->
-      <section class="section-container">
-        <h2 class="section-title">🔔 Alertas e Notificações</h2>
-        <div class="alerts-list" id="alerts-list">
-          <!-- Alertas serão gerados dinamicamente -->
-        </div>
-      </section>
+        <!-- Seção de Alertas e Notificações -->
+        <section class="section-container">
+          <h2 class="section-title">🔔 Alertas e Notificações</h2>
+          <div class="alerts-list" id="alerts-list">
+            <!-- Alertas serão gerados dinamicamente -->
+          </div>
+        </section>
 
-      <!-- Informações Adicionais -->
-      <section class="section-container">
-        <h2 class="section-title">ℹ️ Informações da Sala</h2>
-        <div class="info-grid">
-          <div class="info-item">
-            <span class="info-label">Localização:</span>
-            <span class="info-value" id="info-location">1º Andar, Ala Norte</span>
+        <!-- Informações Adicionais -->
+        <section class="section-container">
+          <h2 class="section-title">ℹ️ Informações da Sala</h2>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Localização:</span>
+              <span class="info-value" id="info-location"
+                >1º Andar, Ala Norte</span
+              >
+            </div>
+            <div class="info-item">
+              <span class="info-label">Capacidade:</span>
+              <span class="info-value" id="info-capacity">25 pessoas</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Área:</span>
+              <span class="info-value" id="info-area">45 m²</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Sistema HVAC:</span>
+              <span class="info-value" id="info-hvac">Daikin VRV Plus</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Última Manutenção:</span>
+              <span class="info-value" id="info-maintenance">15/03/2026</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Próxima Manutenção:</span>
+              <span class="info-value" id="info-next-maintenance"
+                >15/06/2026</span
+              >
+            </div>
           </div>
-          <div class="info-item">
-            <span class="info-label">Capacidade:</span>
-            <span class="info-value" id="info-capacity">25 pessoas</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Área:</span>
-            <span class="info-value" id="info-area">45 m²</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Sistema HVAC:</span>
-            <span class="info-value" id="info-hvac">Daikin VRV Plus</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Última Manutenção:</span>
-            <span class="info-value" id="info-maintenance">15/03/2026</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Próxima Manutenção:</span>
-            <span class="info-value" id="info-next-maintenance">15/06/2026</span>
-          </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- Footer da Página -->
-      <footer class="page-footer">
-        <p>Última atualização: <strong id="last-update">há 2 minutos</strong></p>
-        <p>Sistema de Controle Ambiental © 2026</p>
-      </footer>
-    </main>
-  </div>
-</body>
+        <!-- Footer da Página -->
+        <footer class="page-footer">
+          <p>
+            Última atualização: <strong id="last-update">há 2 minutos</strong>
+          </p>
+          <p>Sistema de Controle Ambiental © 2026</p>
+        </footer>
+      </main>
+    </div>
+  </body>
 </html>

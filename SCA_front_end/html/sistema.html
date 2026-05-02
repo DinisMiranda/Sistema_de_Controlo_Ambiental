@@ -1,335 +1,436 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-PT">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistema - Sistema de Controlo Ambiental</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sistema - Sistema de Controlo Ambiental</title>
 
-  <link rel="stylesheet" href="Css/style.css">
-  <link rel="stylesheet" href="Css/sistema.css">
+    <link rel="stylesheet" href="Css/style.css" />
+    <link rel="stylesheet" href="Css/sistema.css" />
 
-  <script src="Js/sistema.js" defer></script>
-</head>
-<body>
-  <div class="dashboard">
-    <aside class="sidebar">
-      <div class="sidebar-top">
-        <h2>Sistema de Controlo Ambiental</h2>
-        <a href="dashboard.html" class="nav-item">🏠 Home</a>
-        <a href="departamento.html" class="nav-item">📈 Departamentos</a>
-        <a href="relatorio.html" class="nav-item">📄 Relatórios</a>
-        <a href="#" class="nav-item active">⚙️ Sistema</a>
-        <a href="admin.html" class="nav-item admin-link">🛡️ Admin</a>
-      </div>
-
-      <div class="sidebar-bottom">
-        <p id="user-info"></p>
-        <button id="logout-btn" class="btn-primary">Sair</button>
-      </div>
-    </aside>
-
-    <main class="content">
-      <header class="system-header-card">
-        <div class="system-header-content">
-          <div class="system-header-text">
-            <div class="system-badge">⚙️ Configuração central</div>
-            <h1 class="system-title">Sistema</h1>
-            <p class="system-subtitle">
-              Gestão das definições globais, módulos ambientais, automações e estado técnico da plataforma.
-            </p>
-          </div>
-
-          <div class="system-header-actions">
-            <button class="btn-outline" id="btn-test-connection" type="button">Testar ligação</button>
-            <button class="btn-secondary" id="btn-save-system" type="button">Guardar alterações</button>
-          </div>
+    <script src="Js/session.js" defer></script>
+    <script src="Js/sistema.js" defer></script>
+  </head>
+  <body>
+    <div class="dashboard">
+      <aside class="sidebar">
+        <div class="sidebar-top">
+          <h2>Sistema de Controlo Ambiental</h2>
+          <a href="dashboard.html" class="nav-item">🏠 Home</a>
+          <a href="departamento.html" class="nav-item">📈 Departamentos</a>
+          <a href="relatorio.html" class="nav-item">📄 Relatórios</a>
+          <a href="#" class="nav-item active">⚙️ Sistema</a>
+          <a href="admin.html" class="nav-item admin-link">🛡️ Admin</a>
         </div>
 
-        <div class="system-header-meta">
-          <div class="meta-item">
-            <span class="meta-label">Estado global</span>
-            <strong class="meta-value status-good" id="meta-global-status">Operacional</strong>
-          </div>
-
-          <div class="meta-item">
-            <span class="meta-label">Última sincronização</span>
-            <strong class="meta-value" id="meta-last-sync">--</strong>
-          </div>
-
-          <div class="meta-item">
-            <span class="meta-label">Versão</span>
-            <strong class="meta-value">v1.0.0</strong>
-          </div>
+        <div class="sidebar-bottom">
+          <p id="user-info"></p>
+          <button id="logout-btn" class="btn-primary">Sair</button>
         </div>
-      </header>
+      </aside>
 
-      <section class="system-overview-grid">
-        <article class="overview-card">
-          <span class="overview-label">Sensores ativos</span>
-          <strong class="overview-value" id="overview-sensors">18</strong>
-          <span class="overview-caption">2 offline</span>
-        </article>
-
-        <article class="overview-card">
-          <span class="overview-label">Atuadores ativos</span>
-          <strong class="overview-value" id="overview-actuators">12</strong>
-          <span class="overview-caption">1 em manutenção</span>
-        </article>
-
-        <article class="overview-card">
-          <span class="overview-label">Modo global</span>
-          <strong class="overview-value" id="overview-mode">Automático</strong>
-          <span class="overview-caption">Regras inteligentes ativas</span>
-        </article>
-
-        <article class="overview-card">
-          <span class="overview-label">Notificações</span>
-          <strong class="overview-value" id="overview-notifications">Ativas</strong>
-          <span class="overview-caption">Email e painel interno</span>
-        </article>
-      </section>
-
-      <section class="system-layout-grid">
-        <div class="main-column">
-          <section class="system-section-card">
-            <div class="section-header">
-              <div>
-                <h2 class="section-title">Configurações gerais</h2>
-                <p class="section-subtitle">Definições centrais de funcionamento do sistema</p>
-              </div>
+      <main class="content">
+        <header class="system-header-card">
+          <div class="system-header-content">
+            <div class="system-header-text">
+              <div class="system-badge">⚙️ Configuração central</div>
+              <h1 class="system-title">Sistema</h1>
+              <p class="system-subtitle">
+                Gestão das definições globais, módulos ambientais, automações e
+                estado técnico da plataforma.
+              </p>
             </div>
 
-            <div class="form-grid">
-              <div class="form-group">
-                <label for="system-name">Nome do sistema</label>
-                <input type="text" id="system-name" value="Sistema de Controlo Ambiental">
-              </div>
+            <div class="system-header-actions">
+              <button
+                class="btn-outline"
+                id="btn-test-connection"
+                type="button"
+              >
+                Testar ligação
+              </button>
+              <button class="btn-secondary" id="btn-save-system" type="button">
+                Guardar alterações
+              </button>
+            </div>
+          </div>
 
-              <div class="form-group">
-                <label for="system-location">Localização</label>
-                <input type="text" id="system-location" value="Campus ESMAD - Vila do Conde">
-              </div>
-
-              <div class="form-group">
-                <label for="system-timezone">Fuso horário</label>
-                <select id="system-timezone">
-                  <option selected>Europe/Lisbon</option>
-                  <option>UTC</option>
-                  <option>Europe/Madrid</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label for="system-refresh">Frequência de atualização</label>
-                <select id="system-refresh">
-                  <option>15 segundos</option>
-                  <option selected>30 segundos</option>
-                  <option>1 minuto</option>
-                  <option>5 minutos</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label for="global-mode">Modo global</label>
-                <select id="global-mode">
-                  <option selected>Automático</option>
-                  <option>Manual</option>
-                  <option>Híbrido</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label for="alert-channel">Canal principal de alertas</label>
-                <select id="alert-channel">
-                  <option selected>Painel + Email</option>
-                  <option>Só painel</option>
-                  <option>Só email</option>
-                </select>
-              </div>
+          <div class="system-header-meta">
+            <div class="meta-item">
+              <span class="meta-label">Estado global</span>
+              <strong class="meta-value status-good" id="meta-global-status"
+                >Operacional</strong
+              >
             </div>
 
-            <div class="toggles-grid">
-              <label class="toggle-card">
+            <div class="meta-item">
+              <span class="meta-label">Última sincronização</span>
+              <strong class="meta-value" id="meta-last-sync">--</strong>
+            </div>
+
+            <div class="meta-item">
+              <span class="meta-label">Versão</span>
+              <strong class="meta-value">v1.0.0</strong>
+            </div>
+          </div>
+        </header>
+
+        <section class="system-overview-grid">
+          <article class="overview-card">
+            <span class="overview-label">Sensores ativos</span>
+            <strong class="overview-value" id="overview-sensors">18</strong>
+            <span class="overview-caption">2 offline</span>
+          </article>
+
+          <article class="overview-card">
+            <span class="overview-label">Atuadores ativos</span>
+            <strong class="overview-value" id="overview-actuators">12</strong>
+            <span class="overview-caption">1 em manutenção</span>
+          </article>
+
+          <article class="overview-card">
+            <span class="overview-label">Modo global</span>
+            <strong class="overview-value" id="overview-mode"
+              >Automático</strong
+            >
+            <span class="overview-caption">Regras inteligentes ativas</span>
+          </article>
+
+          <article class="overview-card">
+            <span class="overview-label">Notificações</span>
+            <strong class="overview-value" id="overview-notifications"
+              >Ativas</strong
+            >
+            <span class="overview-caption">Email e painel interno</span>
+          </article>
+        </section>
+
+        <section class="system-layout-grid">
+          <div class="main-column">
+            <section class="system-section-card">
+              <div class="section-header">
                 <div>
-                  <span class="toggle-title">Notificações ativas</span>
-                  <span class="toggle-description">Enviar alertas críticos e avisos do sistema</span>
+                  <h2 class="section-title">Configurações gerais</h2>
+                  <p class="section-subtitle">
+                    Definições centrais de funcionamento do sistema
+                  </p>
                 </div>
-                <span class="switch">
-                  <input type="checkbox" id="toggle-notifications" checked>
-                  <span class="slider"></span>
-                </span>
-              </label>
+              </div>
 
-              <label class="toggle-card">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="system-name">Nome do sistema</label>
+                  <input
+                    type="text"
+                    id="system-name"
+                    value="Sistema de Controlo Ambiental"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="system-location">Localização</label>
+                  <input
+                    type="text"
+                    id="system-location"
+                    value="Campus ESMAD - Vila do Conde"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="system-timezone">Fuso horário</label>
+                  <select id="system-timezone">
+                    <option selected>Europe/Lisbon</option>
+                    <option>UTC</option>
+                    <option>Europe/Madrid</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="system-refresh">Frequência de atualização</label>
+                  <select id="system-refresh">
+                    <option>15 segundos</option>
+                    <option selected>30 segundos</option>
+                    <option>1 minuto</option>
+                    <option>5 minutos</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="global-mode">Modo global</label>
+                  <select id="global-mode">
+                    <option selected>Automático</option>
+                    <option>Manual</option>
+                    <option>Híbrido</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="alert-channel">Canal principal de alertas</label>
+                  <select id="alert-channel">
+                    <option selected>Painel + Email</option>
+                    <option>Só painel</option>
+                    <option>Só email</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="toggles-grid">
+                <label class="toggle-card">
+                  <div>
+                    <span class="toggle-title">Notificações ativas</span>
+                    <span class="toggle-description"
+                      >Enviar alertas críticos e avisos do sistema</span
+                    >
+                  </div>
+                  <span class="switch">
+                    <input type="checkbox" id="toggle-notifications" checked />
+                    <span class="slider"></span>
+                  </span>
+                </label>
+
+                <label class="toggle-card">
+                  <div>
+                    <span class="toggle-title">Modo de segurança</span>
+                    <span class="toggle-description"
+                      >Restringe ações automáticas fora dos limites
+                      definidos</span
+                    >
+                  </div>
+                  <span class="switch">
+                    <input type="checkbox" id="toggle-safety" checked />
+                    <span class="slider"></span>
+                  </span>
+                </label>
+
+                <label class="toggle-card">
+                  <div>
+                    <span class="toggle-title">Sincronização automática</span>
+                    <span class="toggle-description"
+                      >Atualização automática dos estados dos dispositivos</span
+                    >
+                  </div>
+                  <span class="switch">
+                    <input type="checkbox" id="toggle-sync" checked />
+                    <span class="slider"></span>
+                  </span>
+                </label>
+              </div>
+            </section>
+
+            <section class="system-section-card">
+              <div class="section-header">
                 <div>
-                  <span class="toggle-title">Modo de segurança</span>
-                  <span class="toggle-description">Restringe ações automáticas fora dos limites definidos</span>
+                  <h2 class="section-title">Módulos ambientais</h2>
+                  <p class="section-subtitle">
+                    Ativar, desativar e acompanhar os módulos do sistema
+                  </p>
                 </div>
-                <span class="switch">
-                  <input type="checkbox" id="toggle-safety" checked>
-                  <span class="slider"></span>
-                </span>
-              </label>
+              </div>
 
-              <label class="toggle-card">
+              <div class="modules-list" id="modules-list">
+                <!-- preenchido por JS -->
+              </div>
+            </section>
+
+            <section class="system-section-card">
+              <div class="section-header">
                 <div>
-                  <span class="toggle-title">Sincronização automática</span>
-                  <span class="toggle-description">Atualização automática dos estados dos dispositivos</span>
+                  <h2 class="section-title">Parâmetros automáticos</h2>
+                  <p class="section-subtitle">
+                    Intervalos ideais usados pelo controlo automático
+                  </p>
                 </div>
-                <span class="switch">
-                  <input type="checkbox" id="toggle-sync" checked>
-                  <span class="slider"></span>
-                </span>
-              </label>
-            </div>
-          </section>
-
-          <section class="system-section-card">
-            <div class="section-header">
-              <div>
-                <h2 class="section-title">Módulos ambientais</h2>
-                <p class="section-subtitle">Ativar, desativar e acompanhar os módulos do sistema</p>
               </div>
-            </div>
 
-            <div class="modules-list" id="modules-list">
-              <!-- preenchido por JS -->
-            </div>
-          </section>
-
-          <section class="system-section-card">
-            <div class="section-header">
-              <div>
-                <h2 class="section-title">Parâmetros automáticos</h2>
-                <p class="section-subtitle">Intervalos ideais usados pelo controlo automático</p>
-              </div>
-            </div>
-
-            <div class="parameter-grid">
-              <div class="parameter-card">
-                <div class="parameter-top">
-                  <span class="parameter-name">Temperatura ideal</span>
-                  <strong class="parameter-value" id="temperature-range-value">20°C - 24°C</strong>
-                </div>
-
-                <div class="dual-range">
-                  <div class="range-group">
-                    <label for="temp-min">Mínimo</label>
-                    <input type="range" id="temp-min" min="16" max="24" value="20">
+              <div class="parameter-grid">
+                <div class="parameter-card">
+                  <div class="parameter-top">
+                    <span class="parameter-name">Temperatura ideal</span>
+                    <strong class="parameter-value" id="temperature-range-value"
+                      >20°C - 24°C</strong
+                    >
                   </div>
-                  <div class="range-group">
-                    <label for="temp-max">Máximo</label>
-                    <input type="range" id="temp-max" min="20" max="30" value="24">
+
+                  <div class="dual-range">
+                    <div class="range-group">
+                      <label for="temp-min">Mínimo</label>
+                      <input
+                        type="range"
+                        id="temp-min"
+                        min="16"
+                        max="24"
+                        value="20"
+                      />
+                    </div>
+                    <div class="range-group">
+                      <label for="temp-max">Máximo</label>
+                      <input
+                        type="range"
+                        id="temp-max"
+                        min="20"
+                        max="30"
+                        value="24"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div class="parameter-card">
-                <div class="parameter-top">
-                  <span class="parameter-name">Humidade ideal</span>
-                  <strong class="parameter-value" id="humidity-range-value">40% - 60%</strong>
-                </div>
-
-                <div class="dual-range">
-                  <div class="range-group">
-                    <label for="humidity-min">Mínimo</label>
-                    <input type="range" id="humidity-min" min="20" max="60" value="40">
+                <div class="parameter-card">
+                  <div class="parameter-top">
+                    <span class="parameter-name">Humidade ideal</span>
+                    <strong class="parameter-value" id="humidity-range-value"
+                      >40% - 60%</strong
+                    >
                   </div>
-                  <div class="range-group">
-                    <label for="humidity-max">Máximo</label>
-                    <input type="range" id="humidity-max" min="40" max="80" value="60">
+
+                  <div class="dual-range">
+                    <div class="range-group">
+                      <label for="humidity-min">Mínimo</label>
+                      <input
+                        type="range"
+                        id="humidity-min"
+                        min="20"
+                        max="60"
+                        value="40"
+                      />
+                    </div>
+                    <div class="range-group">
+                      <label for="humidity-max">Máximo</label>
+                      <input
+                        type="range"
+                        id="humidity-max"
+                        min="40"
+                        max="80"
+                        value="60"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="parameter-card">
+                  <div class="parameter-top">
+                    <span class="parameter-name">CO₂ máximo</span>
+                    <strong class="parameter-value" id="co2-max-value"
+                      >800 ppm</strong
+                    >
+                  </div>
+
+                  <div class="single-range">
+                    <label for="co2-max">Limite máximo</label>
+                    <input
+                      type="range"
+                      id="co2-max"
+                      min="400"
+                      max="1500"
+                      step="50"
+                      value="800"
+                    />
+                  </div>
+                </div>
+
+                <div class="parameter-card">
+                  <div class="parameter-top">
+                    <span class="parameter-name">Iluminação padrão</span>
+                    <strong class="parameter-value" id="light-default-value"
+                      >70%</strong
+                    >
+                  </div>
+
+                  <div class="single-range">
+                    <label for="light-default">Intensidade base</label>
+                    <input
+                      type="range"
+                      id="light-default"
+                      min="0"
+                      max="100"
+                      step="5"
+                      value="70"
+                    />
                   </div>
                 </div>
               </div>
+            </section>
+          </div>
 
-              <div class="parameter-card">
-                <div class="parameter-top">
-                  <span class="parameter-name">CO₂ máximo</span>
-                  <strong class="parameter-value" id="co2-max-value">800 ppm</strong>
-                </div>
-
-                <div class="single-range">
-                  <label for="co2-max">Limite máximo</label>
-                  <input type="range" id="co2-max" min="400" max="1500" step="50" value="800">
-                </div>
-              </div>
-
-              <div class="parameter-card">
-                <div class="parameter-top">
-                  <span class="parameter-name">Iluminação padrão</span>
-                  <strong class="parameter-value" id="light-default-value">70%</strong>
-                </div>
-
-                <div class="single-range">
-                  <label for="light-default">Intensidade base</label>
-                  <input type="range" id="light-default" min="0" max="100" step="5" value="70">
+          <aside class="side-column">
+            <section class="system-section-card">
+              <div class="section-header">
+                <div>
+                  <h2 class="section-title">Estado técnico</h2>
+                  <p class="section-subtitle">Serviços principais do sistema</p>
                 </div>
               </div>
-            </div>
-          </section>
-        </div>
 
-        <aside class="side-column">
-          <section class="system-section-card">
-            <div class="section-header">
-              <div>
-                <h2 class="section-title">Estado técnico</h2>
-                <p class="section-subtitle">Serviços principais do sistema</p>
+              <div class="health-list" id="health-list">
+                <!-- preenchido por JS -->
               </div>
-            </div>
+            </section>
 
-            <div class="health-list" id="health-list">
-              <!-- preenchido por JS -->
-            </div>
-          </section>
-
-          <section class="system-section-card">
-            <div class="section-header">
-              <div>
-                <h2 class="section-title">Manutenção</h2>
-                <p class="section-subtitle">Calendário técnico e operações</p>
-              </div>
-            </div>
-
-            <div class="maintenance-info">
-              <div class="maintenance-item">
-                <span class="maintenance-label">Última manutenção</span>
-                <strong class="maintenance-value">15/03/2026</strong>
+            <section class="system-section-card">
+              <div class="section-header">
+                <div>
+                  <h2 class="section-title">Manutenção</h2>
+                  <p class="section-subtitle">Calendário técnico e operações</p>
+                </div>
               </div>
 
-              <div class="maintenance-item">
-                <span class="maintenance-label">Próxima manutenção</span>
-                <strong class="maintenance-value">15/06/2026</strong>
+              <div class="maintenance-info">
+                <div class="maintenance-item">
+                  <span class="maintenance-label">Última manutenção</span>
+                  <strong class="maintenance-value">15/03/2026</strong>
+                </div>
+
+                <div class="maintenance-item">
+                  <span class="maintenance-label">Próxima manutenção</span>
+                  <strong class="maintenance-value">15/06/2026</strong>
+                </div>
+
+                <div class="maintenance-item">
+                  <span class="maintenance-label">Responsável</span>
+                  <strong class="maintenance-value">Equipa técnica</strong>
+                </div>
               </div>
 
-              <div class="maintenance-item">
-                <span class="maintenance-label">Responsável</span>
-                <strong class="maintenance-value">Equipa técnica</strong>
+              <div class="action-stack">
+                <button
+                  class="btn-outline action-btn"
+                  id="btn-sync-now"
+                  type="button"
+                >
+                  Sincronizar agora
+                </button>
+                <button
+                  class="btn-outline action-btn"
+                  id="btn-run-diagnostics"
+                  type="button"
+                >
+                  Executar diagnóstico
+                </button>
+                <button
+                  class="btn-outline action-btn"
+                  id="btn-maintenance-log"
+                  type="button"
+                >
+                  Ver registo técnico
+                </button>
               </div>
-            </div>
+            </section>
 
-            <div class="action-stack">
-              <button class="btn-outline action-btn" id="btn-sync-now" type="button">Sincronizar agora</button>
-              <button class="btn-outline action-btn" id="btn-run-diagnostics" type="button">Executar diagnóstico</button>
-              <button class="btn-outline action-btn" id="btn-maintenance-log" type="button">Ver registo técnico</button>
-            </div>
-          </section>
-
-          <section class="system-section-card">
-            <div class="section-header">
-              <div>
-                <h2 class="section-title">Eventos recentes</h2>
-                <p class="section-subtitle">Últimas alterações do sistema</p>
+            <section class="system-section-card">
+              <div class="section-header">
+                <div>
+                  <h2 class="section-title">Eventos recentes</h2>
+                  <p class="section-subtitle">Últimas alterações do sistema</p>
+                </div>
               </div>
-            </div>
 
-            <div class="event-list" id="event-list">
-              <!-- preenchido por JS -->
-            </div>
-          </section>
-        </aside>
-      </section>
-    </main>
-  </div>
-</body>
+              <div class="event-list" id="event-list">
+                <!-- preenchido por JS -->
+              </div>
+            </section>
+          </aside>
+        </section>
+      </main>
+    </div>
+  </body>
 </html>

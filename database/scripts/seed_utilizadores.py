@@ -2,8 +2,7 @@
 Fake data for the ``Utilizadores`` table — **UTF-8 CSV** by default; direct MySQL load is
 planned (``--db`` hook; not implemented yet).
 
-Password column values are prefixed with ``demo:`` and are **not** production-grade
-credentials (use real hashing in application code for deployments).
+Password column values are SHA256 hashes of "password" (not production-grade; use real hashing in application code for deployments).
 
 **What it does**
     Uses the Faker library (Portuguese locale) to invent names, datetimes, and placeholder
@@ -334,7 +333,7 @@ def build_utilizadores_rows(
     for _ in range(num_users):
         nome = faker.name()
         email = email_from_name(nome, used_emails)
-        palavra_passe_hash = f"demo:{faker.sha256()}"
+        palavra_passe_hash = "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"  # SHA256 of "password"
         data_criacao = faker.date_time_between(start_date="-1y", end_date="now")
         admin_flag = int(random.randint(1, 20) == 1)
 
