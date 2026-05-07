@@ -47,7 +47,7 @@ function getSensorByType(room, typeRegExp) {
 async function fetchLatestReading(sensorId) {
   if (!sensorId) return null;
   try {
-    const response = await fetchWithAuth(`/api/sensors/${sensorId}/readings`);
+    const response = await fetchWithAuth(`/api/sensores/${sensorId}/readings`);
     if (!response.ok) return null;
     const readings = await response.json();
     if (!Array.isArray(readings) || readings.length === 0) return null;

@@ -320,6 +320,7 @@ function setupLogout() {
   if (logoutBtn) {
     logoutBtn.addEventListener("click", function () {
       localStorage.removeItem("user");
+      localStorage.removeItem("token");
       window.location.href = "login.html";
     });
   }

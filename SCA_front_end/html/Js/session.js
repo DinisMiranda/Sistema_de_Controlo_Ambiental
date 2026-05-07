@@ -64,22 +64,6 @@ async function validateSession() {
   }
 }
 
-async function requireAuth() {
-  const user = await validateSession();
-  if (!user) {
-    window.location.href = "login.html";
-    return null;
-  }
-  return user;
-}
-
-async function redirectIfAuthenticated() {
-  const user = await validateSession();
-  if (user) {
-    window.location.href = "dashboard.html";
-  }
-}
-
 async function loginRequest(email, password) {
   const response = await fetch(`${API_BASE}/api/auth/login`, {
     method: "POST",
@@ -98,26 +82,78 @@ async function loginRequest(email, password) {
   return data;
 }
 
-async function fetchWithAuth(path, options = {}) {
+async function registerDepartmentRequest(name) {
   const token = getToken();
-  const headers = { ...(options.headers || {}) };
+  if (!token) throw new Error("Usuário não autenticado");
 
-  if (token) headers.Authorization = `Bearer ${token}`;
-  if (options.body && !headers["Content-Type"]) {
-    headers["Content-Type"] = "application/json";
+  const response = await fetch(`${API_BASE}/api/departments`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ name }),
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data.error || "Falha ao registrar departamento");
   }
 
-  const response = await fetch(`${API_BASE}${path}`, {
+  return data;
+}
+
+async function fetchWithAuth(url, options = {}) {
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(`${API_BASE}${url}`, {
     ...options,
-    headers,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      ...(options.headers || {}),
+    },
   });
 
   if (response.status === 401) {
-    clearSession();
-    if (!window.location.pathname.endsWith("login.html")) {
-      window.location.href = "login.html";
-    }
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    window.location.href = "login.html";
+
+    throw new Error("Sessão expirada");
   }
 
   return response;
+}
+
+async function getSensorReadings(sensorId) {
+  let response = await fetchWithAuth(`/api/sensores/${sensorId}/readings`);
+
+  if (!response.ok) {
+    response = await fetchWithAuth(`/api/sensores/${sensorId}/readings`);
+  }
+
+  if (!response.ok) {
+    return [];
+  }
+
+  return response.json();
+}
+
+async function loadDashboardData() {
+  try {
+    const response = await fetchWithAuth("/api/sensores");
+
+    if (!response.ok) {
+      throw new Error("Erro ao carregar dashboard");
+    }
+
+    const sensors = await response.json();
+
+    updateDashboard(sensors);
+  } catch (error) {
+    console.error(error);
+  }
 }

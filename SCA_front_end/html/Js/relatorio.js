@@ -1,85 +1,5 @@
-const reportsData = [
-  {
-    date: "2026-03-20 08:30",
-    room: "Sala 101",
-    type: "temperatura",
-    value: "22.5 °C",
-    status: "normal",
-    note: "Valor dentro da gama ideal",
-  },
-  {
-    date: "2026-03-20 08:45",
-    room: "Sala 101",
-    type: "humidade",
-    value: "45%",
-    status: "normal",
-    note: "Humidade estabilizada",
-  },
-  {
-    date: "2026-03-20 09:00",
-    room: "Sala 102",
-    type: "consumo",
-    value: "5.2 kWh",
-    status: "normal",
-    note: "Consumo regular",
-  },
-  {
-    date: "2026-03-20 09:15",
-    room: "Auditório Principal",
-    type: "temperatura",
-    value: "26.5 °C",
-    status: "alert",
-    note: "Temperatura acima do ideal",
-  },
-  {
-    date: "2026-03-20 09:20",
-    room: "Auditório Principal",
-    type: "acao",
-    value: "Climatização ligada",
-    status: "warning",
-    note: "Ação automática aplicada",
-  },
-  {
-    date: "2026-03-19 14:10",
-    room: "Laboratório A",
-    type: "humidade",
-    value: "52%",
-    status: "warning",
-    note: "Humidade ligeiramente elevada",
-  },
-  {
-    date: "2026-03-19 14:30",
-    room: "Laboratório A",
-    type: "iluminacao",
-    value: "100%",
-    status: "normal",
-    note: "Iluminação total ativa",
-  },
-  {
-    date: "2026-03-18 11:00",
-    room: "Sala 201",
-    type: "consumo",
-    value: "3.8 kWh",
-    status: "normal",
-    note: "Abaixo da média semanal",
-  },
-  {
-    date: "2026-03-18 12:10",
-    room: "Sala 201",
-    type: "acao",
-    value: "Modo automático",
-    status: "normal",
-    note: "Sistema alternado com sucesso",
-  },
-  {
-    date: "2026-03-17 10:40",
-    room: "Sala 102",
-    type: "iluminacao",
-    value: "68%",
-    status: "normal",
-    note: "Distribuição estável",
-  },
-];
+javascript;
+let reportsData = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
   const user = await requireAuth();
@@ -88,14 +8,150 @@ document.addEventListener("DOMContentLoaded", async () => {
   checkAdminAccess();
   setupLogout();
   setupDefaultDates();
-  renderReports(reportsData);
   setupEvents();
+
+  await loadReports();
 
   const headerLastUpdate = document.getElementById("header-last-update");
   if (headerLastUpdate) {
     headerLastUpdate.textContent = new Date().toLocaleString("pt-PT");
   }
 });
+
+// ========================================
+// BACKEND API
+// ========================================
+
+async function loadReports() {
+  try {
+    // tenta primeiro endpoint inglês
+    let response = await fetchWithAuth("/api/reports");
+
+    // fallback automático para endpoints existentes
+    if (!response.ok) {
+      response = await fetchWithAuth("/api/sensores");
+    }
+
+    if (!response.ok) {
+      response = await fetchWithAuth("/api/sensores");
+    }
+
+    if (!response.ok) {
+      throw new Error("Nenhum endpoint disponível");
+    }
+
+    const data = await response.json();
+
+    // converte sensores em relatórios visuais
+    reportsData = data.map((item) => {
+      const sensorType = item.type || item.tipo || "temperatura";
+      const sensorValue = item.value || item.valor || 0;
+
+      return {
+        date: formatDate(item.updatedAt || item.timestamp || new Date()),
+        room: item.room || item.department || item.nome || "Departamento",
+        type: normalizeType(sensorType),
+        value: formatSensorValue(sensorType, sensorValue),
+        status: generateStatus(sensorType, sensorValue),
+        note: generateNote(sensorType, sensorValue),
+      };
+    });
+
+    renderReports(reportsData);
+  } catch (error) {
+    console.error("Erro ao obter relatórios:", error);
+
+    renderReports([]);
+
+    const tbody = document.getElementById("reports-table-body");
+
+    if (tbody) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align:center; padding:20px; color:red;">
+            Backend indisponível
+          </td>
+        </tr>
+      `;
+    }
+  }
+}
+
+function normalizeType(type) {
+  if (!type) return "desconhecido";
+
+  const map = {
+    temperature: "temperatura",
+    humidity: "humidade",
+    lighting: "iluminacao",
+    consumption: "consumo",
+    action: "acao",
+  };
+
+  return map[type] || type;
+}
+
+function formatValue(item) {
+  if (item.value !== undefined) {
+    return formatSensorValue(item.type, item.value);
+  }
+
+  return "--";
+}
+
+function formatSensorValue(type, value) {
+  if (type === "temperature" || type === "temperatura") {
+    return `${value} °C`;
+  }
+
+  if (type === "humidity" || type === "humidade") {
+    return `${value}%`;
+  }
+
+  if (type === "consumption" || type === "consumo") {
+    return `${value} kWh`;
+  }
+
+  return String(value);
+}
+
+function generateStatus(type, value) {
+  const numeric = Number(value);
+
+  if (type === "temperature" || type === "temperatura") {
+    if (numeric > 26) return "alert";
+    if (numeric > 24) return "warning";
+  }
+
+  if (type === "humidity" || type === "humidade") {
+    if (numeric > 70) return "alert";
+    if (numeric > 60) return "warning";
+  }
+
+  return "normal";
+}
+
+function generateNote(type, value) {
+  const status = generateStatus(type, value);
+
+  if (status === "alert") {
+    return "Valor crítico detetado";
+  }
+
+  if (status === "warning") {
+    return "Valor acima do recomendado";
+  }
+
+  return "Sistema estável";
+}
+
+function formatDate(dateString) {
+  if (!dateString) return "--";
+
+  const date = new Date(dateString);
+
+  return date.toLocaleString("pt-PT");
+}
 
 // ========================================
 // CONTROLO DE ACESSO ADMIN
@@ -167,7 +223,7 @@ function applyFilters() {
   const endDate = document.getElementById("end-date").value;
 
   const filtered = reportsData.filter((item) => {
-    const itemDate = item.date.split(" ")[0];
+    const itemDate = item.date.split(",")[0].split("/").reverse().join("-");
 
     const matchesRoom = room === "all" || item.room === room;
     const matchesType = type === "all" || item.type === type;
@@ -184,6 +240,7 @@ function clearFilters() {
   document.getElementById("filter-room").value = "all";
   document.getElementById("filter-type").value = "all";
   document.getElementById("filter-period").value = "7days";
+
   setupDefaultDates();
   renderReports(reportsData);
 }
@@ -243,8 +300,8 @@ function updateSummary(data) {
   const alerts = data.filter(
     (item) => item.status === "alert" || item.status === "warning",
   ).length;
-  alertsEl.textContent = alerts;
 
+  alertsEl.textContent = alerts;
   updateEl.textContent = data.length ? data[0].date : "--";
 }
 
@@ -274,6 +331,7 @@ function formatDateInput(date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
+
   return `${year}-${month}-${day}`;
 }
 
@@ -291,12 +349,16 @@ function exportCSV() {
   ];
 
   const csvContent = rows.map((row) => row.join(";")).join("\n");
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const blob = new Blob([csvContent], {
+    type: "text/csv;charset=utf-8;",
+  });
+
   const url = URL.createObjectURL(blob);
 
   const link = document.createElement("a");
   link.href = url;
   link.download = "relatorios_sca.csv";
+
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -314,7 +376,19 @@ function setupLogout() {
   if (logoutBtn) {
     logoutBtn.addEventListener("click", function () {
       localStorage.removeItem("user");
+      localStorage.removeItem("token");
       window.location.href = "login.html";
     });
   }
 }
+
+router.get("/reports", async (req, res) => {
+  const reports = await prisma.readings.findMany({
+    orderBy: {
+      timestamp: "desc",
+    },
+    take: 100,
+  });
+
+  res.json(reports);
+});
