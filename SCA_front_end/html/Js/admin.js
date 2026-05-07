@@ -1,8 +1,3 @@
-const user = JSON.parse(localStorage.getItem("user"));
-if (!user || user.role !== "Admin") {
-  location.href = "login.html";
-}
-
 // Define the initial test users (matching auth.js for consistency)
 const TEST_USERS = [
   {
@@ -74,7 +69,11 @@ const addUserBtn = document.getElementById("add-user");
 const cancelBtn = document.getElementById("cancel-btn");
 
 // Populate table on load
-populateTable();
+document.addEventListener("DOMContentLoaded", async () => {
+  const user = await requireAuth();
+  if (!user || user.role !== "Admin") return;
+  populateTable();
+});
 
 // Open modal when button is clicked
 addUserBtn.addEventListener("click", () => {

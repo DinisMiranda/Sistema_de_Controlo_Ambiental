@@ -1,108 +1,187 @@
-// ========================================
-// DADOS SIMULADOS DAS SALAS
-// ========================================
+let departmentsData = {};
 
-const departmentsData = {
-  "sala-101": {
-    id: "sala-101",
-    name: "Sala 101",
-    badge: "Ativo",
-    temperature: 22.5,
-    humidity: 45,
-    lightingOn: 30,
-    lightingTotal: 42,
-    status: "normal",
-    statusText: "Ambiente Normal",
-    lastUpdate: "há 2 minutos",
-  },
-  "sala-102": {
-    id: "sala-102",
-    name: "Sala 102",
-    badge: "Ativo",
-    temperature: 23.1,
-    humidity: 42,
-    lightingOn: 25,
-    lightingTotal: 38,
-    status: "normal",
-    statusText: "Ambiente Normal",
-    lastUpdate: "há 1 minuto",
-  },
-  "sala-201": {
-    id: "sala-201",
-    name: "Sala 201",
-    badge: "Ativo",
-    temperature: 21.8,
-    humidity: 48,
-    lightingOn: 18,
-    lightingTotal: 28,
-    status: "normal",
-    statusText: "Ambiente Normal",
-    lastUpdate: "há 3 minutos",
-  },
-  auditorio: {
-    id: "auditorio",
-    name: "Auditório Principal",
-    badge: "Em Uso",
-    temperature: 26.5,
-    humidity: 38,
-    lightingOn: 42,
-    lightingTotal: 42,
-    status: "alert",
-    statusText: "Temperatura Elevada",
-    lastUpdate: "há 1 minuto",
-  },
-  laboratorio: {
-    id: "laboratorio",
-    name: "Laboratório A",
-    badge: "Ativo",
-    temperature: 20.2,
-    humidity: 52,
-    lightingOn: 28,
-    lightingTotal: 28,
-    status: "attention",
-    statusText: "Umidade Elevada",
-    lastUpdate: "há 5 minutos",
-  },
-};
+function formatRoomKey(location) {
+  return String(location)
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "");
+}
 
-// ========================================
-// INICIALIZAÇÃO
-// ========================================
+async function fetchSensorRooms() {
+  try {
+    const response = await fetchWithAuth("/api/sensores");
+    if (!response.ok) {
+      console.error("Não foi possível carregar os sensores do backend.");
+      return {};
+    }
 
-document.addEventListener("DOMContentLoaded", function () {
+    const sensors = await response.json();
+    const rooms = {};
+
+    sensors.forEach((sensor) => {
+      const location = sensor.localizacao || "Desconhecido";
+      const roomKey = formatRoomKey(location);
+      if (!rooms[roomKey]) {
+        rooms[roomKey] = {
+          id: roomKey,
+          name: location,
+          sensors: [],
+        };
+      }
+      rooms[roomKey].sensors.push(sensor);
+    });
+
+    return rooms;
+  } catch (error) {
+    console.error("Erro ao buscar dados de sensores:", error);
+    return {};
+  }
+}
+
+function getSensorByType(room, typeRegExp) {
+  if (!room || !Array.isArray(room.sensors)) return null;
+  return room.sensors.find((sensor) => typeRegExp.test(sensor.tipo_sensor));
+}
+
+async function fetchLatestReading(sensorId) {
+  if (!sensorId) return null;
+  try {
+    const response = await fetchWithAuth(`/api/sensores/${sensorId}/readings`);
+    if (!response.ok) return null;
+    const readings = await response.json();
+    return Array.isArray(readings) && readings.length > 0 ? readings[0] : null;
+  } catch (error) {
+    console.error("Erro ao carregar leituras do sensor:", error);
+    return null;
+  }
+}
+
+function parseReadingValue(reading) {
+  if (!reading || reading.valor === undefined || reading.valor === null)
+    return null;
+  const value = Number(reading.valor);
+  return Number.isFinite(value) ? value : reading.valor;
+}
+
+function getRoomStatus(temperature, humidity, co2) {
+  if (
+    (typeof temperature === "number" &&
+      (temperature < 18 || temperature > 26)) ||
+    (typeof humidity === "number" && (humidity < 35 || humidity > 65)) ||
+    (typeof co2 === "number" && co2 > 1000)
+  ) {
+    return "alert";
+  }
+
+  if (
+    (typeof temperature === "number" &&
+      (temperature < 20 || temperature > 24)) ||
+    (typeof humidity === "number" && (humidity < 40 || humidity > 60)) ||
+    (typeof co2 === "number" && co2 > 800)
+  ) {
+    return "attention";
+  }
+
+  return "normal";
+}
+
+function getRoomStatusText(status) {
+  if (status === "alert") return "Alerta — ação necessária";
+  if (status === "attention") return "Atenção — monitorar";
+  return "Ambiente Normal";
+}
+
+function getAirQualityLabel(co2) {
+  if (typeof co2 !== "number") return "Desconhecida";
+  if (co2 <= 800) return "Boa";
+  if (co2 <= 1000) return "Moderada";
+  return "Elevada";
+}
+
+async function initializeDepartments() {
+  const rooms = await fetchSensorRooms();
+  departmentsData = await Promise.all(
+    Object.values(rooms).map(async (room) => {
+      const temperatureSensor = getSensorByType(room, /temperatura/i);
+      const humiditySensor = getSensorByType(room, /humidade/i);
+      const lightSensor = getSensorByType(room, /luminosidade/i);
+      const co2Sensor = getSensorByType(room, /co2/i);
+
+      const [tempReading, humidityReading, lightReading, co2Reading] =
+        await Promise.all([
+          fetchLatestReading(temperatureSensor?.id_sensor),
+          fetchLatestReading(humiditySensor?.id_sensor),
+          fetchLatestReading(lightSensor?.id_sensor),
+          fetchLatestReading(co2Sensor?.id_sensor),
+        ]);
+
+      const temperature = parseReadingValue(tempReading);
+      const humidity = parseReadingValue(humidityReading);
+      const lightValue = parseReadingValue(lightReading);
+      const co2 = parseReadingValue(co2Reading);
+
+      const lightingOn =
+        typeof lightValue === "number" ? Math.round(lightValue / 10) : 0;
+      const lightingTotal = room.sensors.length || 1;
+      const status = getRoomStatus(temperature, humidity, co2);
+
+      return {
+        id: room.id,
+        name: room.name,
+        badge:
+          status === "normal"
+            ? "Ativo"
+            : status === "attention"
+              ? "Atenção"
+              : "Alerta",
+        temperature:
+          typeof temperature === "number" ? temperature.toFixed(1) : "N/A",
+        humidity: typeof humidity === "number" ? humidity.toFixed(0) : "N/A",
+        lightingOn,
+        lightingTotal,
+        status,
+        statusText: getRoomStatusText(status),
+        lastUpdate:
+          tempReading?.timestamp_leitura ||
+          humidityReading?.timestamp_leitura ||
+          lightReading?.timestamp_leitura ||
+          co2Reading?.timestamp_leitura ||
+          "Desconhecido",
+      };
+    }),
+  );
+
+  renderDepartmentCards();
+  updateStatistics();
+}
+
+document.addEventListener("DOMContentLoaded", async function () {
+  const user = await requireAuth();
+  if (!user) return;
+
   console.log("🏢 Página de Departamentos inicializando...");
 
   checkAdminAccess();
   setupLogout();
-  renderDepartmentCards();
+  await initializeDepartments();
   setupFilters();
-  updateStatistics();
 
   console.log("✅ Departamentos carregados com sucesso!");
 });
-
-// ========================================
-// CONTROLO DE ACESSO ADMIN
-// ========================================
 
 function checkAdminAccess() {
   const user = JSON.parse(localStorage.getItem("user"));
   const adminLink = document.querySelector(".admin-link");
 
   if (adminLink) {
-    if (
-      user.role === "Admin"
-    ) {
+    if (user?.role === "Admin") {
       adminLink.style.display = "block";
     } else {
       adminLink.style.display = "none";
     }
   }
 }
-
-// ========================================
-// RENDERIZAR CARDS DE DEPARTAMENTOS
-// ========================================
 
 function renderDepartmentCards(filter = "all") {
   const grid = document.getElementById("departments-grid");
@@ -138,19 +217,19 @@ function renderDepartmentCards(filter = "all") {
   console.log(`📊 ${cardsRendered} cards renderizados (filtro: ${filter})`);
 }
 
-// ========================================
-// VERIFICAR SE DEVE MOSTRAR SALA
-// ========================================
-
 function shouldShowRoom(room, filter) {
   if (filter === "all") return true;
 
-  if (filter === "temperature") {
-    return room.temperature < 20 || room.temperature > 24;
+  if (typeof room.temperature === "number") {
+    if (filter === "temperature") {
+      return room.temperature < 20 || room.temperature > 24;
+    }
   }
 
-  if (filter === "humidity") {
-    return room.humidity < 40 || room.humidity > 60;
+  if (typeof room.humidity === "number") {
+    if (filter === "humidity") {
+      return room.humidity < 40 || room.humidity > 60;
+    }
   }
 
   if (filter === "light") {
@@ -159,10 +238,6 @@ function shouldShowRoom(room, filter) {
 
   return true;
 }
-
-// ========================================
-// CRIAR CARD DE DEPARTAMENTO
-// ========================================
 
 function createDepartmentCard(room) {
   const card = document.createElement("div");
@@ -174,8 +249,8 @@ function createDepartmentCard(room) {
   const lightPercentage = Math.round(
     (room.lightingOn / room.lightingTotal) * 100,
   );
-  const tempClass = getTempAlertClass(room.temperature);
-  const humidityClass = getHumidityAlertClass(room.humidity);
+  const tempClass = getTempAlertClass(Number(room.temperature));
+  const humidityClass = getHumidityAlertClass(Number(room.humidity));
 
   card.innerHTML = `
     <div class="card-header-dept">
@@ -266,17 +341,15 @@ function createDepartmentCard(room) {
   return card;
 }
 
-// ========================================
-// FUNÇÕES AUXILIARES - ALERTAS
-// ========================================
-
 function getTempAlertClass(temp) {
+  if (typeof temp !== "number") return "";
   if (temp < 18 || temp > 26) return "alert";
   if (temp < 20 || temp > 24) return "warning";
   return "";
 }
 
 function getHumidityAlertClass(humidity) {
+  if (typeof humidity !== "number") return "";
   if (humidity < 35 || humidity > 65) return "alert";
   if (humidity < 40 || humidity > 60) return "warning";
   return "";
@@ -309,10 +382,6 @@ function getStatusIcon(status) {
   return icons[status] || icons.normal;
 }
 
-// ========================================
-// CONFIGURAR FILTROS
-// ========================================
-
 function setupFilters() {
   const filterBtns = document.querySelectorAll(".filter-btn");
 
@@ -334,10 +403,6 @@ function setupFilters() {
     });
   });
 }
-
-// ========================================
-// ATUALIZAR ESTATÍSTICAS
-// ========================================
 
 function updateStatistics() {
   const totalRooms = Object.keys(departmentsData).length;
@@ -363,10 +428,6 @@ function updateStatistics() {
   if (alertEl) alertEl.textContent = roomsAlert;
 }
 
-// ========================================
-// NAVEGAÇÃO
-// ========================================
-
 function goToRoomDetails(roomId) {
   console.log("📍 Navegando para detalhes da sala:", roomId);
   window.location.href = `detalhe_departamento.html?room=${encodeURIComponent(roomId)}`;
@@ -377,16 +438,12 @@ function goToRoomControl(roomId) {
   window.location.href = `detalhe_departamento.html?room=${encodeURIComponent(roomId)}&scroll=control`;
 }
 
-// ========================================
-// LOGOUT
-// ========================================
-
 function setupLogout() {
   const logoutBtn = document.getElementById("logout-btn");
 
   if (logoutBtn) {
     logoutBtn.addEventListener("click", function () {
-      localStorage.removeItem("user");
+      clearSession();
       window.location.href = "login.html";
     });
   }
