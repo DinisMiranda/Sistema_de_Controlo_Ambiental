@@ -1,6 +1,6 @@
 const API_BASE = "http://localhost:3001";
 
-function normalizeUser(user) {
+function normalizeUser(user = {}) {
   return {
     ...user,
     name: user.name || user.nome || user.Nome || "",
@@ -26,7 +26,14 @@ function getToken() {
 
 function getCurrentUser() {
   const raw = localStorage.getItem("user");
-  return raw ? JSON.parse(raw) : null;
+  if (!raw) return null;
+
+  try {
+    return JSON.parse(raw);
+  } catch {
+    clearSession();
+    return null;
+  }
 }
 
 async function validateSession() {
@@ -35,9 +42,7 @@ async function validateSession() {
 
   try {
     const response = await fetch(`${API_BASE}/api/auth/me`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     if (!response.ok) {
@@ -46,13 +51,13 @@ async function validateSession() {
     }
 
     const data = await response.json();
-    if (data?.user) {
-      setSession(data.user, token);
-      return getCurrentUser();
+    if (!data?.user) {
+      clearSession();
+      return null;
     }
 
-    clearSession();
-    return null;
+    setSession(data.user, token);
+    return getCurrentUser();
   } catch {
     clearSession();
     return null;
@@ -84,23 +89,22 @@ async function loginRequest(email, password) {
     body: JSON.stringify({ email, password }),
   });
 
+  const data = await response.json().catch(() => ({}));
+
   if (!response.ok) {
-    const errorBody = await response.json().catch(() => ({}));
-    throw new Error(errorBody.error || "Falha na autenticação");
+    throw new Error(data.error || "Falha na autenticação");
   }
 
-  return response.json();
+  return data;
 }
 
 async function fetchWithAuth(path, options = {}) {
   const token = getToken();
-  const headers = {
-    "Content-Type": "application/json",
-    ...(options.headers || {}),
-  };
+  const headers = { ...(options.headers || {}) };
 
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
+  if (token) headers.Authorization = `Bearer ${token}`;
+  if (options.body && !headers["Content-Type"]) {
+    headers["Content-Type"] = "application/json";
   }
 
   const response = await fetch(`${API_BASE}${path}`, {
