@@ -1,28 +1,3 @@
-// Define the initial test users (matching auth.js for consistency)
-const TEST_USERS = [
-  {
-    name: "João Silva",
-    email: "joao@empresa.com",
-    department: "Auditório",
-    role: "User",
-    password: "joao123",
-  },
-  {
-    name: "Maria Sousa",
-    email: "maria@empresa.com",
-    department: "Lab A",
-    role: "User",
-    password: "maria123",
-  },
-  {
-    name: "Administrador",
-    email: "admin@edificio.com",
-    department: "Administração",
-    role: "Admin",
-    password: "admin123",
-  },
-];
-
 // Function to get all users (test + admin-added users)
 function getAllUsers() {
   let allUsers = [...TEST_USERS];

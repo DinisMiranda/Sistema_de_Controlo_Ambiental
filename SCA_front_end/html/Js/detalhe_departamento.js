@@ -191,7 +191,7 @@ async function loadRoomActualData(room) {
   currentRoom = {
     ...room,
     location: room.name,
-    capacity: "",
+    capacity: null,
     area: "",
     hvacSystem: "",
     lastMaintenance: "",
