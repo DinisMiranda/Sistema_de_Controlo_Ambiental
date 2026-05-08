@@ -1,4 +1,4 @@
-﻿let currentRoom = null;
+let currentRoom = null;
 
 function formatRoomKey(location) {
   return String(location)
@@ -191,11 +191,11 @@ async function loadRoomActualData(room) {
   currentRoom = {
     ...room,
     location: room.name,
-    capacity: "---",
-    area: "---",
-    hvacSystem: "---",
-    lastMaintenance: "---",
-    nextMaintenance: "---",
+    capacity: "",
+    area: "",
+    hvacSystem: "",
+    lastMaintenance: "",
+    nextMaintenance: "",
     temperature:
       typeof temperature === "number" ? Number(temperature.toFixed(1)) : "N/A",
     humidity:
@@ -284,13 +284,13 @@ function updateRoomInfo() {
 
   if (infoLocation)
     infoLocation.textContent = currentRoom.location || currentRoom.name;
-  if (infoCapacity) infoCapacity.textContent = currentRoom.capacity || "---";
-  if (infoArea) infoArea.textContent = currentRoom.area || "---";
-  if (infoHvac) infoHvac.textContent = currentRoom.hvacSystem || "---";
+  if (infoCapacity) infoCapacity.textContent = currentRoom.capacity || "";
+  if (infoArea) infoArea.textContent = currentRoom.area || "";
+  if (infoHvac) infoHvac.textContent = currentRoom.hvacSystem || "";
   if (infoMaintenance)
-    infoMaintenance.textContent = currentRoom.lastMaintenance || "---";
+    infoMaintenance.textContent = currentRoom.lastMaintenance || "";
   if (infoNextMaintenance)
-    infoNextMaintenance.textContent = currentRoom.nextMaintenance || "---";
+    infoNextMaintenance.textContent = currentRoom.nextMaintenance || "";
 }
 
 function renderAlerts() {

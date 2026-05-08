@@ -1,4 +1,4 @@
-let departmentsData = {};
+let departmentsData = [];
 
 function formatRoomKey(location) {
   return String(location)
@@ -405,7 +405,7 @@ function setupFilters() {
 }
 
 function updateStatistics() {
-  const totalRooms = Object.keys(departmentsData).length;
+  const totalRooms = departmentsData.length;
 
   let roomsOk = 0;
   let roomsWarning = 0;

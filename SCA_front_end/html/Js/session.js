@@ -142,6 +142,22 @@ async function getSensorReadings(sensorId) {
   return response.json();
 }
 
+async function requireAuth() {
+  const user = await validateSession();
+  if (!user) {
+    window.location.href = "login.html";
+    return null;
+  }
+  return user;
+}
+
+async function redirectIfAuthenticated() {
+  const user = await validateSession();
+  if (user) {
+    window.location.href = "dashboard.html";
+  }
+}
+
 async function loadDashboardData() {
   try {
     const response = await fetchWithAuth("/api/sensores");

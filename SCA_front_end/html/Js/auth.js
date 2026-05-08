@@ -1,28 +1,4 @@
-const API_BASE = "http://localhost:3001";
-
-const TEST_USERS = [
-  {
-    id: 1,
-    email: "admin@edificio.com",
-    password: "admin123",
-    name: "Administrador",
-    role: "Admin",
-  },
-  {
-    id: 2,
-    email: "joao@empresa.com",
-    password: "joao123",
-    name: "João Silva",
-    role: "User",
-  },
-  {
-    id: 3,
-    email: "maria@empresa.com",
-    password: "maria123",
-    name: "Maria Sousa",
-    role: "User",
-  },
-];
+const API_BASE = window.CONFIG?.API_BASE || "http://localhost:3001";
 
 function normalizeUser(user = {}) {
   return {
@@ -60,41 +36,11 @@ function getCurrentUser() {
   }
 }
 
-async function validateSession() {
+async function checkAuth({ redirect = false } = {}) {
   const token = getToken();
-  if (!token) return null;
-
-  try {
-    const response = await fetch(`${API_BASE}/api/auth/me`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      clearSession();
-      return null;
-    }
-
-    const data = await response.json();
-    if (!data?.user) {
-      clearSession();
-      return null;
-    }
-
-    setSession(data.user, token);
-    return getCurrentUser();
-  } catch {
-    clearSession();
-    return null;
-  }
-}
-
-async function requireAuth() {
-  const token = localStorage.getItem("token");
 
   if (!token) {
-    window.location.href = "login.html";
+    if (redirect) window.location.href = "login.html";
     return null;
   }
 
@@ -102,27 +48,34 @@ async function requireAuth() {
     const response = await fetchWithAuth("/api/auth/me");
 
     if (!response.ok) {
-      throw new Error("Token inválido");
+      throw new Error("Sessão inválida");
     }
 
     const data = await response.json();
 
-    if (!data.user) {
-      throw new Error("Sessão inválida");
+    if (!data?.user) {
+      throw new Error("Utilizador inválido");
     }
 
     setSession(data.user, token);
-
-    return data.user;
+    return getCurrentUser();
   } catch {
     clearSession();
-    window.location.href = "login.html";
+
+    if (redirect) {
+      window.location.href = "login.html";
+    }
+
     return null;
   }
 }
 
+async function requireAuth() {
+  return checkAuth({ redirect: true });
+}
+
 async function redirectIfAuthenticated() {
-  const user = await validateSession();
+  const user = await checkAuth();
   if (user) {
     window.location.href = "dashboard.html";
   }
@@ -180,7 +133,8 @@ async function fetchWithAuth(path, options = {}) {
   }
 
   try {
-    const response = await fetch(`${API_BASE}${path}`, {
+    const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+    const response = await fetch(`${API_BASE}${normalizedPath}`, {
       ...options,
       headers,
     });

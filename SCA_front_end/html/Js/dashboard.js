@@ -108,6 +108,7 @@ function getAirQualityLabel(co2) {
 }
 
 async function initializeDashboard() {
+  setLoadingState([tempValue, humidityValue]);
   roomsData = await fetchSensorRooms();
   populateRoomSelector();
 
