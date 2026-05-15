@@ -1,40 +1,107 @@
 // Function to get all users (test + admin-added users)
-function getAllUsers() {
-  let allUsers = [...TEST_USERS];
-  const addedUsers = JSON.parse(localStorage.getItem("addedUsers")) || [];
-  allUsers = allUsers.concat(addedUsers);
-  return allUsers;
-}
+// function getAllUsers() {
+//   let allUsers = [...TEST_USERS];
+//   const addedUsers = JSON.parse(localStorage.getItem("addedUsers")) || [];
+//   allUsers = allUsers.concat(addedUsers);
+//   return allUsers;
+// }
 
 // Initialize users array using the shared function
-let users = getAllUsers();
+// let users = getAllUsers();
 
 // Function to save only added users to localStorage
-function saveUsers() {
-  const addedUsers = users.filter(
-    (user) => !TEST_USERS.some((testUser) => testUser.email === user.email),
-  );
-  localStorage.setItem("addedUsers", JSON.stringify(addedUsers));
+// function saveUsers() {
+//   const addedUsers = users.filter(
+//     (user) => !TEST_USERS.some((testUser) => testUser.email === user.email),
+//   );
+//   localStorage.setItem("addedUsers", JSON.stringify(addedUsers));
+// }
+
+const user = JSON.parse(localStorage.getItem("user"));
+
+const adminMenu = document.getElementById("admin-menu");
+
+if (adminMenu) {
+  adminMenu.style.display = user?.admin ? "block" : "none";
 }
 
-// Function to populate table
-function populateTable() {
-  const table = document.querySelector("table");
-  // Clear existing rows except header
-  const rows = table.querySelectorAll("tr");
-  for (let i = 1; i < rows.length; i++) {
-    rows[i].remove();
+async function loadUsers() {
+  const response = await fetchWithAuth("/api/users");
+  if (!response.ok) {
+    console.error("Erro ao carregar utilizadores");
+    return [];
   }
+  return response.json();
+}
+
+async function createUser(name, email, password) {
+  const response = await fetchWithAuth("/api/auth/register", {
+    method: "POST",
+    body: JSON.stringify({ nome: name, email, password }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || "Erro ao criar utilizador");
+  return data;
+}
+
+async function deleteUser(userId) {
+  const response = await fetchWithAuth(`/api/users/${userId}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) throw new Error("Erro ao apagar utilizador");
+}
+
+// Populate table on load
+document.addEventListener("DOMContentLoaded", async () => {
+  const user = await requireAuth();
+  if (!user || user.role !== "Admin") return;
+
+  const users = await loadUsers();
+  populateTable(users);
+});
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const user = await requireAuth();
+
+  if (!user) return;
+
+  const isAdmin =
+    user?.role?.toLowerCase() === "admin" ||
+    user?.admin === true;
+
+  if (!isAdmin) {
+    window.location.href = "dashboard.html";
+  }
+});
+
+// Function to populate table
+function populateTable(users) {
+  const table = document.querySelector("table tbody");
+  table.innerHTML = "";
+  // Clear existing rows except header
+  // const rows = table.querySelectorAll("tr");
+  // for (let i = 1; i < rows.length; i++) {
+  //   rows[i].remove();
+  // }
   // Add users
-  users.forEach((user) =>
-    addUserToTable(
-      user.name,
-      user.email,
-      user.department,
-      user.role,
-      user.password,
-    ),
-  );
+  users.forEach((user) => {
+    const row = table.insertRow();
+    row.innerHTML = `
+      <td>${user.nome}</td>
+      <td>${user.email}</td>
+      <td>${user.admin ? "Admin" : "User"}</td>
+      <td>
+        <button onclick="handleDelete(${user.id_administrador})">Apagar</button>
+      </td>
+    `;
+    // addUserToTable(
+    //  user.name,
+    //  user.email,
+    //  user.department,
+    //  user.role,
+    //  user.password,
+    // );
+  });
 }
 
 // Get modal and form elements
@@ -42,13 +109,6 @@ const userModal = document.getElementById("user-modal");
 const userForm = document.getElementById("user-form");
 const addUserBtn = document.getElementById("add-user");
 const cancelBtn = document.getElementById("cancel-btn");
-
-// Populate table on load
-document.addEventListener("DOMContentLoaded", async () => {
-  const user = await requireAuth();
-  if (!user || user.role !== "Admin") return;
-  populateTable();
-});
 
 // Open modal when button is clicked
 addUserBtn.addEventListener("click", () => {
@@ -62,52 +122,86 @@ cancelBtn.addEventListener("click", () => {
 });
 
 // Close modal when clicking outside the modal content
-userModal.addEventListener("click", (e) => {
-  if (e.target === userModal) {
-    userModal.style.display = "none";
-  }
-});
+// userModal.addEventListener("click", (e) => {
+//  if (e.target === userModal) {
+//    userModal.style.display = "none";
+//  }
+// });
 
 // Handle form submission
-userForm.addEventListener("submit", (e) => {
+// userForm.addEventListener("submit", (e) => {
+// e.preventDefault();
+
+// Get form values
+// const name = document.getElementById("user-name").value.trim();
+// const email = document.getElementById("user-email").value.trim();
+// const department = document.getElementById("user-department").value.trim();
+// const role = document.getElementById("user-role").value;
+// const password = document.getElementById("user-password").value;
+
+// Validate inputs
+// if (!name || !email || !department || !password) {
+//   alert("Por favor, preencha todos os campos.");
+//   return;
+// }
+
+// Validate password strength
+// if (password.length < 6) {
+//   alert("A password deve ter pelo menos 6 caracteres.");
+//   return;
+// }
+
+// Check if email already exists
+// if (users.some((u) => u.email === email)) {
+//   alert("Este email já está registado.");
+//   return;
+// }
+
+// Add new user to users array
+// users.push({ name, email, department, role, password });
+// saveUsers();
+
+// Add to table
+// addUserToTable(name, email, department, role, password);
+
+// Close modal and reset form
+// userModal.style.display = "none";
+// userForm.reset();
+
+userForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  // Get form values
   const name = document.getElementById("user-name").value.trim();
   const email = document.getElementById("user-email").value.trim();
-  const department = document.getElementById("user-department").value.trim();
-  const role = document.getElementById("user-role").value;
   const password = document.getElementById("user-password").value;
 
-  // Validate inputs
-  if (!name || !email || !department || !password) {
-    alert("Por favor, preencha todos os campos.");
-    return;
+  try {
+    await createUser(name, email, password);
+
+    userModal.style.display = "none";
+    userForm.reset();
+
+    // Refresh the table from the backend
+    const users = await loadUsers();
+    populateTable(users);
+  } catch (err) {
+    alert(err.message);
   }
-
-  // Validate password strength
-  if (password.length < 6) {
-    alert("A password deve ter pelo menos 6 caracteres.");
-    return;
-  }
-
-  // Check if email already exists
-  if (users.some((u) => u.email === email)) {
-    alert("Este email já está registado.");
-    return;
-  }
-
-  // Add new user to users array
-  users.push({ name, email, department, role, password });
-  saveUsers();
-
-  // Add to table
-  addUserToTable(name, email, department, role, password);
-
-  // Close modal and reset form
-  userModal.style.display = "none";
-  userForm.reset();
 });
+
+async function handleDelete(userId) {
+  if (!confirm("Tem a certeza que quer apagar este utilizador?")) return;
+
+  try {
+    await deleteUser(userId);
+
+    // Refresh the table
+    const users = await loadUsers();
+    populateTable(users);
+  } catch (err) {
+    alert(err.message);
+  }
+}
 
 // Function to add user to table
 function addUserToTable(name, email, department, role, password) {

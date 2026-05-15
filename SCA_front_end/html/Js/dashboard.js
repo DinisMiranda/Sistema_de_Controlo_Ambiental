@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   initializeUserAvatar();
   loadUserInfo();
   setupLogout();
-  checkAdminAccess();
+  //checkAdminAccess();
   initializeControlMode();
 });
 
@@ -241,6 +241,12 @@ async function updateRoomData(roomId) {
         : "Luminosidade indisponível";
   }
 
+  if (typeof temperature === "number") {  
+  animateValue(tempValue, parseFloat(tempValue.textContent) || 0, temperature, 500);  
+    } else {  
+  tempValue.textContent = "N/A";  
+}  
+
   updateComfortStatus(status, statusText, statusIcon);
 
   console.log("✅ Sala atualizada:", room.name);
@@ -339,6 +345,13 @@ function loadUserInfo() {
   }
 }
 
+function logout() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+
+  window.location.href = "login.html";
+}
+
 function setupLogout() {
   const logoutBtn = document.getElementById("logout-btn");
 
@@ -350,18 +363,21 @@ function setupLogout() {
   }
 }
 
-function checkAdminAccess() {
+document.addEventListener("DOMContentLoaded", () => {
   const user = JSON.parse(localStorage.getItem("user"));
+
   const adminLink = document.querySelector(".admin-link");
 
-  if (adminLink) {
-    if (user?.role === "Admin") {
-      adminLink.style.display = "block";
-    } else {
-      adminLink.style.display = "none";
-    }
+  if (!adminLink) return;
+
+  const isAdmin =
+    user &&
+    String(user.role || "").toLowerCase() === "admin";
+
+  if (!isAdmin) {
+    adminLink.style.display = "none";
   }
-}
+});
 
 function initializeControlMode() {
   const toggleModeBtn = document.getElementById("toggle-mode");

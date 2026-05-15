@@ -1,11 +1,10 @@
-javascript;
 let reportsData = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
   const user = await requireAuth();
   if (!user) return;
 
-  checkAdminAccess();
+  // checkAdminAccess();
   setupLogout();
   setupDefaultDates();
   setupEvents();
@@ -157,18 +156,21 @@ function formatDate(dateString) {
 // CONTROLO DE ACESSO ADMIN
 // ========================================
 
-function checkAdminAccess() {
+document.addEventListener("DOMContentLoaded", () => {
   const user = JSON.parse(localStorage.getItem("user"));
+
   const adminLink = document.querySelector(".admin-link");
 
-  if (adminLink) {
-    if (user.role === "Admin") {
-      adminLink.style.display = "block";
-    } else {
-      adminLink.style.display = "none";
-    }
+  if (!adminLink) return;
+
+  const isAdmin =
+    user &&
+    String(user.role || "").toLowerCase() === "admin";
+
+  if (!isAdmin) {
+    adminLink.style.display = "none";
   }
-}
+});
 
 function setupDefaultDates() {
   const startDate = document.getElementById("start-date");
@@ -382,13 +384,24 @@ function setupLogout() {
   }
 }
 
-router.get("/reports", async (req, res) => {
-  const reports = await prisma.readings.findMany({
-    orderBy: {
-      timestamp: "desc",
-    },
-    take: 100,
-  });
+async function loadReports() {
+  const response = await fetchWithAuth("/api/reports");
+  const reports = await response.json();
 
-  res.json(reports);
+  console.log(reports);
+}
+
+loadReports();
+
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const response = await fetch("http://localhost:3000/relatorios");
+
+    const relatorios = await response.json();
+
+    renderRelatorios(relatorios);
+
+  } catch (error) {
+    console.error(error);
+  }
 });

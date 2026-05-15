@@ -1,6 +1,8 @@
 import { Router, type Request, type Response } from "express";
 import { createToken, verifyToken } from "../lib/auth.js";
 
+const API_URL = "http://localhost:3001";
+
 export const authRouter = Router();
 
 const TEST_USERS = [

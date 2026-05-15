@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const user = await requireAuth();
   if (!user) return;
 
-  checkAdminAccess();
+  // checkAdminAccess();
   setupLogout();
   renderModules();
   renderHealth();
@@ -99,18 +99,21 @@ document.addEventListener("DOMContentLoaded", async () => {
 // CONTROLO DE ACESSO ADMIN
 // ========================================
 
-function checkAdminAccess() {
+document.addEventListener("DOMContentLoaded", () => {
   const user = JSON.parse(localStorage.getItem("user"));
+
   const adminLink = document.querySelector(".admin-link");
 
-  if (adminLink) {
-    if (user.role === "Admin") {
-      adminLink.style.display = "block";
-    } else {
-      adminLink.style.display = "none";
-    }
+  if (!adminLink) return;
+
+  const isAdmin =
+    user &&
+    String(user.role || "").toLowerCase() === "admin";
+
+  if (!isAdmin) {
+    adminLink.style.display = "none";
   }
-}
+});
 
 function renderModules() {
   const container = document.getElementById("modules-list");
@@ -321,7 +324,7 @@ function setupLogout() {
     logoutBtn.addEventListener("click", function () {
       localStorage.removeItem("user");
       localStorage.removeItem("token");
-      window.location.href = "login.html";
+      window.location.href = "html/login.html";
     });
   }
 }

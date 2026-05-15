@@ -120,7 +120,7 @@ async function fetchWithAuth(url, options = {}) {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
-    window.location.href = "login.html";
+    // window.location.href = "login.html";
 
     throw new Error("Sessão expirada");
   }
@@ -145,7 +145,7 @@ async function getSensorReadings(sensorId) {
 async function requireAuth() {
   const user = await validateSession();
   if (!user) {
-    window.location.href = "login.html";
+    // window.location.href = "login.html";
     return null;
   }
   return user;

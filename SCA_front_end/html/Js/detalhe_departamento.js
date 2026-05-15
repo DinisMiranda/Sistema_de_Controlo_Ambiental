@@ -558,14 +558,21 @@ function setupLogout() {
   }
 }
 
-function checkAdminAccess() {
+document.addEventListener("DOMContentLoaded", () => {
   const user = JSON.parse(localStorage.getItem("user"));
+
   const adminLink = document.querySelector(".admin-link");
 
-  if (adminLink) {
-    adminLink.style.display = user?.role === "Admin" ? "block" : "none";
+  if (!adminLink) return;
+
+  const isAdmin =
+    user &&
+    String(user.role || "").toLowerCase() === "admin";
+
+  if (!isAdmin) {
+    adminLink.style.display = "none";
   }
-}
+});
 
 async function initializeRoomDetails() {
   const user = await requireAuth();
@@ -573,7 +580,7 @@ async function initializeRoomDetails() {
 
   loadUserInfo();
   setupLogout();
-  checkAdminAccess();
+  // checkAdminAccess();
 
   const urlParams = new URLSearchParams(window.location.search);
   const roomId = urlParams.get("room") || "sala-101";

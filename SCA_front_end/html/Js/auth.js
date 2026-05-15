@@ -1,3 +1,5 @@
+//const CONFIG = { API_BASE: "http://localhost:3001" }
+
 const API_BASE = window.CONFIG?.API_BASE || "http://localhost:3001";
 
 function normalizeUser(user = {}) {
@@ -40,12 +42,14 @@ async function checkAuth({ redirect = false } = {}) {
   const token = getToken();
 
   if (!token) {
-    if (redirect) window.location.href = "login.html";
+    console.log("No token found");
     return null;
   }
 
   try {
     const response = await fetchWithAuth("/api/auth/me");
+
+    console.log("Auth response status:", response.status);
 
     if (!response.ok) {
       throw new Error("Sessão inválida");
@@ -53,18 +57,26 @@ async function checkAuth({ redirect = false } = {}) {
 
     const data = await response.json();
 
+    console.log("Auth response data:", data);
+
     if (!data?.user) {
       throw new Error("Utilizador inválido");
     }
 
     setSession(data.user, token);
+
     return getCurrentUser();
-  } catch {
+
+  } catch (error) {
+
+    console.error("Auth check failed:", error);
+
     clearSession();
 
-    if (redirect) {
-      window.location.href = "login.html";
-    }
+    // TEMPORARILY DISABLED TO STOP LOGIN LOOP
+    // if (redirect) {
+    //   window.location.href = "login.html";
+    // }
 
     return null;
   }
@@ -119,7 +131,7 @@ async function loginRequest(email, password) {
 
 async function fetchWithAuth(path, options = {}) {
   const token = getToken();
-
+  const url = path.startsWith("/") ? `${API_BASE}${path}` : `${API_BASE}/${path}`;
   const headers = {
     ...(options.headers || {}),
   };
@@ -142,9 +154,9 @@ async function fetchWithAuth(path, options = {}) {
     if (response.status === 401) {
       clearSession();
 
-      if (!window.location.pathname.endsWith("login.html")) {
-        window.location.href = "login.html";
-      }
+      // if (!window.location.pathname.endsWith("login.html")) {
+      //  window.location.href = "login.html";
+      // }
     }
 
     return response;

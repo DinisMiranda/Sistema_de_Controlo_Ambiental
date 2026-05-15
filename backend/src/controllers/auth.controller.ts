@@ -63,7 +63,7 @@ export async function login(req: Request, res: Response) {
       id,
       nome: user.get("nome"),
       email: user.get("email"),
-      admin,
+      admin: user.get("admin"),
     },
   });
 }
@@ -74,3 +74,4 @@ export function me(req: Request, res: Response) {
   }
   res.json({ user: req.user });
 }
+

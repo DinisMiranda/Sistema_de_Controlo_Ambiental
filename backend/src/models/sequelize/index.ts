@@ -41,5 +41,17 @@ export const models = {
 };
 
 export async function syncModels() {
-  await sequelize.sync({ alter: true });
+  await sequelize.sync();
 }
+
+export async function authenticateSequelize() {
+  try {
+    await sequelize.authenticate();
+  } catch (error) {
+    console.error("Unable to connect to the database:", error);
+    throw error;
+  }
+}
+
+export const RegistosConsumo = 
+  initRegistosConsumoModel(sequelize);

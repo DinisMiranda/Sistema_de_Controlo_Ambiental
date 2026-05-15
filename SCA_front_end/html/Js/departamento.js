@@ -101,56 +101,58 @@ function getAirQualityLabel(co2) {
 
 async function initializeDepartments() {
   const rooms = await fetchSensorRooms();
-  departmentsData = await Promise.all(
-    Object.values(rooms).map(async (room) => {
-      const temperatureSensor = getSensorByType(room, /temperatura/i);
-      const humiditySensor = getSensorByType(room, /humidade/i);
-      const lightSensor = getSensorByType(room, /luminosidade/i);
-      const co2Sensor = getSensorByType(room, /co2/i);
+  departmentsData = {};  
+  Object.values(rooms).forEach(room => { departmentsData[room.id] = room; });  
+  // departmentsData = await Promise.all(
+    // Object.values(rooms).map(async (room) => {
+      // const temperatureSensor = getSensorByType(room, /temperatura/i);
+      // const humiditySensor = getSensorByType(room, /humidade/i);
+      // const lightSensor = getSensorByType(room, /luminosidade/i);
+      // const co2Sensor = getSensorByType(room, /co2/i);
 
-      const [tempReading, humidityReading, lightReading, co2Reading] =
-        await Promise.all([
-          fetchLatestReading(temperatureSensor?.id_sensor),
-          fetchLatestReading(humiditySensor?.id_sensor),
-          fetchLatestReading(lightSensor?.id_sensor),
-          fetchLatestReading(co2Sensor?.id_sensor),
-        ]);
+      // const [tempReading, humidityReading, lightReading, co2Reading] =
+        // await Promise.all([
+          // fetchLatestReading(temperatureSensor?.id_sensor),
+          // fetchLatestReading(humiditySensor?.id_sensor),
+          // fetchLatestReading(lightSensor?.id_sensor),
+          // fetchLatestReading(co2Sensor?.id_sensor),
+        //]);
 
-      const temperature = parseReadingValue(tempReading);
-      const humidity = parseReadingValue(humidityReading);
-      const lightValue = parseReadingValue(lightReading);
-      const co2 = parseReadingValue(co2Reading);
+      // const temperature = parseReadingValue(tempReading);
+      // const humidity = parseReadingValue(humidityReading);
+      // const lightValue = parseReadingValue(lightReading);
+      // const co2 = parseReadingValue(co2Reading);
 
-      const lightingOn =
-        typeof lightValue === "number" ? Math.round(lightValue / 10) : 0;
-      const lightingTotal = room.sensors.length || 1;
-      const status = getRoomStatus(temperature, humidity, co2);
+      // const lightingOn =
+        // typeof lightValue === "number" ? Math.round(lightValue / 10) : 0;
+      // const lightingTotal = room.sensors.length || 1;
+      // const status = getRoomStatus(temperature, humidity, co2);
 
-      return {
-        id: room.id,
-        name: room.name,
-        badge:
-          status === "normal"
-            ? "Ativo"
-            : status === "attention"
-              ? "Atenção"
-              : "Alerta",
-        temperature:
-          typeof temperature === "number" ? temperature.toFixed(1) : "N/A",
-        humidity: typeof humidity === "number" ? humidity.toFixed(0) : "N/A",
-        lightingOn,
-        lightingTotal,
-        status,
-        statusText: getRoomStatusText(status),
-        lastUpdate:
-          tempReading?.timestamp_leitura ||
-          humidityReading?.timestamp_leitura ||
-          lightReading?.timestamp_leitura ||
-          co2Reading?.timestamp_leitura ||
-          "Desconhecido",
-      };
-    }),
-  );
+      // return {
+        // id: room.id,
+        // name: room.name,
+        // badge:
+          // status === "normal"
+            // ? "Ativo"
+            // : status === "attention"
+              // ? "Atenção"
+              // : "Alerta",
+        // temperature:
+          // typeof temperature === "number" ? temperature.toFixed(1) : "N/A",
+        // humidity: typeof humidity === "number" ? humidity.toFixed(0) : "N/A",
+        // lightingOn,
+        // lightingTotal,
+        // status,
+        // statusText: getRoomStatusText(status),
+        // lastUpdate:
+          // tempReading?.timestamp_leitura ||
+          // humidityReading?.timestamp_leitura ||
+          // lightReading?.timestamp_leitura ||
+          // co2Reading?.timestamp_leitura ||
+          // "Desconhecido",
+      // };
+    // }),
+  // );
 
   renderDepartmentCards();
   updateStatistics();
@@ -162,7 +164,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   console.log("🏢 Página de Departamentos inicializando...");
 
-  checkAdminAccess();
+  // checkAdminAccess();
   setupLogout();
   await initializeDepartments();
   setupFilters();
@@ -170,18 +172,21 @@ document.addEventListener("DOMContentLoaded", async function () {
   console.log("✅ Departamentos carregados com sucesso!");
 });
 
-function checkAdminAccess() {
+document.addEventListener("DOMContentLoaded", () => {
   const user = JSON.parse(localStorage.getItem("user"));
+
   const adminLink = document.querySelector(".admin-link");
 
-  if (adminLink) {
-    if (user?.role === "Admin") {
-      adminLink.style.display = "block";
-    } else {
-      adminLink.style.display = "none";
-    }
+  if (!adminLink) return;
+
+  const isAdmin =
+    user &&
+    String(user.role || "").toLowerCase() === "admin";
+
+  if (!isAdmin) {
+    adminLink.style.display = "none";
   }
-}
+});
 
 function renderDepartmentCards(filter = "all") {
   const grid = document.getElementById("departments-grid");
@@ -444,7 +449,49 @@ function setupLogout() {
   if (logoutBtn) {
     logoutBtn.addEventListener("click", function () {
       clearSession();
-      window.location.href = "login.html";
+      window.location.href = "html/login.html";
     });
   }
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const response = await fetch("http://localhost:3000/departamentos");
+
+    const departamentos = await response.json();
+
+    renderDepartamentos(departamentos);
+
+  } catch (error) {
+    console.error("Erro ao carregar departamentos:", error);
+  }
+});
+
+function renderDepartamentos(departamentos) {
+  const container = document.getElementById("departamentos-list");
+
+  if (!container) {
+  console.error("Container não encontrado");
+  return;
+  }
+
+container.innerHTML = html;
+
+  data.forEach((dept) => {
+    coontainer.innerHTML += `
+      <div class="departamento-card">
+        <h3>${dept.nome}</h3>
+        <p>Temperatura: ${dept.temperatura}°C</p>
+        <p>Humidade: ${dept.humidade}%</p>
+        <p>CO2: ${dept.co2} ppm</p>
+      </div>
+    `;
+  });
+}
+
+async function initializePage() {
+  const user = await requireAuth();
+  if (!user) return;
+
+  console.log("🚀 Inicializando página de departamentos...");
 }
