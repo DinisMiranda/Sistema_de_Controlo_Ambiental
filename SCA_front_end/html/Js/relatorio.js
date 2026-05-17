@@ -32,10 +32,6 @@ async function loadReports() {
     }
 
     if (!response.ok) {
-      response = await fetchWithAuth("/api/sensores");
-    }
-
-    if (!response.ok) {
       throw new Error("Nenhum endpoint disponível");
     }
 
@@ -384,24 +380,3 @@ function setupLogout() {
   }
 }
 
-async function loadReports() {
-  const response = await fetchWithAuth("/api/reports");
-  const reports = await response.json();
-
-  console.log(reports);
-}
-
-loadReports();
-
-document.addEventListener("DOMContentLoaded", async () => {
-  try {
-    const response = await fetch("http://localhost:3000/relatorios");
-
-    const relatorios = await response.json();
-
-    renderRelatorios(relatorios);
-
-  } catch (error) {
-    console.error(error);
-  }
-});
