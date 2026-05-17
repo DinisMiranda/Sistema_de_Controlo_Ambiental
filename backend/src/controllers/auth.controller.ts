@@ -45,12 +45,12 @@ export async function login(req: Request, res: Response) {
 
   const user = await models.Utilizador.findOne({ where: { email } });
   if (!user) {
-    return res.status(401).json({ error: "credenciais inválidas" });
+    return res.status(401).json({ error: "Credenciais Inválidas" });
   }
 
   const validPassword = user.get("palavra_passe_hash") === hashPassword(password);
   if (!validPassword) {
-    return res.status(401).json({ error: "credenciais inválidas" });
+    return res.status(401).json({ error: "Credenciais Inválidas" });
   }
 
   const id = Number(user.get("id_administrador"));

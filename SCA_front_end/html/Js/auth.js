@@ -38,6 +38,21 @@ function getCurrentUser() {
   }
 }
 
+function setupLogout() {
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  if (!logoutBtn) return;
+
+  logoutBtn.addEventListener("click", () => {
+    // Remove token/session
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    // Redirect to login
+    window.location.href = "../../index.html";
+  });
+}
+
 async function checkAuth({ redirect = false } = {}) {
   const token = getToken();
 

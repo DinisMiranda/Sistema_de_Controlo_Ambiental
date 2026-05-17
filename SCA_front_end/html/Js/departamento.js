@@ -57,6 +57,15 @@ async function fetchLatestReading(sensorId) {
   }
 }
 
+function renderDepartments() {
+  departmentsGrid.innerHTML = "";
+
+  Object.values(departmentsData).forEach((room) => {
+    const card = createDepartmentCard(room);
+    departmentsGrid.appendChild(card);
+  });
+}
+
 function parseReadingValue(reading) {
   if (!reading || reading.valor === undefined || reading.valor === null)
     return null;
@@ -100,62 +109,93 @@ function getAirQualityLabel(co2) {
 }
 
 async function initializeDepartments() {
-  const rooms = await fetchSensorRooms();
-  departmentsData = {};  
-  Object.values(rooms).forEach(room => { departmentsData[room.id] = room; });  
-  // departmentsData = await Promise.all(
-    // Object.values(rooms).map(async (room) => {
-      // const temperatureSensor = getSensorByType(room, /temperatura/i);
-      // const humiditySensor = getSensorByType(room, /humidade/i);
-      // const lightSensor = getSensorByType(room, /luminosidade/i);
-      // const co2Sensor = getSensorByType(room, /co2/i);
+  try {
+    // Fetch departments
+    const depResponse = await fetch(`${API_BASE}/api/departments`);
+    const departments = await depResponse.json();
 
-      // const [tempReading, humidityReading, lightReading, co2Reading] =
-        // await Promise.all([
-          // fetchLatestReading(temperatureSensor?.id_sensor),
-          // fetchLatestReading(humiditySensor?.id_sensor),
-          // fetchLatestReading(lightSensor?.id_sensor),
-          // fetchLatestReading(co2Sensor?.id_sensor),
-        //]);
+    // Fetch rooms
+    const roomResponse = await fetch(`${API_BASE}/api/salas`);
+    const roomsData = await roomResponse.json();
 
-      // const temperature = parseReadingValue(tempReading);
-      // const humidity = parseReadingValue(humidityReading);
-      // const lightValue = parseReadingValue(lightReading);
-      // const co2 = parseReadingValue(co2Reading);
+    // Fetch sensors
+    const sensorResponse = await fetch(`${API_BASE}/api/sensores`);
+    const sensors = await sensorResponse.json();
 
-      // const lightingOn =
-        // typeof lightValue === "number" ? Math.round(lightValue / 10) : 0;
-      // const lightingTotal = room.sensors.length || 1;
-      // const status = getRoomStatus(temperature, humidity, co2);
+    // Create room map
+    const rooms = {};
 
-      // return {
-        // id: room.id,
-        // name: room.name,
-        // badge:
-          // status === "normal"
-            // ? "Ativo"
-            // : status === "attention"
-              // ? "Atenção"
-              // : "Alerta",
-        // temperature:
-          // typeof temperature === "number" ? temperature.toFixed(1) : "N/A",
-        // humidity: typeof humidity === "number" ? humidity.toFixed(0) : "N/A",
-        // lightingOn,
-        // lightingTotal,
-        // status,
-        // statusText: getRoomStatusText(status),
-        // lastUpdate:
-          // tempReading?.timestamp_leitura ||
-          // humidityReading?.timestamp_leitura ||
-          // lightReading?.timestamp_leitura ||
-          // co2Reading?.timestamp_leitura ||
-          // "Desconhecido",
-      // };
-    // }),
-  // );
+    roomsData.forEach((room) => {
+      rooms[room.id] = {
+        ...room,
+        sensors: [],
+      };
+    });
 
-  renderDepartmentCards();
-  updateStatistics();
+    // Attach sensors to rooms
+    sensors.forEach((sensor) => {
+      if (sensor.roomId && rooms[sensor.roomId]) {
+        rooms[sensor.roomId].sensors.push(sensor);
+      }
+    });
+
+    // Render departments
+    departments.forEach((department) => {
+      renderDepartment(department);
+    });
+
+    // Load sensor data for each room
+    await Promise.all(
+      Object.values(rooms).map(async (room) => {
+        if (!room.sensors || room.sensors.length === 0) {
+          return;
+        }
+
+        await Promise.all(
+          room.sensors
+            .filter((sensor) => sensor != null)
+            .map(async (sensor) => {
+              const sensorId = sensor.id;
+
+              try {
+                // Latest reading
+                const latestRes = await fetch(
+                  `${API_BASE}/api/sensores/${sensorId}/latest`
+                );
+
+                // Historical readings
+                const readingsRes = await fetch(
+                  `${API_BASE}/api/sensores/${sensorId}/readings`
+                );
+
+                if (!latestRes.ok || !readingsRes.ok) {
+                  throw new Error(
+                    `Failed to fetch data for sensor ${sensorId}`
+                  );
+                }
+
+                const latest = await latestRes.json();
+                const readings = await readingsRes.json();
+
+                // Update UI
+                updateRoomSensor(room.id, sensorId, latest, readings);
+
+              } catch (err) {
+                console.error(
+                  `Error loading sensor ${sensorId}:`,
+                  err
+                );
+              }
+            })
+        );
+      })
+    );
+
+    console.log("Departments initialized successfully");
+
+  } catch (error) {
+    console.error("Error initializing departments:", error);
+  }
 }
 
 document.addEventListener("DOMContentLoaded", async function () {
@@ -179,9 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!adminLink) return;
 
-  const isAdmin =
-    user &&
-    String(user.role || "").toLowerCase() === "admin";
+  const isAdmin = user && String(user.role || "").toLowerCase() === "admin";
 
   if (!isAdmin) {
     adminLink.style.display = "none";
@@ -461,7 +499,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const departamentos = await response.json();
 
     renderDepartamentos(departamentos);
-
   } catch (error) {
     console.error("Erro ao carregar departamentos:", error);
   }
@@ -471,11 +508,11 @@ function renderDepartamentos(departamentos) {
   const container = document.getElementById("departamentos-list");
 
   if (!container) {
-  console.error("Container não encontrado");
-  return;
+    console.error("Container não encontrado");
+    return;
   }
 
-container.innerHTML = html;
+  container.innerHTML = html;
 
   data.forEach((dept) => {
     coontainer.innerHTML += `
@@ -495,3 +532,21 @@ async function initializePage() {
 
   console.log("🚀 Inicializando página de departamentos...");
 }
+
+document.addEventListener("DOMContentLoaded", async function () {
+  const user = await requireAuth();
+  if (!user) return;
+
+  console.log("🏢 Página de Departamentos inicializando...");
+
+  setupLogout();
+
+  await initializeDepartments();
+  setupFilters();
+
+  setInterval(async () => {
+    await initializeDepartments();
+  }, 5000);
+
+  console.log("✅ Departamentos carregados com sucesso!");
+});
