@@ -1,5 +1,3 @@
-const API_BASE = window.CONFIG?.API_BASE || "http://localhost:3001";
-
 function normalizeUser(user = {}) {
   return {
     ...user,
