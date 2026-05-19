@@ -93,6 +93,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   setupRanges();
   setupActions();
   updateHeaderMeta();
+  loadUserInfo();
 });
 
 // ========================================
@@ -152,6 +153,15 @@ function renderModules() {
       );
     });
   });
+}
+
+function loadUserInfo() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userInfoElement = document.getElementById("user-info");
+
+  if (user && userInfoElement) {
+    userInfoElement.textContent = `👤 ${user.name}`;
+  }
 }
 
 function renderHealth() {

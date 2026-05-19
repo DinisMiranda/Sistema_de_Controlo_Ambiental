@@ -1,9 +1,93 @@
 import { Request, Response } from "express";
 import { models } from "../models/sequelize/index.js";
 
-export async function getAllSensores(_req: Request, res: Response) {
-  const sensores = await models.Sensor.findAll({ order: [["id_sensor", "ASC"]] });
-  res.json(sensores);
+export async function getAllSensores(_req, res) {
+  res.json([
+    // SALA 101
+    {
+      id_sensor: 1,
+      localizacao: "Sala 101",
+      tipo_sensor: "temperatura",
+    },
+    {
+      id_sensor: 2,
+      localizacao: "Sala 101",
+      tipo_sensor: "humidade",
+    },
+    {
+      id_sensor: 3,
+      localizacao: "Sala 101",
+      tipo_sensor: "iluminacao",
+    },
+
+    // SALA 102
+    {
+      id_sensor: 4,
+      localizacao: "Sala 102",
+      tipo_sensor: "temperatura",
+    },
+    {
+      id_sensor: 5,
+      localizacao: "Sala 102",
+      tipo_sensor: "humidade",
+    },
+    {
+      id_sensor: 6,
+      localizacao: "Sala 102",
+      tipo_sensor: "iluminacao",
+    },
+
+    // SALA 201
+    {
+      id_sensor: 7,
+      localizacao: "Sala 201",
+      tipo_sensor: "temperatura",
+    },
+    {
+      id_sensor: 8,
+      localizacao: "Sala 201",
+      tipo_sensor: "humidade",
+    },
+    {
+      id_sensor: 9,
+      localizacao: "Sala 201",
+      tipo_sensor: "iluminacao",
+    },
+
+    // Auditorio
+    {
+      id_sensor: 10,
+      localizacao: "Auditório",
+      tipo_sensor: "temperatura",
+    },
+    {
+      id_sensor: 11,
+      localizacao: "Auditório",
+      tipo_sensor: "humidade",
+    },
+    {
+      id_sensor: 12,
+      localizacao: "Auditório",
+      tipo_sensor: "iluminacao",
+    },
+
+    // Laboratório
+    {
+      id_sensor: 13,
+      localizacao: "Laboratório",
+      tipo_sensor: "temperatura",
+    },
+    {
+      id_sensor: 14,
+      localizacao: "Laboratório",
+      tipo_sensor: "humidade",
+    },
+    {
+      id_sensor: 15,
+      localizacao: "Laboratório",
+      tipo_sensor: "iluminacao",
+    },
+  ]);
 }
 
 export async function getSensorById(req: Request, res: Response) {

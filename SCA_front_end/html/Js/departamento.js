@@ -160,17 +160,17 @@ async function initializeDepartments() {
               try {
                 // Latest reading
                 const latestRes = await fetch(
-                  `${API_BASE}/api/sensores/${sensorId}/latest`
+                  `${API_BASE}/api/sensores/${sensorId}/latest`,
                 );
 
                 // Historical readings
                 const readingsRes = await fetch(
-                  `${API_BASE}/api/sensores/${sensorId}/readings`
+                  `${API_BASE}/api/sensores/${sensorId}/readings`,
                 );
 
                 if (!latestRes.ok || !readingsRes.ok) {
                   throw new Error(
-                    `Failed to fetch data for sensor ${sensorId}`
+                    `Failed to fetch data for sensor ${sensorId}`,
                   );
                 }
 
@@ -179,20 +179,15 @@ async function initializeDepartments() {
 
                 // Update UI
                 updateRoomSensor(room.id, sensorId, latest, readings);
-
               } catch (err) {
-                console.error(
-                  `Error loading sensor ${sensorId}:`,
-                  err
-                );
+                console.error(`Error loading sensor ${sensorId}:`, err);
               }
-            })
+            }),
         );
-      })
+      }),
     );
 
     console.log("Departments initialized successfully");
-
   } catch (error) {
     console.error("Error initializing departments:", error);
   }
@@ -208,6 +203,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   setupLogout();
   await initializeDepartments();
   setupFilters();
+  loadUserInfo();
 
   console.log("✅ Departamentos carregados com sucesso!");
 });
@@ -524,6 +520,15 @@ function renderDepartamentos(departamentos) {
       </div>
     `;
   });
+}
+
+function loadUserInfo() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userInfoElement = document.getElementById("user-info");
+
+  if (user && userInfoElement) {
+    userInfoElement.textContent = `👤 ${user.name}`;
+  }
 }
 
 async function initializePage() {

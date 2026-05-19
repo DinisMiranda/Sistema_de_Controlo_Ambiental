@@ -221,6 +221,15 @@ async function loadRoomActualData(room) {
   };
 }
 
+function loadUserInfo() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userInfoElement = document.getElementById("user-info");
+
+  if (user && userInfoElement) {
+    userInfoElement.textContent = `👤 ${user.name}`;
+  }
+}
+
 function updateRoomHeader() {
   const breadcrumbRoom = document.getElementById("breadcrumb-room");
   const roomTitle = document.getElementById("room-title");
@@ -580,6 +589,7 @@ async function initializeRoomDetails() {
 
   loadUserInfo();
   setupLogout();
+  loadUserInfo();
   // checkAdminAccess();
 
   const urlParams = new URLSearchParams(window.location.search);

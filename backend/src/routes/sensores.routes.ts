@@ -32,7 +32,7 @@ sensoresRouter.post(
 sensoresRouter.patch("/:id", requireAuth, requireAdmin, patchSensor);
 sensoresRouter.delete("/:id", requireAuth, requireAdmin, deleteSensor);
 
-router.get("/:id/latest", async (req, res) => {
+sensoresRouter.get("/:id/latest", async (req, res) => {
   try {
     const sensorId = Number(req.params.id);
 
@@ -65,27 +65,30 @@ router.get("/:id/latest", async (req, res) => {
   }
 });
 
-router.get("/:id/readings", async (req, res) => {
-  try {
-    const sensorId = Number(req.params.id);
+sensoresRouter.get("/:id/readings", async (req, res) => {
+  const sensorId = Number(req.params.id);
 
-    const readings = await db.query(
-      `
-      SELECT *
-      FROM readings
-      WHERE sensorId = ?
-      ORDER BY timestamp ASC
-      LIMIT 50
-      `,
-      [sensorId],
-    );
+  const fakeReadings = {
+    1: [{ valor: 22.5, unidade: "°C" }],
+    2: [{ valor: 55, unidade: "%" }],
+    3: [{ valor: 78, unidade: "lux" }],
 
-    res.json(readings);
-  } catch (error) {
-    console.error(error);
+    4: [{ valor: 24.1, unidade: "°C" }],
+    5: [{ valor: 48, unidade: "%" }],
+    6: [{ valor: 65, unidade: "lux" }],
 
-    res.status(500).json({
-      message: "Internal server error",
-    });
-  }
+    7: [{ valor: 19.8, unidade: "°C" }],
+    8: [{ valor: 61, unidade: "%" }],
+    9: [{ valor: 82, unidade: "lux" }],
+
+    10: [{ valor: 27.3, unidade: "°C" }],
+    11: [{ valor: 70, unidade: "%" }],
+    12: [{ valor: 40, unidade: "lux" }],
+
+    13: [{ valor: 21.7, unidade: "°C" }],
+    14: [{ valor: 52, unidade: "%" }],
+    15: [{ valor: 90, unidade: "lux" }],
+  };
+
+  res.json(fakeReadings[sensorId] || []);
 });

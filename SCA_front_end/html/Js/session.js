@@ -107,7 +107,7 @@ async function registerDepartmentRequest(name) {
 async function fetchWithAuth(url, options = {}) {
   const token = localStorage.getItem("token");
 
-  const response = await fetch(`${API_BASE}${url}`, {
+  return fetch(`http://localhost:3001${url}`, {
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -143,12 +143,14 @@ async function getSensorReadings(sensorId) {
 }
 
 async function requireAuth() {
-  const user = await validateSession();
-  if (!user) {
-    // window.location.href = "login.html";
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    window.location.href = "login.html";
     return null;
   }
-  return user;
+
+  return JSON.parse(localStorage.getItem("user"));
 }
 
 async function redirectIfAuthenticated() {

@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   setupLogout();
   setupDefaultDates();
   setupEvents();
+  loadUserInfo();
 
   await loadReports();
 
@@ -69,6 +70,15 @@ async function loadReports() {
         </tr>
       `;
     }
+  }
+}
+
+function loadUserInfo() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userInfoElement = document.getElementById("user-info");
+
+  if (user && userInfoElement) {
+    userInfoElement.textContent = `👤 ${user.name}`;
   }
 }
 

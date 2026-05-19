@@ -11,17 +11,33 @@ function formatRoomKey(location) {
 async function fetchSensorRooms() {
   try {
     const response = await fetchWithAuth("/api/sensores");
+
     if (!response.ok) {
       console.error("Não foi possível carregar os sensores do backend.");
       return {};
     }
 
-    const sensors = await response.json();
+    const data = await response.json();
+    console.log("Resposta da API de sensores:", data);
+    console.log(data);
+    console.log("TYPE:", typeof data);
+    console.log("IS ARRAY:", Array.isArray(data));
+
+    const sensors = Array.isArray(data)
+      ? data
+      : Array.isArray(data.data)
+        ? data.data
+        : Array.isArray(data.sensores)
+          ? data.sensores
+          : [];
+    console.log("Sensores processados:", sensors);
+
     const rooms = {};
 
     sensors.forEach((sensor) => {
       const location = sensor.localizacao || "Desconhecido";
       const roomKey = formatRoomKey(location);
+
       if (!rooms[roomKey]) {
         rooms[roomKey] = {
           id: roomKey,
@@ -29,6 +45,7 @@ async function fetchSensorRooms() {
           sensors: [],
         };
       }
+
       rooms[roomKey].sensors.push(sensor);
     });
 
@@ -41,7 +58,13 @@ async function fetchSensorRooms() {
 
 function getSensorByType(room, typeRegExp) {
   if (!room || !Array.isArray(room.sensors)) return null;
-  return room.sensors.find((sensor) => typeRegExp.test(sensor.tipo_sensor));
+
+  return room.sensors.find((sensor) => {
+    const type =
+      sensor.tipo_sensor || sensor.tipo || sensor.tipo_sensores || "";
+
+    return typeRegExp.test(type);
+  });
 }
 
 async function fetchLatestReading(sensorId) {
@@ -51,7 +74,7 @@ async function fetchLatestReading(sensorId) {
     if (!response.ok) return null;
     const readings = await response.json();
     if (!Array.isArray(readings) || readings.length === 0) return null;
-    return readings[0];
+    return readings[readings.length - 1];
   } catch (error) {
     console.error("Erro ao carregar leituras do sensor:", error);
     return null;
@@ -108,7 +131,6 @@ function getAirQualityLabel(co2) {
 }
 
 async function initializeDashboard() {
-  setLoadingState([tempValue, humidityValue]);
   roomsData = await fetchSensorRooms();
   populateRoomSelector();
 
@@ -118,31 +140,47 @@ async function initializeDashboard() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", async function () {
+document.addEventListener("DOMContentLoaded", async () => {
   const user = await requireAuth();
   if (!user) return;
 
   initializeHeader();
-  await initializeDashboard();
   initializeUserAvatar();
   loadUserInfo();
   setupLogout();
-  //checkAdminAccess();
   initializeControlMode();
-});
 
+  const adminLink = document.querySelector(".admin-link");
+
+  if (adminLink) {
+    const isAdmin =
+      user && String(user.role || "").toLowerCase() === "admin";
+
+    if (!isAdmin) {
+      adminLink.style.display = "none";
+    }
+  }
+
+  await initializeDashboard();
+});
 function initializeHeader() {
   console.log("Header inicializado");
 }
 
 function populateRoomSelector() {
   const roomSelect = document.getElementById("room-select");
+
   if (!roomSelect) {
     console.error("Seletor de sala não encontrado");
     return;
   }
 
   roomSelect.innerHTML = "";
+
+  if (Object.keys(roomsData).length === 0) {
+    roomSelect.innerHTML = '<option value="">Nenhuma sala encontrada</option>';
+    return;
+  }
 
   Object.values(roomsData).forEach((room) => {
     const option = document.createElement("option");
@@ -151,9 +189,29 @@ function populateRoomSelector() {
     roomSelect.appendChild(option);
   });
 
-  roomSelect.addEventListener("change", function (e) {
+  roomSelect.onchange = function (e) {
     updateRoomData(e.target.value);
-  });
+  };
+}
+
+async function loadRoomsData(roomID) {
+  try {
+    const response = await fetchWithAuth(`/api/sensores?sala=${roomID}`);
+    const data = await response.json();
+
+    updateDashboard(data);
+  } catch (error) {
+    console.error("Erro ao carregar dados das salas:", error);
+    return [];
+  }
+}
+
+function updateDashboard(data) {
+  document.getElementById("temperature").textContent = data.temperatura + "°C";
+
+  document.getElementById("humidity").textContent = data.humidade + "%";
+
+  document.getElementById("light").textContent = data.iluminacao + "%";
 }
 
 async function updateRoomData(roomId) {
@@ -165,7 +223,10 @@ async function updateRoomData(roomId) {
 
   const temperatureSensor = getSensorByType(room, /temperatura/i);
   const humiditySensor = getSensorByType(room, /humidade/i);
-  const lightSensor = getSensorByType(room, /luminosidade/i);
+  const lightSensor = getSensorByType(
+    room,
+    /iluminacao|iluminação|luminosidade/i,
+  );
   const co2Sensor = getSensorByType(room, /co2/i);
 
   const [temperatureReading, humidityReading, lightReading, co2Reading] =
@@ -199,27 +260,31 @@ async function updateRoomData(roomId) {
   const tempValue = document.getElementById("temperature-value");
   if (tempValue) {
     const target = typeof temperature === "number" ? temperature : 0;
-    animateValue(
-      tempValue,
-      parseFloat(tempValue.textContent) || 0,
-      target,
-      500,
-    );
-    tempValue.textContent =
-      typeof temperature === "number" ? temperature.toFixed(1) : "N/A";
+    if (typeof temperature === "number") {
+      animateValue(
+        tempValue,
+        parseFloat(tempValue.textContent) || 0,
+        temperature,
+        500,
+      );
+    } else {
+      tempValue.textContent = "N/A";
+    }
   }
 
   const humidityValue = document.getElementById("humidity-value");
+
   if (humidityValue) {
-    const target = typeof humidity === "number" ? humidity : 0;
-    animateValue(
-      humidityValue,
-      parseFloat(humidityValue.textContent) || 0,
-      target,
-      500,
-    );
-    humidityValue.textContent =
-      typeof humidity === "number" ? humidity.toFixed(0) : "N/A";
+    if (typeof humidity === "number") {
+      animateValue(
+        humidityValue,
+        parseFloat(humidityValue.textContent) || 0,
+        humidity,
+        500,
+      );
+    } else {
+      humidityValue.textContent = "N/A";
+    }
   }
 
   const airQualityValue = document.getElementById("air-quality-value");
@@ -240,12 +305,6 @@ async function updateRoomData(roomId) {
         ? `Luminosidade atual: ${Math.round(lightValue)} ${lightReading?.unidade || ""}`
         : "Luminosidade indisponível";
   }
-
-  if (typeof temperature === "number") {  
-  animateValue(tempValue, parseFloat(tempValue.textContent) || 0, temperature, 500);  
-    } else {  
-  tempValue.textContent = "N/A";  
-}  
 
   updateComfortStatus(status, statusText, statusIcon);
 
@@ -362,22 +421,6 @@ function setupLogout() {
     });
   }
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-
-  const adminLink = document.querySelector(".admin-link");
-
-  if (!adminLink) return;
-
-  const isAdmin =
-    user &&
-    String(user.role || "").toLowerCase() === "admin";
-
-  if (!isAdmin) {
-    adminLink.style.display = "none";
-  }
-});
 
 function initializeControlMode() {
   const toggleModeBtn = document.getElementById("toggle-mode");
