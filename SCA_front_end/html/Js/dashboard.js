@@ -115,9 +115,9 @@ function determineRoomStatus(temperature, humidity, co2) {
 function getStatusText(status) {
   switch (status) {
     case "alert":
-      return "Atenção — revisão necessária";
+      return "Atenção — Revisão Necessária";
     case "attention":
-      return "Atenção — monitorar condições";
+      return "Atenção — Monitorar Condições";
     default:
       return "Ambiente Confortável";
   }
@@ -404,19 +404,13 @@ function loadUserInfo() {
   }
 }
 
-function logout() {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-
-  window.location.href = "login.html";
-}
-
 function setupLogout() {
   const logoutBtn = document.getElementById("logout-btn");
 
   if (logoutBtn) {
-    logoutBtn.addEventListener("click", function () {
-      clearSession();
+    logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
       window.location.href = "login.html";
     });
   }

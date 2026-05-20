@@ -101,13 +101,14 @@ function getAirQualityLabel(co2) {
 
 async function initializeDepartments() {
   try {
-
     // Fetch rooms
     const roomResponse = await fetch(`${window.CONFIG.API_BASE}/api/salas`);
     const roomsData = await roomResponse.json();
 
     // Fetch sensors
-    const sensorResponse = await fetch(`${window.CONFIG.API_BASE}/api/sensores`);
+    const sensorResponse = await fetch(
+      `${window.CONFIG.API_BASE}/api/sensores`,
+    );
     const sensors = await sensorResponse.json();
 
     // Create room map
@@ -470,13 +471,13 @@ function setupLogout() {
   const logoutBtn = document.getElementById("logout-btn");
 
   if (logoutBtn) {
-    logoutBtn.addEventListener("click", function () {
-      clearSession();
-      window.location.href = "html/login.html";
+    logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "login.html";
     });
   }
 }
-
 function loadUserInfo() {
   const user = JSON.parse(localStorage.getItem("user"));
   const userInfoElement = document.getElementById("user-info");
@@ -492,4 +493,3 @@ async function initializePage() {
 
   console.log("🚀 Inicializando página de departamentos...");
 }
-
