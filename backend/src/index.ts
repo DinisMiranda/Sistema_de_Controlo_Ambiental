@@ -41,9 +41,10 @@ async function seedUsers() {
   if (count === 0) {
     await Utilizador.bulkCreate([
       {
-        nome: "Administrador",
+        nome: "Carlos Pereira",
         email: "admin@edificio.com",
         palavra_passe_hash: hashPassword("admin123"),
+        department: "Administração",
         admin: true,
         data_criacao: new Date(),
       },
@@ -51,6 +52,7 @@ async function seedUsers() {
         nome: "João Silva",
         email: "joao@empresa.com",
         palavra_passe_hash: hashPassword("joao123"),
+        department: "Auditório",
         admin: false,
         data_criacao: new Date(),
       },
@@ -58,6 +60,7 @@ async function seedUsers() {
         nome: "Maria Sousa",
         email: "maria@empresa.com",
         palavra_passe_hash: hashPassword("maria123"),
+        department: "Lab A",
         admin: false,
         data_criacao: new Date(),
       },

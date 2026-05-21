@@ -39,8 +39,14 @@ async function createUser(name, email, password) {
     method: "POST",
     body: JSON.stringify({ nome: name, email, password }),
   });
+
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || "Erro ao criar utilizador");
+
+  if (!response.ok) {
+    const fieldInfo = data.fields ? ` (campos: ${data.fields.join(", ")})` : "";
+    throw new Error((data.error || "Erro ao criar utilizador") + fieldInfo);
+  }
+
   return data;
 }
 
@@ -54,53 +60,38 @@ async function deleteUser(userId) {
 // Populate table on load
 document.addEventListener("DOMContentLoaded", async () => {
   const user = await requireAuth();
-  if (!user || user.role !== "Admin") return;
+
+  if (!user) return;
+
+  const isAdmin = user?.role?.toLowerCase() === "admin" || user?.admin === true;
+
+  if (!isAdmin) {
+    window.location.href = "dashboard.html";
+    return;
+  }
 
   const users = await loadUsers();
   populateTable(users);
 });
 
-document.addEventListener("DOMContentLoaded", async () => {
-  const user = await requireAuth();
-
-  if (!user) return;
-
-  const isAdmin =
-    user?.role?.toLowerCase() === "admin" ||
-    user?.admin === true;
-
-  if (!isAdmin) {
-    window.location.href = "dashboard.html";
-  }
-});
-
 // Function to populate table
 function populateTable(users) {
-  const table = document.querySelector("table tbody");
+  const table = document.querySelector("#users-table tbody");
   table.innerHTML = "";
-  // Clear existing rows except header
-  // const rows = table.querySelectorAll("tr");
-  // for (let i = 1; i < rows.length; i++) {
-  //   rows[i].remove();
-  // }
-  // Add users
   users.forEach((user) => {
     const row = table.insertRow();
     row.innerHTML = `
       <td>${user.nome}</td>
       <td>${user.email}</td>
-      <td>${user.admin ? "Admin" : "User"}</td>
-      <td>
-        <button onclick="handleDelete(${user.id_administrador})">Apagar</button>
+      <td>${user.department}</td>
+      <td style="color: ${user.admin ? "var(--accent-orange)" : "var(--text-secondary)"}">
+        ${user.admin ? "Admin" : "User"}
+      </td>
+      <td style="text-align: center;">
+        <button class="delete-btn" style="background: none; border: none; color: var(--error); font-size: 1.2rem; cursor: pointer; padding: 0;"
+          onclick="handleDelete(${user.id_administrador})">✕</button>
       </td>
     `;
-    // addUserToTable(
-    //  user.name,
-    //  user.email,
-    //  user.department,
-    //  user.role,
-    //  user.password,
-    // );
   });
 }
 
@@ -175,13 +166,21 @@ userForm.addEventListener("submit", async (e) => {
   const email = document.getElementById("user-email").value.trim();
   const password = document.getElementById("user-password").value;
 
+  // Guard before hitting the API
+  if (!name || !email || !password) {
+    alert("Por favor, preencha todos os campos.");
+    return;
+  }
+
+  if (password.length < 6) {
+    alert("A password deve ter pelo menos 6 caracteres.");
+    return;
+  }
+
   try {
     await createUser(name, email, password);
-
     userModal.style.display = "none";
     userForm.reset();
-
-    // Refresh the table from the backend
     const users = await loadUsers();
     populateTable(users);
   } catch (err) {
@@ -190,90 +189,20 @@ userForm.addEventListener("submit", async (e) => {
 });
 
 async function handleDelete(userId) {
+  if (!userId || userId === "undefined") {
+    alert("Erro: ID do utilizador inválido.");
+    return;
+  }
   if (!confirm("Tem a certeza que quer apagar este utilizador?")) return;
 
   try {
     await deleteUser(userId);
-
-    // Refresh the table
     const users = await loadUsers();
     populateTable(users);
   } catch (err) {
     alert(err.message);
   }
 }
-
-// Function to add user to table
-function addUserToTable(name, email, department, role, password) {
-  const table = document.querySelector("table");
-  const newRow = table.insertRow(-1);
-
-  const roleColor =
-    role === "Admin" ? "var(--accent-orange)" : "var(--text-secondary)";
-
-  newRow.innerHTML = `
-    <td>${name}</td>
-    <td>${email}</td>
-    <td>${department}</td>
-    <td style="color: ${roleColor}">${role}</td>
-    <td style="text-align: center;"><button class="delete-btn" style="background: none; border: none; color: var(--error); font-size: 1.2rem; cursor: pointer; padding: 0;">✕</button></td>
-  `;
-
-  // Store password in data attribute (consider using secure method for production)
-  newRow.dataset.password = password;
-
-  // Add delete button event listener
-  const deleteBtn = newRow.querySelector(".delete-btn");
-  deleteBtn.addEventListener("click", () => deleteUserWithConfirmation(newRow));
-}
-
-// Delete modal elements
-const deleteModal = document.getElementById("delete-modal");
-const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
-const cancelDeleteBtn = document.getElementById("cancel-delete-btn");
-let rowToDelete = null;
-
-// Function to delete user with confirmation
-function deleteUserWithConfirmation(row) {
-  rowToDelete = row;
-  deleteModal.style.display = "flex";
-}
-
-// Confirm delete
-confirmDeleteBtn.addEventListener("click", () => {
-  if (rowToDelete) {
-    // Get email from row
-    const email = rowToDelete.cells[1].textContent;
-    // Remove from users array
-    users = users.filter((u) => u.email !== email);
-    saveUsers();
-    // Remove row
-    rowToDelete.remove();
-    deleteModal.style.display = "none";
-    rowToDelete = null;
-  }
-});
-
-// Cancel delete
-cancelDeleteBtn.addEventListener("click", () => {
-  deleteModal.style.display = "none";
-  rowToDelete = null;
-});
-
-// Close delete modal when clicking outside
-deleteModal.addEventListener("click", (e) => {
-  if (e.target === deleteModal) {
-    deleteModal.style.display = "none";
-    rowToDelete = null;
-  }
-});
-
-// Add delete button event listeners to existing rows
-document.querySelectorAll(".delete-btn").forEach((btn) => {
-  btn.addEventListener("click", () =>
-    deleteUserWithConfirmation(btn.closest("tr")),
-  );
-});
 
 // Color existing rows based on role
 document.querySelectorAll("table tr:not(:first-child)").forEach((row) => {
@@ -378,7 +307,7 @@ homeForm.addEventListener("submit", (e) => {
     }
   } else {
     const newHome = {
-      id: Math.max(...homes.map((h) => h.id), 0) + 1,
+      id: Math.max(0, ...homes.map((h) => h.id)) + 1,
       name,
       location,
       type,

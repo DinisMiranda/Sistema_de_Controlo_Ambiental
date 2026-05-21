@@ -105,7 +105,7 @@ async function registerDepartmentRequest(name) {
 async function fetchWithAuth(url, options = {}) {
   const token = localStorage.getItem("token");
 
-  return fetch(`http://localhost:3001${url}`, {
+  const response = await fetch(`http://localhost:3001${url}`, {
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -117,9 +117,6 @@ async function fetchWithAuth(url, options = {}) {
   if (response.status === 401) {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-
-    // window.location.href = "login.html";
-
     throw new Error("Sessão expirada");
   }
 
@@ -130,13 +127,10 @@ async function getSensorReadings(sensorId) {
   let response = await fetchWithAuth(`/api/sensores/${sensorId}/readings`);
 
   if (!response.ok) {
-    response = await fetchWithAuth(`/api/sensores/${sensorId}/readings`);
+    response = await fetchWithAuth(`/api/sensores/${sensorId}/readings`); // retry
   }
 
-  if (!response.ok) {
-    return [];
-  }
-
+  if (!response.ok) { return []; }
   return response.json();
 }
 

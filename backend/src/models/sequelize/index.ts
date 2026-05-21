@@ -26,8 +26,12 @@ Atuador.hasMany(AcaoSistema, { foreignKey: "id_atuador" });
 ParametroAutomatico.belongsTo(Atuador, { foreignKey: "atuadores_id_atuador" });
 Atuador.hasMany(ParametroAutomatico, { foreignKey: "atuadores_id_atuador" });
 
-RegistoConsumo.belongsTo(LeituraSensor, { foreignKey: "leituras_sensor_id_leitura" });
-LeituraSensor.hasMany(RegistoConsumo, { foreignKey: "leituras_sensor_id_leitura" });
+RegistoConsumo.belongsTo(LeituraSensor, {
+  foreignKey: "leituras_sensor_id_leitura",
+});
+LeituraSensor.hasMany(RegistoConsumo, {
+  foreignKey: "leituras_sensor_id_leitura",
+});
 
 export const models = {
   Tipo,
@@ -41,7 +45,7 @@ export const models = {
 };
 
 export async function syncModels() {
-  await sequelize.sync();
+  await sequelize.sync({alter: true});
 }
 
 export async function authenticateSequelize() {
@@ -53,5 +57,4 @@ export async function authenticateSequelize() {
   }
 }
 
-export const RegistosConsumo = 
-  initRegistosConsumoModel(sequelize);
+export const RegistosConsumo = initRegistosConsumoModel(sequelize);

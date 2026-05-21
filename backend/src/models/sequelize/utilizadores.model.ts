@@ -1,5 +1,13 @@
 import { DataTypes, Sequelize } from "sequelize";
 
+interface UtilizadorAttributes {
+  id_administrador: number;
+  nome: string;
+  email: string;
+  admin: boolean;
+  department: string;
+}
+
 export function initUtilizadoresModel(sequelize: Sequelize) {
   return sequelize.define(
     "Utilizador",
@@ -32,6 +40,10 @@ export function initUtilizadoresModel(sequelize: Sequelize) {
         type: DataTypes.BOOLEAN,
         allowNull: false,
       },
+      department: {
+        type: DataTypes.STRING(100),
+        allowNull: true,
+      },
     },
     {
       tableName: "Utilizadores",
@@ -39,3 +51,5 @@ export function initUtilizadoresModel(sequelize: Sequelize) {
     }
   );
 }
+
+

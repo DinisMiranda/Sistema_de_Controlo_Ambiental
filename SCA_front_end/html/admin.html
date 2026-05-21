@@ -157,6 +157,7 @@
             Adicionar Utilizador
           </button>
           <table
+            id="users-table"
             style="
               width: 100%;
               margin-top: 1rem;
@@ -164,76 +165,18 @@
               border-collapse: collapse;
             "
           >
-            <tr>
-              <th>Nome</th>
-              <th>Email</th>
-              <th>Departamento</th>
-              <th>Role</th>
-              <th>Ações</th>
-            </tr>
-            <tr>
-              <td>João Silva</td>
-              <td>joao@edificio.com</td>
-              <td>Auditório</td>
-              <td style="color: var(--text-secondary)">User</td>
-              <td style="text-align: center">
-                <button
-                  class="delete-btn"
-                  style="
-                    background: none;
-                    border: none;
-                    color: var(--error);
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                    padding: 0;
-                  "
-                >
-                  ✕
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td>Maria Sousa</td>
-              <td>maria@edificio.com</td>
-              <td>Lab A</td>
-              <td style="color: var(--text-secondary)">User</td>
-              <td style="text-align: center">
-                <button
-                  class="delete-btn"
-                  style="
-                    background: none;
-                    border: none;
-                    color: var(--error);
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                    padding: 0;
-                  "
-                >
-                  ✕
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td>Carlos Pereira</td>
-              <td>admin@edificio.com</td>
-              <td>Administração</td>
-              <td style="color: var(--accent-orange)">Admin</td>
-              <td style="text-align: center">
-                <button
-                  class="delete-btn"
-                  style="
-                    background: none;
-                    border: none;
-                    color: var(--error);
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                    padding: 0;
-                  "
-                >
-                  ✕
-                </button>
-              </td>
-            </tr>
+            <thead>
+              <tr>
+               <th>Nome</th>
+               <th>Email</th>
+               <th>Departamento</th>
+               <th>Role</th>
+               <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="users-table-body">
+              <!-- Rows will be populated by JavaScript -->
+            </tbody>
           </table>
         </div>
       </div>
@@ -244,6 +187,7 @@
           <h2>Gestão de Casas</h2>
           <button class="btn-primary" id="add-home">Adicionar Casa</button>
           <table
+            id="homes-table"
             style="
               width: 100%;
               margin-top: 1rem;
@@ -864,19 +808,23 @@
               "
               >Departamento:</label
             >
-            <input
-              type="text"
+            <select
               id="user-department"
-              required
+              class="form-control"
               style="
                 width: 100%;
                 padding: 0.5rem;
                 border: 1px solid var(--border);
                 border-radius: 4px;
                 background: var(--bg-main);
-                color: var(--text-main);
-              "
-            />
+                color: var(--text-main);"
+            >
+              <option value="">Select Department</option>
+              <option value="Administração">Administração</option>
+              <option value="Auditório">Auditório</option>
+              <option value="Laboratório A">Laboratório A</option>
+              <option value="Laboratório B">Laboratório B</option>
+            </select>
           </div>
           <div>
             <label

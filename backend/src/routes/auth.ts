@@ -21,7 +21,7 @@ const TEST_USERS = [
     password: "maria123",
   },
   {
-    name: "Administrador",
+    name: "Carlos Pereira",
     email: "admin@edificio.com",
     department: "Administração",
     role: "Admin",
