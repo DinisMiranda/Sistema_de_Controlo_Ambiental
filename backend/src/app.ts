@@ -46,7 +46,7 @@ async function start() {
   try {
     await sequelize.authenticate();
 
-    await sequelize.sync({ alter: true});
+    await sequelize.sync();
 
     console.log("Database synced");
 
