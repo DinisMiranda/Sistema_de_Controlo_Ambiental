@@ -1,91 +1,106 @@
 import { Request, Response } from "express";
 import { models } from "../models/sequelize/index.js";
 
-export async function getAllSensores(_req, res) {
+export async function getAllSensores(_req: Request, res: Response) {
   res.json([
     // SALA 101
     {
       id_sensor: 1,
+      nome: "Sensor de Temperatura 1",
       localizacao: "Sala 101",
-      tipo_sensor: "temperatura",
+      tipo_sensor: "Temperatura",
     },
     {
       id_sensor: 2,
+      nome: "Sensor de Humidade 1",
       localizacao: "Sala 101",
-      tipo_sensor: "humidade",
+      tipo_sensor: "Humidade",
     },
     {
       id_sensor: 3,
+      nome: "Sensor de Iluminação 1",
       localizacao: "Sala 101",
-      tipo_sensor: "iluminacao",
+      tipo_sensor: "Iluminação",
     },
 
     // SALA 102
     {
       id_sensor: 4,
+      nome: "Sensor de Temperatura 2",
       localizacao: "Sala 102",
-      tipo_sensor: "temperatura",
+      tipo_sensor: "Temperatura",
     },
     {
       id_sensor: 5,
+      nome: "Sensor de Humidade 2",
       localizacao: "Sala 102",
-      tipo_sensor: "humidade",
+      tipo_sensor: "Humidade",
     },
     {
       id_sensor: 6,
+      nome: "Sensor de Iluminação 2",
       localizacao: "Sala 102",
-      tipo_sensor: "iluminacao",
+      tipo_sensor: "Iluminação",
     },
 
     // SALA 201
     {
       id_sensor: 7,
+      nome: "Sensor de Temperatura 3",
       localizacao: "Sala 201",
-      tipo_sensor: "temperatura",
+      tipo_sensor: "Temperatura",
     },
     {
       id_sensor: 8,
+      nome: "Sensor de Humidade 3",
       localizacao: "Sala 201",
-      tipo_sensor: "humidade",
+      tipo_sensor: "Humidade",
     },
     {
       id_sensor: 9,
+      nome: "Sensor de Iluminação 3",
       localizacao: "Sala 201",
-      tipo_sensor: "iluminacao",
+      tipo_sensor: "Iluminação",
     },
 
     // Auditorio
     {
       id_sensor: 10,
+      nome: "Sensor de Temperatura 4",
       localizacao: "Auditório",
-      tipo_sensor: "temperatura",
+      tipo_sensor: "Temperatura",
     },
     {
       id_sensor: 11,
+      nome: "Sensor de Humidade 4",
       localizacao: "Auditório",
-      tipo_sensor: "humidade",
+      tipo_sensor: "Humidade",
     },
     {
       id_sensor: 12,
+      nome: "Sensor de Iluminação 4",
       localizacao: "Auditório",
-      tipo_sensor: "iluminacao",
+      tipo_sensor: "Iluminação",
     },
 
     // Laboratório
     {
       id_sensor: 13,
+      nome: "Sensor de Temperatura 5",
       localizacao: "Laboratório",
-      tipo_sensor: "temperatura",
+      tipo_sensor: "Temperatura",
     },
     {
       id_sensor: 14,
+      nome: "Sensor de Humidade 5",
       localizacao: "Laboratório",
-      tipo_sensor: "humidade",
+      tipo_sensor: "Humidade",
     },
     {
       id_sensor: 15,
+      nome: "Sensor de Iluminação 5",
       localizacao: "Laboratório",
-      tipo_sensor: "iluminacao",
+      tipo_sensor: "Iluminação",
     },
   ]);
 }

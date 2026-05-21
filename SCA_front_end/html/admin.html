@@ -296,6 +296,7 @@
               border-collapse: collapse;
             "
           >
+          <thead>
             <tr>
               <th>ID</th>
               <th>Nome</th>
@@ -304,86 +305,10 @@
               <th>Status</th>
               <th>Ações</th>
             </tr>
-            <tr>
-              <td>S001</td>
-              <td>Sensor Temperatura 1</td>
-              <td>Temperatura</td>
-              <td>Auditório</td>
-              <td>
-                <span style="color: var(--success); font-weight: bold"
-                  >● Ativo</span
-                >
-              </td>
-              <td style="text-align: center">
-                <button
-                  class="edit-btn"
-                  style="
-                    background: none;
-                    border: none;
-                    color: var(--primary);
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                    padding: 0;
-                    margin-right: 0.5rem;
-                  "
-                >
-                  ✎
-                </button>
-                <button
-                  class="delete-btn"
-                  style="
-                    background: none;
-                    border: none;
-                    color: var(--error);
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                    padding: 0;
-                  "
-                >
-                  ✕
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td>A001</td>
-              <td>Ar Condicionado 1</td>
-              <td>Atuador</td>
-              <td>Auditório</td>
-              <td>
-                <span style="color: var(--success); font-weight: bold"
-                  >● Ativo</span
-                >
-              </td>
-              <td style="text-align: center">
-                <button
-                  class="edit-btn"
-                  style="
-                    background: none;
-                    border: none;
-                    color: var(--primary);
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                    padding: 0;
-                    margin-right: 0.5rem;
-                  "
-                >
-                  ✎
-                </button>
-                <button
-                  class="delete-btn"
-                  style="
-                    background: none;
-                    border: none;
-                    color: var(--error);
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                    padding: 0;
-                  "
-                >
-                  ✕
-                </button>
-              </td>
-            </tr>
+          </thead>
+          <tbody id="sensors-actuators-table-body">
+            <!-- Rows will be populated by JavaScript -->
+          </tbody>           
           </table>
         </div>
       </div>

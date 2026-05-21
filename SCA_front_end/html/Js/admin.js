@@ -72,6 +72,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const users = await loadUsers();
   populateTable(users);
+
+  await loadSensorsAndActuators();
 });
 
 // Function to populate table
@@ -335,72 +337,15 @@ const deviceModal = document.getElementById("device-modal");
 const deviceForm = document.getElementById("device-form");
 const deviceModalTitle = document.getElementById("device-modal-title");
 const deviceCancelBtn = document.getElementById("device-cancel-btn");
-let editingDeviceId = null;
-let deviceType = "sensor"; // sensor or actuator
 
-function openDeviceModal(deviceId = null, type = "sensor") {
-  editingDeviceId = deviceId;
-  deviceType = type;
-  if (deviceId) {
-    const device = devices.find((d) => d.id === deviceId);
-    if (device) {
-      deviceModalTitle.textContent =
-        "Editar " + (type === "sensor" ? "Sensor" : "Atuador");
-      document.getElementById("device-name").value = device.name;
-      document.getElementById("device-type").value = device.type;
-      document.getElementById("device-home").value = device.home;
-    }
-  } else {
-    deviceModalTitle.textContent =
-      "Adicionar " + (type === "sensor" ? "Sensor" : "Atuador");
-    deviceForm.reset();
-  }
-  deviceModal.style.display = "flex";
-}
+let deviceType = "sensor";
 
-deviceForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const name = document.getElementById("device-name").value.trim();
-  const type = document.getElementById("device-type").value.trim();
-  const home = document.getElementById("device-home").value.trim();
+document.getElementById("add-sensor")?.addEventListener("click", () => {
+  openDeviceModal("sensor");
+});
 
-  if (!name || !type || !home) {
-    alert("Por favor, preencha todos os campos.");
-    return;
-  }
-
-  if (editingDeviceId) {
-    const device = devices.find((d) => d.id === editingDeviceId);
-    if (device) {
-      device.name = name;
-      device.type = type;
-      device.home = home;
-      updateDeviceRow(editingDeviceId);
-    }
-  } else {
-    const prefix = deviceType === "sensor" ? "S" : "A";
-    const newDevice = {
-      id:
-        prefix +
-        String(
-          Math.max(
-            ...devices
-              .filter((d) => d.id.startsWith(prefix))
-              .map((d) => parseInt(d.id.substring(1))),
-            0,
-          ) + 1,
-        ).padStart(3, "0"),
-      name,
-      type,
-      home,
-      status: "Ativo",
-    };
-    devices.push(newDevice);
-    addDeviceRow(newDevice);
-  }
-
-  deviceModal.style.display = "none";
-  deviceForm.reset();
+document.getElementById("add-actuator")?.addEventListener("click", () => {
+  openDeviceModal("actuator");
 });
 
 deviceCancelBtn.addEventListener("click", () => {
@@ -613,81 +558,6 @@ function updateHomeRow(homeId) {
     }
   }
 }
-
-// ============================================
-// SENSORS & ACTUATORS MANAGEMENT
-// ============================================
-
-const sensorsTable = document.querySelector("#tab-sensors-actuators table");
-let devices = [
-  {
-    id: "S001",
-    name: "Sensor Temperatura 1",
-    type: "Temperatura",
-    home: "Auditório",
-    status: "Ativo",
-  },
-  {
-    id: "A001",
-    name: "Ar Condicionado 1",
-    type: "Atuador",
-    home: "Auditório",
-    status: "Ativo",
-  },
-];
-
-document.getElementById("add-sensor")?.addEventListener("click", () => {
-  openDeviceModal(null, "sensor");
-});
-
-document.getElementById("add-actuator")?.addEventListener("click", () => {
-  openDeviceModal(null, "actuator");
-});
-
-function addDeviceRow(device) {
-  const newRow = sensorsTable.insertRow(-1);
-  const statusColor =
-    device.status === "Ativo" ? "var(--success)" : "var(--error)";
-
-  newRow.innerHTML = `
-    <td>${device.id}</td>
-    <td>${device.name}</td>
-    <td>${device.type}</td>
-    <td>${device.home}</td>
-    <td><span style="color: ${statusColor}; font-weight: bold;">● ${device.status}</span></td>
-    <td style="text-align: center;">
-      <button class="edit-btn" style="background: none; border: none; color: var(--primary); font-size: 1.2rem; cursor: pointer; padding: 0; margin-right: 0.5rem;">✎</button>
-      <button class="delete-btn" style="background: none; border: none; color: var(--error); font-size: 1.2rem; cursor: pointer; padding: 0;">✕</button>
-    </td>
-  `;
-
-  const deleteBtn = newRow.querySelector(".delete-btn");
-  const editBtn = newRow.querySelector(".edit-btn");
-
-  deleteBtn.addEventListener("click", () => {
-    devices = devices.filter((d) => d.id !== device.id);
-    newRow.remove();
-  });
-
-  editBtn.addEventListener("click", () => {
-    const type = device.id.startsWith("S") ? "sensor" : "actuator";
-    openDeviceModal(device.id, type);
-  });
-}
-
-function updateDeviceRow(deviceId) {
-  const rows = sensorsTable.querySelectorAll("tr");
-  for (let i = 1; i < rows.length; i++) {
-    if (rows[i].cells[0].textContent === deviceId) {
-      const device = devices.find((d) => d.id === deviceId);
-      rows[i].cells[1].textContent = device.name;
-      rows[i].cells[2].textContent = device.type;
-      rows[i].cells[3].textContent = device.home;
-      break;
-    }
-  }
-}
-
 // ============================================
 // PARAMETERS MANAGEMENT
 // ============================================
@@ -846,34 +716,6 @@ homesInitialRows.forEach((row) => {
   }
 });
 
-// Sensors/Actuators initial rows
-const devicesInitialRows = document.querySelectorAll(
-  "#tab-sensors-actuators table tbody tr, #tab-sensors-actuators table tr:not(:first-child)",
-);
-devicesInitialRows.forEach((row) => {
-  const editBtn = row.querySelector(".edit-btn");
-  const deleteBtn = row.querySelector(".delete-btn");
-
-  if (editBtn) {
-    editBtn.addEventListener("click", () => {
-      const id = row.cells[0].textContent;
-      const device = devices.find((d) => d.id === id);
-      if (device) {
-        const type = device.id.startsWith("S") ? "sensor" : "actuator";
-        openDeviceModal(id, type);
-      }
-    });
-  }
-
-  if (deleteBtn) {
-    deleteBtn.addEventListener("click", () => {
-      const id = row.cells[0].textContent;
-      devices = devices.filter((d) => d.id !== id);
-      row.remove();
-    });
-  }
-});
-
 // Parameters initial rows
 const parametersInitialRows = document.querySelectorAll(
   "#tab-parameters table tbody tr, #tab-parameters table tr:not(:first-child)",
@@ -919,5 +761,207 @@ typesInitialRows.forEach((row) => {
       types = types.filter((t) => t.id !== id);
       row.remove();
     });
+  }
+});
+
+// ============================================
+// SENSORS & ACTUATORS
+// ============================================
+
+async function loadSensores() {
+  const response = await fetchWithAuth("/api/sensores");
+
+  if (!response.ok) {
+    throw new Error("Erro ao carregar sensores");
+  }
+
+  return await response.json();
+}
+
+async function loadAtuadores() {
+  const response = await fetchWithAuth("/api/atuadores");
+
+  if (!response.ok) {
+    throw new Error("Erro ao carregar atuadores");
+  }
+
+  return await response.json();
+}
+
+async function createSensor(sensorData) {
+  const response = await fetchWithAuth("/api/sensores", {
+    method: "POST",
+    body: JSON.stringify(sensorData),
+  });
+
+  if (!response.ok) {
+    throw new Error("Erro ao criar sensor");
+  }
+
+  return await response.json();
+}
+
+async function createAtuador(atuadorData) {
+  const response = await fetchWithAuth("/api/atuadores", {
+    method: "POST",
+    body: JSON.stringify(atuadorData),
+  });
+
+  if (!response.ok) {
+    throw new Error("Erro ao criar atuador");
+  }
+
+  return await response.json();
+}
+
+function createStatusBadge(status) {
+  const isActive =
+    status === true ||
+    status === "ativo" ||
+    status === "Ativo" ||
+    status === "active";
+
+  return `
+    <span
+      style="
+        color: ${isActive ? "var(--success)" : "var(--error)"};
+        font-weight: bold;
+      "
+    >
+      ● ${isActive ? "Ativo" : "Inativo"}
+    </span>
+  `;
+}
+
+function populateSensorsActuatorsTable(sensores, atuadores) {
+  const tableBody = document.getElementById(
+    "sensors-actuators-table-body",
+  );
+
+  if (!tableBody) return;
+
+  tableBody.innerHTML = "";
+
+  const sensorRows = sensores.map((sensor) => ({
+    id: sensor.id_sensor,
+    nome: sensor.nome,
+    tipo: sensor.tipo_sensor || "Sensor",
+    localizacao: sensor.localizacao || "—",
+    estado: sensor.estado,
+  }));
+
+  const actuatorRows = atuadores.map((atuador) => ({
+    id: atuador.id_atuador,
+    nome: atuador.nome,
+    tipo: atuador.tipo_atuador || "Atuador",
+    localizacao: atuador.localizacao || "—",
+    estado: atuador.estado,
+  }));
+
+  const allRows = [...sensorRows, ...actuatorRows];
+
+  allRows.forEach((item) => {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${item.id}</td>
+      <td>${item.nome}</td>
+      <td>${item.tipo}</td>
+      <td>${item.localizacao}</td>
+      <td>${createStatusBadge(item.estado)}</td>
+      <td style="text-align: center">
+        <button
+          class="edit-btn"
+          style="
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0;
+            margin-right: 0.5rem;
+          "
+        >
+          ✎
+        </button>
+
+        <button
+          class="delete-btn"
+          style="
+            background: none;
+            border: none;
+            color: var(--error);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0;
+          "
+        >
+          ✕
+        </button>
+      </td>
+    `;
+
+    tableBody.appendChild(row);
+  });
+}
+
+function openDeviceModal(type = "sensor") {
+  deviceType = type;
+
+  deviceModalTitle.textContent =
+    type === "sensor"
+      ? "Adicionar Sensor"
+      : "Adicionar Atuador";
+
+  deviceForm.reset();
+  deviceModal.style.display = "flex";
+}
+
+async function loadSensorsAndActuators() {
+  try {
+    const [sensores, atuadores] = await Promise.all([
+      loadSensores(),
+      loadAtuadores(),
+    ]);
+
+    populateSensorsActuatorsTable(sensores, atuadores);
+  } catch (error) {
+    console.error("Erro ao carregar sensores/atuadores:", error);
+  }
+}
+
+deviceForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const nome = document.getElementById("device-name").value.trim();
+  const tipo = document.getElementById("device-type").value.trim();
+  const localizacao = document.getElementById("device-home").value.trim();
+
+  if (!nome || !tipo || !localizacao) {
+    alert("Preencha todos os campos.");
+    return;
+  }
+
+  try {
+    if (deviceType === "sensor") {
+      await createSensor({
+        nome,
+        tipo_sensor: tipo,
+        localizacao,
+      });
+    } else {
+      await createAtuador({
+        nome,
+        tipo_atuador: tipo,
+        localizacao,
+      });
+    }
+
+    deviceModal.style.display = "none";
+
+    await loadSensorsAndActuators();
+  } catch (error) {
+    console.error(error);
+    alert(error.message);
   }
 });
