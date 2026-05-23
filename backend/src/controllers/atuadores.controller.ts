@@ -20,8 +20,29 @@ export async function getAtuadorById(req: Request, res: Response) {
 }
 
 export async function createAtuador(req: Request, res: Response) {
-  const created = await models.Atuador.create(req.body);
-  res.status(201).json(created);
+  try {
+    const { nome, tipo_atuador, localizacao } = req.body;
+
+    if (!nome || !tipo_atuador || !localizacao) {
+      return res.status(400).json({
+        error: "Campos obrigatórios em falta",
+      });
+    }
+
+    const atuador = await models.Atuador.create({
+      nome: nome,
+      tipo_atuador: tipo_atuador,
+      localizacao: localizacao,
+    });
+
+    return res.status(201).json(atuador);
+  } catch (err: any) {
+    console.error(err);
+
+    return res.status(400).json({
+      error: err.message,
+    });
+  }
 }
 
 export async function patchAtuador(req: Request, res: Response) {

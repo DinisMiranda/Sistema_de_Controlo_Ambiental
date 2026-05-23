@@ -6,10 +6,12 @@ export function validateRequiredBody(fields: string[]) {
       return res.status(400).json({ error: "body inválido" });
     }
 
-    const missing = fields.filter((field) => req.body[field] === undefined || req.body[field] === "");
+    const missing = fields.filter(
+      (field) => req.body[field] === undefined || req.body[field] === "",
+    );
     if (missing.length > 0) {
       return res.status(400).json({
-        error: "validação falhou",
+        error: "Validação Falhou",
         fields: missing,
       });
     }

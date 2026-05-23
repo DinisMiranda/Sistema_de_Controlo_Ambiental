@@ -119,8 +119,33 @@ export async function getSensorById(req: Request, res: Response) {
 }
 
 export async function createSensor(req: Request, res: Response) {
-  const created = await models.Sensor.create(req.body);
-  res.status(201).json(created);
+  try {
+    const { nome, tipo_sensor, localizacao } = req.body;
+
+    if (!nome || !tipo_sensor || !localizacao) {
+      return res.status(400).json({
+        error: "Campos obrigatórios em falta",
+      });
+    }
+
+    const sensor = await models.Sensor.create({
+      nome: req.body.nome,
+      tipo_sensor: req.body.tipo_sensor,
+      localizacao: req.body.localizacao,
+
+      estado: "ativo",
+      Tipos_classe: "Sensor",
+      Tipos_tipo: req.body.tipo_sensor,
+    });
+
+    return res.status(201).json(sensor);
+  } catch (err: any) {
+    console.error(err);
+
+    return res.status(400).json({
+      error: err.message,
+    });
+  }
 }
 
 export async function patchSensor(req: Request, res: Response) {
