@@ -3,6 +3,7 @@ import {
   createParametro,
   getParametros,
   patchParametro,
+  deleteParametro,
 } from "../controllers/parametros.controller.js";
 import { requireAdmin, requireAuth } from "../middlewares/auth.middleware.js";
 import { validateRequiredBody } from "../middlewares/validate-body.middleware.js";
@@ -17,3 +18,4 @@ parametrosRouter.post(
   createParametro
 );
 parametrosRouter.patch("/:id", patchParametro);
+parametrosRouter.delete("/:id", deleteParametro);

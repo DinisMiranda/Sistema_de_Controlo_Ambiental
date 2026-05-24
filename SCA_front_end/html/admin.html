@@ -337,84 +337,12 @@
                 <th>ID</th>
                 <th>Nome</th>
                 <th>Descrição</th>
-                <th>Valor Min</th>
-                <th>Valor Max</th>
+                <th>Valor</th>
+                <th>ID Atuador</th>
                 <th>Ações</th>
               </tr>
             </thead>
             <tbody id="parameters-table-body">
-              <tr>
-                <td>1</td>
-                <td>Temperatura Ideal</td>
-                <td>Temperatura recomendada para conforto</td>
-                <td>18°C</td>
-                <td>24°C</td>
-                <td style="text-align: center">
-                  <button
-                    class="edit-btn"
-                    style="
-                      background: none;
-                      border: none;
-                      color: var(--primary);
-                      font-size: 1.2rem;
-                      cursor: pointer;
-                      padding: 0;
-                      margin-right: 0.5rem;
-                    "
-                  >
-                    ✎
-                  </button>
-                  <button
-                    class="delete-btn"
-                    style="
-                      background: none;
-                      border: none;
-                      color: var(--error);
-                      font-size: 1.2rem;
-                      cursor: pointer;
-                      padding: 0;
-                    "
-                  >
-                    ✕
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>Humidade Ideal</td>
-                <td>Umidade recomendada para ambiente</td>
-                <td>40%</td>
-                <td>60%</td>
-                <td style="text-align: center">
-                  <button
-                    class="edit-btn"
-                    style="
-                      background: none;
-                      border: none;
-                      color: var(--primary);
-                      font-size: 1.2rem;
-                      cursor: pointer;
-                      padding: 0;
-                      margin-right: 0.5rem;
-                    "
-                  >
-                    ✎
-                  </button>
-                  <button
-                    class="delete-btn"
-                    style="
-                      background: none;
-                      border: none;
-                      color: var(--error);
-                      font-size: 1.2rem;
-                      cursor: pointer;
-                      padding: 0;
-                    "
-                  >
-                    ✕
-                  </button>
-                </td>
-              </tr>
             </tbody>
           </table>
         </div>
@@ -1027,8 +955,7 @@
               "
               >Tipo:</label
             >
-            <input
-              type="text"
+            <select
               id="device-type"
               required
               style="
@@ -1039,7 +966,9 @@
                 background: var(--bg-main);
                 color: var(--text-main);
               "
-            />
+            >
+              <option value="">Selecionar tipo...</option>
+            </select>
           </div>
           <div>
             <label
@@ -1172,7 +1101,7 @@
                 margin-bottom: 0.5rem;
                 color: var(--text-main);
               "
-              >Valor Mínimo:</label
+              >Valor:</label
             >
             <input
               type="text"
@@ -1195,11 +1124,10 @@
                 margin-bottom: 0.5rem;
                 color: var(--text-main);
               "
-              >Valor Máximo:</label
+              >Atuador:</label
             >
-            <input
-              type="text"
-              id="parameter-maxValue"
+            <select
+              id="parameter-atuador"
               required
               style="
                 width: 100%;
@@ -1209,7 +1137,9 @@
                 background: var(--bg-main);
                 color: var(--text-main);
               "
-            />
+            >
+              <option value="">Selecionar atuador...</option>
+            </select>
           </div>
           <div style="display: flex; gap: 1rem; justify-content: flex-end">
             <button

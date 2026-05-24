@@ -21,7 +21,7 @@ export async function getAtuadorById(req: Request, res: Response) {
 
 export async function createAtuador(req: Request, res: Response) {
   try {
-    const { nome, tipo_atuador, localizacao } = req.body;
+    const { nome, tipo_atuador, localizacao, estado, Tipos_classe, Tipos_tipo } = req.body;
 
     if (!nome || !tipo_atuador || !localizacao) {
       return res.status(400).json({
@@ -30,9 +30,12 @@ export async function createAtuador(req: Request, res: Response) {
     }
 
     const atuador = await models.Atuador.create({
-      nome: nome,
-      tipo_atuador: tipo_atuador,
-      localizacao: localizacao,
+      nome,
+      tipo_atuador,
+      localizacao,
+      estado:      estado      ?? "ativo",
+      Tipos_classe: Tipos_classe ?? "Atuador",
+      Tipos_tipo:  Tipos_tipo  ?? tipo_atuador,
     });
 
     return res.status(201).json(atuador);

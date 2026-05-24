@@ -325,63 +325,111 @@ function addParameterRow(param) {
   row.querySelector(".edit-btn").addEventListener("click", () => openParameterModal(param.id_parametro, param));
   row.querySelector(".delete-btn").addEventListener("click", async () => {
     if (!confirm("Tem a certeza que quer apagar este parâmetro?")) return;
-    // No DELETE endpoint yet — remove from UI only
-    row.remove();
+    
+    try {
+      const response = await fetchWithAuth(
+        `/api/automatic-parameters/${param.id_parametro}`,
+        { method: "DELETE" }
+      );
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.error || "Erro ao apagar parâmetro");
+    }
+
+    await loadParametros();
+
+  } catch (err) {
+    alert(err.message);
+  }
   });
+}
+
+const DEFAULT_ATUADORES = [
+  { nome: "Iluminação Principal", tipo_atuador: "Iluminação",  localizacao: "Geral" },
+  { nome: "Climatização Central", tipo_atuador: "Temperatura",     localizacao: "Geral" },
+  { nome: "Ventilação Central",   tipo_atuador: "Ventilação",          localizacao: "Geral" },
+  { nome: "Relé de Circuito",     tipo_atuador: "Ventilação",        localizacao: "Geral" },
+];
+
+async function seedDefaultAtuadores() {
+  for (const data of DEFAULT_ATUADORES) {
+    await createAtuador(data);
+  }
+}
+
+async function populateAtuadorSelect(select, param = null) {
+  select.innerHTML = '<option value="">A carregar atuadores...</option>';
+  select.disabled = true;
+
+  const existing = document.getElementById("atuador-seed-hint");
+  if (existing) existing.remove();
+
+  try {
+    const atuadores = await loadAtuadores();
+
+    if (!atuadores || atuadores.length === 0) {
+      select.innerHTML = '<option value="">Nenhum atuador disponível</option>';
+      select.disabled = false;
+
+      const hint = document.createElement("div");
+      hint.id = "atuador-seed-hint";
+      hint.style.cssText = "margin-top:0.5rem;display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;";
+      hint.innerHTML = `
+        <span style="color:var(--text-secondary);font-size:0.85rem;">Sem atuadores na base de dados.</span>
+        <button type="button" id="seed-atuadores-btn" class="btn-primary" style="font-size:0.8rem;padding:0.3rem 0.8rem;cursor:pointer;">
+          ➕ Criar atuadores padrão
+        </button>
+      `;
+      select.parentElement.appendChild(hint);
+
+      document.getElementById("seed-atuadores-btn").addEventListener("click", async () => {
+        hint.innerHTML = '<span style="color:var(--text-secondary);font-size:0.85rem;">A criar atuadores...</span>';
+        try {
+          await seedDefaultAtuadores();
+          hint.remove();
+          await populateAtuadorSelect(select, param);
+          await loadSensorsAndActuators();
+        } catch (err) {
+          hint.innerHTML = `<span style="color:var(--error);font-size:0.85rem;">Erro: ${err.message}</span>`;
+        }
+      });
+      return;
+    }
+
+    select.innerHTML = '<option value="">Selecionar atuador...</option>';
+    atuadores.forEach((a) => {
+      const opt = document.createElement("option");
+      opt.value = a.id_atuador;
+      opt.textContent = `${a.nome} — ${a.tipo_atuador || "Atuador"} | ${a.localizacao || "—"} | ${a.estado || "—"}`;
+      if (param && a.id_atuador === param.atuadores_id_atuador) opt.selected = true;
+      select.appendChild(opt);
+    });
+  } catch (err) {
+    console.error("Erro ao carregar atuadores:", err);
+    select.innerHTML = `<option value="">Erro: ${err.message}</option>`;
+  } finally {
+    select.disabled = false;
+  }
 }
 
 async function openParameterModal(parameterId = null, param = null) {
   editingParameterId = parameterId;
 
-    if (parameterId && param) {
-      parameterModalTitle.textContent = "Editar Parâmetro";
-      document.getElementById("parameter-name").value        = param.nome_parametro;
-      document.getElementById("parameter-description").value = param.descricao || "";
-      document.getElementById("parameter-minValue").value    = param.valor_parametro;
-    } else {
-      parameterModalTitle.textContent = "Adicionar Parâmetro";
-      parameterForm.reset();
-    }
-
-    // Populate actuator dropdown
-    const select = document.getElementById("parameter-atuador");
-    if (select) {
-    select.innerHTML = '<option value="">A carregar atuadores...</option>';
-
-    try {
-      const atuadores = await loadAtuadores();
-      select.innerHTML = '<option value="">Selecionar atuador...</option>';
-
-      atuadores.forEach((a) => {
-        const opt = document.createElement("option");
-        opt.value = a.id_atuador;
-        opt.textContent = `${a.nome} (${a.tipo_atuador || "Atuador"})`;
-
-        if (param && a.id_atuador === param.atuadores_id_atuador) {
-          opt.selected = true;
-        }
-
-        select.appendChild(opt);
-      });
-    } catch (err) {
-      select.innerHTML = '<option value="">Erro ao carregar atuadores</option>';
-    }
-  }
-  try {
-    const atuadores = await loadAtuadores();
-    select.innerHTML = '<option value="">Selecionar atuador...</option>';
-    atuadores.forEach((a) => {
-      const opt = document.createElement("option");
-      opt.value = a.id_atuador;
-      opt.textContent = `${a.nome} (${a.tipo_atuador || "Atuador"})`;
-      if (param && a.id_atuador === param.atuadores_id_atuador) opt.selected = true;
-      select.appendChild(opt);
-    });
-  } catch {
-    select.innerHTML = '<option value="">Erro ao carregar atuadores</option>';
+  if (parameterId && param) {
+    parameterModalTitle.textContent = "Editar Parâmetro";
+    document.getElementById("parameter-name").value        = param.nome_parametro;
+    document.getElementById("parameter-description").value = param.descricao || "";
+    document.getElementById("parameter-minValue").value    = param.valor_parametro;
+  } else {
+    parameterModalTitle.textContent = "Adicionar Parâmetro";
+    parameterForm.reset();
   }
 
   parameterModal.style.display = "flex";
+
+  const select = document.getElementById("parameter-atuador");
+  if (select) await populateAtuadorSelect(select, param);
 }
 
 document.getElementById("add-parameter")?.addEventListener("click", () => openParameterModal());
@@ -569,7 +617,10 @@ async function loadSensores() {
 
 async function loadAtuadores() {
   const response = await fetchWithAuth("/api/atuadores");
-  if (!response.ok) throw new Error("Erro ao carregar atuadores");
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new Error(`Erro ${response.status} ao carregar atuadores: ${data.error || response.statusText}`);
+  }
   return response.json();
 }
 
@@ -593,12 +644,12 @@ async function createSensor(data) {
 
 async function createAtuador(data) {
   const payload = {
-    nome: data.nome,
+    nome:         data.nome,
     tipo_atuador: data.tipo_atuador,
-    localizacao: data.localizacao,
-    estado: true,
+    localizacao:  data.localizacao,
+    estado:       "ativo",
     Tipos_classe: "Atuador",
-    Tipos_tipo: data.tipo_atuador
+    Tipos_tipo:   data.tipo_atuador,
   };
 
   console.log("Sending actuator:", payload);
@@ -678,10 +729,30 @@ async function loadSensorsAndActuators() {
   }
 }
 
+const SENSOR_TIPOS = [
+  { value: "Luminosidade",           label: "Luminosidade" },
+  { value: "Temperatura_ambiente",   label: "Temperatura Ambiente" },
+  { value: "Humidade_relativa",      label: "Humidade Relativa" },
+  { value: "Consumo_energetico_kWh", label: "Consumo Energético (kWh)" },
+];
+
+const ATUADOR_TIPOS = [
+  { value: "Iluminação",    label: "Iluminação regulatória (Luminosidade)" },
+  { value: "Temperatura",      label: "Climatização (Temperatura Ambiente)" },
+  { value: "Ventilação",           label: "Ventilação (Humidade Relativa)" },
+  { value: "Ventilação",          label: "Ventilação (Humidade Relativa)" },
+];
+
 function openDeviceModal(type = "sensor") {
   deviceType = type;
   deviceModalTitle.textContent = type === "sensor" ? "Adicionar Sensor" : "Adicionar Atuador";
   deviceForm.reset();
+
+  const typeSelect = document.getElementById("device-type");
+  const options = type === "sensor" ? SENSOR_TIPOS : ATUADOR_TIPOS;
+  typeSelect.innerHTML = '<option value="">Selecionar tipo...</option>' +
+    options.map(o => `<option value="${o.value}">${o.label}</option>`).join("");
+
   deviceModal.style.display = "flex";
 }
 
