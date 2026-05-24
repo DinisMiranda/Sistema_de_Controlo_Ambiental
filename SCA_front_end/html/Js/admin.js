@@ -737,7 +737,7 @@ const SENSOR_TIPOS = [
 
 const ATUADOR_TIPOS = [
   { value: "Iluminação",    label: "Iluminação" },
-  { value: "Temperatura",      label: "Climatização" },
+  { value: "Temperatura",      label: "Temperatura" },
   { value: "Ventilação",           label: "Ventilação" },
 ];
 
