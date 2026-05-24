@@ -349,7 +349,6 @@ const DEFAULT_ATUADORES = [
   { nome: "Iluminação Principal", tipo_atuador: "Iluminação",  localizacao: "Geral" },
   { nome: "Climatização Central", tipo_atuador: "Temperatura",     localizacao: "Geral" },
   { nome: "Ventilação Central",   tipo_atuador: "Ventilação",          localizacao: "Geral" },
-  { nome: "Relé de Circuito",     tipo_atuador: "Ventilação",        localizacao: "Geral" },
 ];
 
 async function seedDefaultAtuadores() {
@@ -737,10 +736,9 @@ const SENSOR_TIPOS = [
 ];
 
 const ATUADOR_TIPOS = [
-  { value: "Iluminação",    label: "Iluminação regulatória (Luminosidade)" },
-  { value: "Temperatura",      label: "Climatização (Temperatura Ambiente)" },
-  { value: "Ventilação",           label: "Ventilação (Humidade Relativa)" },
-  { value: "Ventilação",          label: "Ventilação (Humidade Relativa)" },
+  { value: "Iluminação",    label: "Iluminação" },
+  { value: "Temperatura",      label: "Climatização" },
+  { value: "Ventilação",           label: "Ventilação" },
 ];
 
 function openDeviceModal(type = "sensor") {
