@@ -131,9 +131,35 @@ def import_tipos(cfg: dict[str, str]) -> None:
     run_sql(cfg, sql)
     print(f"Tipos: {len(rows)} rows")
 
+def import_casas(cfg: dict[str, str]) -> None:
+    rows = read_csv("casas_examination.csv")
+    if not rows:
+        return
+    values = []
+    for index, row in enumerate(rows, start=1):
+        values.append(
+            "("
+            f"{index}, "
+            f"{sql_literal(row['nome'])}, "
+            f"{sql_literal(row['morada'])}, "
+            f"{sql_literal(row['codigo_postal'])}, "
+            f"{sql_literal(row['data_criacao'])}"
+            ")"
+        )
+    sql = (
+        "INSERT INTO `casas` "
+        "(`id_casa`, `nome`, `morada`, `codigo_postal`, `data_criacao`) VALUES\n"
+        + ",\n".join(values)
+        + ";\n"
+        f"ALTER TABLE `casas` AUTO_INCREMENT = {len(rows) + 1};"
+    )
+    run_sql(cfg, sql)
+    print(f"casas: {len(rows)} rows")
+
 
 IMPORTERS = {
     "tipos": import_tipos,
+    "casas": import_casas,
 }
 
 
