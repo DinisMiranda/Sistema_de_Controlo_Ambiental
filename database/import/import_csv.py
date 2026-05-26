@@ -156,10 +156,39 @@ def import_casas(cfg: dict[str, str]) -> None:
     run_sql(cfg, sql)
     print(f"casas: {len(rows)} rows")
 
+def import_utilizadores(cfg: dict[str, str]) -> None:
+    rows = read_csv("utilizadores_examination.csv")
+    if not rows:
+        return
+    values = []
+    for index, row in enumerate(rows, start=1):
+        admin = row.get("admin", "0").strip() or "0"
+        values.append(
+            "("
+            f"{index}, "
+            f"{sql_literal(row['nome'])}, "
+            f"{sql_literal(row['email'])}, "
+            f"{sql_literal(row['palavra_passe_hash'])}, "
+            f"{sql_literal(row['data_criacao'])}, "
+            f"{admin}"
+            ")"
+        )
+    sql = (
+        "INSERT INTO `Utilizadores` "
+        "(`id_administrador`, `nome`, `email`, `palavra_passe_hash`, `data_criacao`, `admin`) "
+        "VALUES\n"
+        + ",\n".join(values)
+        + ";\n"
+        f"ALTER TABLE `Utilizadores` AUTO_INCREMENT = {len(rows) + 1};"
+    )
+    run_sql(cfg, sql)
+    print(f"Utilizadores: {len(rows)} rows")
+
 
 IMPORTERS = {
     "tipos": import_tipos,
     "casas": import_casas,
+    "utilizadores": import_utilizadores,
 }
 
 
