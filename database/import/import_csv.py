@@ -110,6 +110,7 @@ def truncate_all(cfg: dict[str, str]) -> None:
     statements.append("SET FOREIGN_KEY_CHECKS = 1;")
     run_sql(cfg, "\n".join(statements))
 
+
 def import_tipos(cfg: dict[str, str]) -> None:
     rows = read_csv("tipos_examination.csv")
     if not rows:
@@ -130,6 +131,7 @@ def import_tipos(cfg: dict[str, str]) -> None:
     )
     run_sql(cfg, sql)
     print(f"Tipos: {len(rows)} rows")
+
 
 def import_casas(cfg: dict[str, str]) -> None:
     rows = read_csv("casas_examination.csv")
@@ -155,6 +157,7 @@ def import_casas(cfg: dict[str, str]) -> None:
     )
     run_sql(cfg, sql)
     print(f"casas: {len(rows)} rows")
+
 
 def import_utilizadores(cfg: dict[str, str]) -> None:
     rows = read_csv("utilizadores_examination.csv")
@@ -184,6 +187,7 @@ def import_utilizadores(cfg: dict[str, str]) -> None:
     run_sql(cfg, sql)
     print(f"Utilizadores: {len(rows)} rows")
 
+
 def import_casa_administradores(cfg: dict[str, str]) -> None:
     rows = read_csv("casa_administradores_examination.csv")
     if not rows:
@@ -198,6 +202,7 @@ def import_casa_administradores(cfg: dict[str, str]) -> None:
     )
     run_sql(cfg, sql)
     print(f"Casa_Administradores: {len(rows)} rows")
+
 
 def import_sensores(cfg: dict[str, str]) -> None:
     rows = read_csv("sensores_examination.csv")
@@ -229,6 +234,7 @@ def import_sensores(cfg: dict[str, str]) -> None:
     run_sql(cfg, sql)
     print(f"sensores: {len(rows)} rows")
 
+
 def import_atuadores(cfg: dict[str, str]) -> None:
     rows = read_csv("atuadores_examination.csv")
     if not rows:
@@ -257,6 +263,7 @@ def import_atuadores(cfg: dict[str, str]) -> None:
     run_sql(cfg, sql)
     print(f"atuadores: {len(rows)} rows")
 
+
 def import_leituras_sensor(cfg: dict[str, str]) -> None:
     rows = read_csv("leituras_sensor_examination.csv")
     if not rows:
@@ -281,6 +288,7 @@ def import_leituras_sensor(cfg: dict[str, str]) -> None:
     )
     run_sql(cfg, sql)
     print(f"leituras_sensor: {len(rows)} rows")
+
 
 def import_acoes_sistema(cfg: dict[str, str]) -> None:
     rows = read_csv("acoes_sistema_examination.csv")
@@ -310,6 +318,7 @@ def import_acoes_sistema(cfg: dict[str, str]) -> None:
     run_sql(cfg, sql)
     print(f"acoes_sistema: {len(rows)} rows")
 
+
 def import_parametros_automaticos(cfg: dict[str, str]) -> None:
     rows = read_csv("parametros_automaticos_examination.csv")
     if not rows:
@@ -336,6 +345,7 @@ def import_parametros_automaticos(cfg: dict[str, str]) -> None:
     run_sql(cfg, sql)
     print(f"parametros_automaticos: {len(rows)} rows")
 
+
 def import_registos_consumo(cfg: dict[str, str]) -> None:
     rows = read_csv("registos_consumo_examination.csv")
     if not rows:
@@ -360,63 +370,6 @@ def import_registos_consumo(cfg: dict[str, str]) -> None:
     )
     run_sql(cfg, sql)
     print(f"registos_consumo: {len(rows)} rows")
-
-
-IMPORTERS = {
-    "tipos": import_tipos,
-    "casas": import_casas,
-    "utilizadores": import_utilizadores,
-    "casa_administradores": import_casa_administradores,
-    "sensores": import_sensores,
-    "atuadores": import_atuadores,
-    "leituras_sensor": import_leituras_sensor,
-    "acoes_sistema": import_acoes_sistema,
-    "parametros_automaticos": import_parametros_automaticos,
-    "registos_consumo": import_registos_consumo,
-}
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description="Import generated CSVs into MySQL")
-    parser.add_argument(
-        "tables",
-        nargs="*",
-        choices=["all", *TABLES_IN_ORDER],
-        help="Tables to import (default: all)",
-    )
-    parser.add_argument(
-        "--no-truncate",
-        action="store_true",
-        help="Do not truncate tables before import (only with explicit table list)",
-    )
-    args = parser.parse_args()
-
-    selected = TABLES_IN_ORDER if not args.tables or "all" in args.tables else args.tables
-    for name in selected:
-        if name not in TABLES_IN_ORDER:
-            print(f"Unknown table: {name}", file=sys.stderr)
-            return 1
-
-    cfg = load_config()
-    if not GENERATED_DIR.is_dir():
-        print(f"Missing generated CSV folder: {GENERATED_DIR}", file=sys.stderr)
-        return 1
-
-    truncate = "all" in (args.tables or ["all"]) and not args.no_truncate
-    if truncate:
-        print("Truncating tables...")
-        truncate_all(cfg)
-
-    for name in selected:
-        print(f"Importing {name}...")
-        IMPORTERS[name](cfg)
-
-    print("Done.")
-    return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
 
 
 IMPORTERS = {
