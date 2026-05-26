@@ -67,14 +67,16 @@ function getSensorByType(room, typeRegExp) {
   });
 }
 
+function sensorIdOf(sensor) {
+  return sensor?.id_sensor ?? sensor?.id;
+}
+
 async function fetchLatestReading(sensorId) {
   if (!sensorId) return null;
   try {
-    const response = await fetchWithAuth(`/api/sensores/${sensorId}/readings`);
+    const response = await fetchWithAuth(`/api/sensores/${sensorId}/latest`);
     if (!response.ok) return null;
-    const readings = await response.json();
-    if (!Array.isArray(readings) || readings.length === 0) return null;
-    return readings[readings.length - 1];
+    return response.json();
   } catch (error) {
     console.error("Erro ao carregar leituras do sensor:", error);
     return null;
@@ -231,10 +233,10 @@ async function updateRoomData(roomId) {
 
   const [temperatureReading, humidityReading, lightReading, co2Reading] =
     await Promise.all([
-      fetchLatestReading(temperatureSensor?.id_sensor),
-      fetchLatestReading(humiditySensor?.id_sensor),
-      fetchLatestReading(lightSensor?.id_sensor),
-      fetchLatestReading(co2Sensor?.id_sensor),
+      fetchLatestReading(sensorIdOf(temperatureSensor)),
+      fetchLatestReading(sensorIdOf(humiditySensor)),
+      fetchLatestReading(sensorIdOf(lightSensor)),
+      fetchLatestReading(sensorIdOf(co2Sensor)),
     ]);
 
   const temperature = parseReadingValue(temperatureReading);
