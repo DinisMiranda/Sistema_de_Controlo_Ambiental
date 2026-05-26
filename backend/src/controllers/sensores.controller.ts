@@ -16,7 +16,15 @@ function formatSensor(sensor: { get: (key: string) => unknown }) {
   };
 }
 
-export async function getAllSensores(_req: Request, res: Response) {
+export async function getAllSensores(req: Request, res: Response) {
+  const sala = (req.query.sala ?? req.query.localizacao) as string | undefined;
+  if (sala) {
+    const sensores = await models.Sensor.findAll({ order: [["id_sensor", "ASC"]] });
+    const filtered = sensores.filter(
+      (s) => String(s.get("localizacao")).toLowerCase() === sala.toLowerCase(),
+    );
+    return res.json(filtered.map(formatSensor));
+  }
   const rows = await models.Sensor.findAll({ order: [["id_sensor", "ASC"]] });
   res.json(rows.map(formatSensor));
 }
