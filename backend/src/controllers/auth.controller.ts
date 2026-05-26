@@ -149,7 +149,7 @@ export async function login(req: Request, res: Response) {
 // ME
 // ============================================
 
-export function me(req: Request, res: Response) {
+export async function me(req: Request, res: Response) {
   try {
     if (!req.user) {
       return res.status(401).json({
@@ -157,8 +157,20 @@ export function me(req: Request, res: Response) {
       });
     }
 
+    const user = await models.Utilizador.findByPk(req.user.id);
+    if (!user) {
+      return res.status(401).json({ error: "Utilizador não encontrado" });
+    }
+
+    const admin = Boolean(user.get("admin"));
     return res.json({
-      user: req.user,
+      user: {
+        id: Number(user.get("id_administrador")),
+        nome: user.get("nome"),
+        email: user.get("email"),
+        admin,
+        role: admin ? "Admin" : "User",
+      },
     });
   } catch (err) {
     console.error("ME ERROR:", err);

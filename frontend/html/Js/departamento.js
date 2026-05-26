@@ -102,13 +102,10 @@ function getAirQualityLabel(co2) {
 async function initializeDepartments() {
   try {
     // Fetch rooms
-    const roomResponse = await fetch(`${window.CONFIG.API_BASE}/api/salas`);
+    const roomResponse = await fetchWithAuth("/api/salas");
     const roomsData = await roomResponse.json();
 
-    // Fetch sensors
-    const sensorResponse = await fetch(
-      `${window.CONFIG.API_BASE}/api/sensores`,
-    );
+    const sensorResponse = await fetchWithAuth("/api/sensores");
     const sensors = await sensorResponse.json();
 
     // Create room map
@@ -145,17 +142,15 @@ async function initializeDepartments() {
           room.sensors
             .filter((sensor) => sensor != null)
             .map(async (sensor) => {
-              const sensorId = sensor.id;
+              const sensorId = sensor.id_sensor ?? sensor.id;
 
               try {
-                // Latest reading
-                const latestRes = await fetch(
-                  `${window.CONFIG.API_BASE}/api/sensores/${sensorId}/latest`,
+                const latestRes = await fetchWithAuth(
+                  `/api/sensores/${sensorId}/latest`,
                 );
 
-                // Historical readings
-                const readingsRes = await fetch(
-                  `${window.CONFIG.API_BASE}/api/sensores/${sensorId}/readings`,
+                const readingsRes = await fetchWithAuth(
+                  `/api/sensores/${sensorId}/readings`,
                 );
 
                 if (!latestRes.ok || !readingsRes.ok) {

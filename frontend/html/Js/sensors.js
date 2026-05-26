@@ -1,14 +1,15 @@
 async function fetchSensorRooms() {
   try {
-    const response = await fetchWithAuth("/api/rooms");
+    const response = await fetchWithAuth("/api/salas");
 
     if (!response.ok) {
       throw new Error("Erro ao carregar salas");
     }
 
     const rooms = await response.json();
+    const list = Array.isArray(rooms) ? rooms : Object.values(rooms);
 
-    return Object.values(rooms).reduce((acc, room) => {
+    return list.reduce((acc, room) => {
       acc[room.id] = room;
       return acc;
     }, {});

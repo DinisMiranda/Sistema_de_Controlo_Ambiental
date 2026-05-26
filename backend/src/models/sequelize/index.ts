@@ -7,9 +7,11 @@ import { initLeiturasSensorModel } from "./leituras-sensor.model.js";
 import { initAcoesSistemaModel } from "./acoes-sistema.model.js";
 import { initRegistosConsumoModel } from "./registos-consumo.model.js";
 import { initParametrosAutomaticosModel } from "./parametros-automaticos.model.js";
+import { initCasasModel } from "./casas.model.js";
 
 const Tipo = initTiposModel(sequelize);
 const Utilizador = initUtilizadoresModel(sequelize);
+const Casa = initCasasModel(sequelize);
 const Sensor = initSensoresModel(sequelize);
 const Atuador = initAtuadoresModel(sequelize);
 const LeituraSensor = initLeiturasSensorModel(sequelize);
@@ -36,6 +38,7 @@ LeituraSensor.hasMany(RegistoConsumo, {
 export const models = {
   Tipo,
   Utilizador,
+  Casa,
   Sensor,
   Atuador,
   LeituraSensor,
