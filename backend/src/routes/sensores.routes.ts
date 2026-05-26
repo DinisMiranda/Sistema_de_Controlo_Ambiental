@@ -17,6 +17,7 @@ sensoresRouter.get("/", getAllSensores);
 sensoresRouter.get("/:id/latest", getLatestReading);
 sensoresRouter.get("/:id/readings", getLeituras);
 sensoresRouter.get("/:id", getSensorById);
+
 sensoresRouter.post(
   "/",
   requireAuth,
