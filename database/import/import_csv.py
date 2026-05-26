@@ -310,6 +310,32 @@ def import_acoes_sistema(cfg: dict[str, str]) -> None:
     run_sql(cfg, sql)
     print(f"acoes_sistema: {len(rows)} rows")
 
+def import_parametros_automaticos(cfg: dict[str, str]) -> None:
+    rows = read_csv("parametros_automaticos_examination.csv")
+    if not rows:
+        return
+    values = []
+    for row in rows:
+        descricao = row.get("descricao", "").strip()
+        values.append(
+            "("
+            f"{sql_literal(row['nome_parametro'])}, "
+            f"{sql_literal(row['valor_parametro'])}, "
+            f"{sql_literal(descricao) if descricao else 'NULL'}, "
+            f"{sql_literal(row['data_atualizacao'])}, "
+            f"{row['atuadores_id_atuador'].strip()}"
+            ")"
+        )
+    sql = (
+        "INSERT INTO `parametros_automaticos` "
+        "(`nome_parametro`, `valor_parametro`, `descricao`, `data_atualizacao`, "
+        "`atuadores_id_atuador`) VALUES\n"
+        + ",\n".join(values)
+        + ";"
+    )
+    run_sql(cfg, sql)
+    print(f"parametros_automaticos: {len(rows)} rows")
+
 
 IMPORTERS = {
     "tipos": import_tipos,
@@ -320,6 +346,7 @@ IMPORTERS = {
     "atuadores": import_atuadores,
     "leituras_sensor": import_leituras_sensor,
     "acoes_sistema": import_acoes_sistema,
+    "parametros_automaticos": import_parametros_automaticos,
 }
 
 
