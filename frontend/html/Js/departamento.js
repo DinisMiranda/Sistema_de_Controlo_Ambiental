@@ -98,78 +98,107 @@ function getAirQualityLabel(co2) {
   return "Elevada";
 }
 
+function sensorIdOf(sensor) {
+  return sensor?.id_sensor ?? sensor?.id;
+}
+
+function formatLastUpdate(timestamp) {
+  if (!timestamp) return "há instantes";
+  const date = new Date(timestamp);
+  if (Number.isNaN(date.getTime())) return "há instantes";
+  return date.toLocaleString("pt-PT");
+}
+
+function applyReadingToRoom(room, sensor, latest) {
+  const type = String(sensor.tipo_sensor || sensor.Tipos_tipo || "");
+  const value = parseReadingValue(latest);
+
+  if (/temperatura/i.test(type)) {
+    room.temperature = value;
+  } else if (/humidade|umidade/i.test(type)) {
+    room.humidity = value;
+  } else if (/luminosidade|iluminacao|iluminação/i.test(type)) {
+    const light = typeof value === "number" ? Math.round(value) : 0;
+    room.lightingOn = light;
+    room.lightingTotal = 100;
+  }
+
+  if (latest?.timestamp_leitura) {
+    room.lastUpdate = formatLastUpdate(latest.timestamp_leitura);
+  }
+}
+
+async function hydrateRoomMetrics(room) {
+  if (!room.sensors?.length) {
+    room.badge = room.badge || "Sem sensores";
+    room.status = "attention";
+    room.statusText = getRoomStatusText("attention");
+    room.lastUpdate = "—";
+    return;
+  }
+
+  room.badge = room.badge || "Ativo";
+  room.lightingTotal = room.lightingTotal || 100;
+  room.lightingOn = room.lightingOn ?? 0;
+
+  await Promise.all(
+    room.sensors.map(async (sensor) => {
+      const sensorId = sensorIdOf(sensor);
+      if (!sensorId) return;
+
+      try {
+        const response = await fetchWithAuth(
+          `/api/sensores/${sensorId}/latest`,
+        );
+        if (!response.ok) return;
+        const latest = await response.json();
+        applyReadingToRoom(room, sensor, latest);
+      } catch (err) {
+        console.error(`Erro ao carregar sensor ${sensorId}:`, err);
+      }
+    }),
+  );
+
+  room.status = getRoomStatus(room.temperature, room.humidity, null);
+  room.statusText = getRoomStatusText(room.status);
+  if (!room.lastUpdate) {
+    room.lastUpdate = "há instantes";
+  }
+}
+
 async function initializeDepartments() {
   try {
-    // Fetch rooms
     const roomResponse = await fetchWithAuth("/api/salas");
     const roomsData = await roomResponse.json();
 
     const sensorResponse = await fetchWithAuth("/api/sensores");
     const sensors = await sensorResponse.json();
 
-    // Create room map
     const rooms = {};
 
     roomsData.forEach((room) => {
       rooms[room.id] = {
         ...room,
+        name: room.name || room.location,
         sensors: [],
+        badge: room.badge || "Ativo",
       };
     });
 
-    // Attach sensors to rooms
     sensors.forEach((sensor) => {
-      if (sensor.roomId && rooms[sensor.roomId]) {
-        rooms[sensor.roomId].sensors.push(sensor);
+      const roomKey =
+        sensor.roomId || formatRoomKey(sensor.localizacao || "");
+      if (rooms[roomKey]) {
+        rooms[roomKey].sensors.push(sensor);
       }
     });
 
-    // Render departments
     departmentsData = Object.values(rooms);
+
+    await Promise.all(departmentsData.map((room) => hydrateRoomMetrics(room)));
 
     renderDepartmentCards();
     updateStatistics();
-
-    // Load sensor data for each room
-    await Promise.all(
-      Object.values(rooms).map(async (room) => {
-        if (!room.sensors || room.sensors.length === 0) {
-          return;
-        }
-
-        await Promise.all(
-          room.sensors
-            .filter((sensor) => sensor != null)
-            .map(async (sensor) => {
-              const sensorId = sensor.id_sensor ?? sensor.id;
-
-              try {
-                const latestRes = await fetchWithAuth(
-                  `/api/sensores/${sensorId}/latest`,
-                );
-
-                const readingsRes = await fetchWithAuth(
-                  `/api/sensores/${sensorId}/readings`,
-                );
-
-                if (!latestRes.ok || !readingsRes.ok) {
-                  throw new Error(
-                    `Failed to fetch data for sensor ${sensorId}`,
-                  );
-                }
-
-                const latest = await latestRes.json();
-                const readings = await readingsRes.json();
-
-                // Update UI
-                updateRoomSensor(room.id, sensorId, latest, readings);
-              } catch (err) {
-                console.error(`Error loading sensor ${sensorId}:`, err);
-              }
-            }),
-        );
-      }),
-    );
 
     console.log("Departments initialized successfully");
   } catch (error) {
@@ -262,23 +291,33 @@ function shouldShowRoom(room, filter) {
   return true;
 }
 
+function formatMetric(value, unit) {
+  return typeof value === "number" ? `${value}${unit}` : "N/A";
+}
+
 function createDepartmentCard(room) {
   const card = document.createElement("div");
-  card.className = `department-card status-${room.status}`;
+  const status = room.status || "normal";
+  card.className = `department-card status-${status}`;
   card.setAttribute("data-room-id", room.id);
-  card.setAttribute("data-temperature", room.temperature);
-  card.setAttribute("data-humidity", room.humidity);
+  card.setAttribute("data-temperature", room.temperature ?? "");
+  card.setAttribute("data-humidity", room.humidity ?? "");
 
-  const lightPercentage = Math.round(
-    (room.lightingOn / room.lightingTotal) * 100,
+  const lightOn = Number(room.lightingOn) || 0;
+  const lightTotal = Number(room.lightingTotal) || 100;
+  const lightPercentage =
+    lightTotal > 0 ? Math.round((lightOn / lightTotal) * 100) : 0;
+  const tempClass = getTempAlertClass(
+    typeof room.temperature === "number" ? room.temperature : NaN,
   );
-  const tempClass = getTempAlertClass(Number(room.temperature));
-  const humidityClass = getHumidityAlertClass(Number(room.humidity));
+  const humidityClass = getHumidityAlertClass(
+    typeof room.humidity === "number" ? room.humidity : NaN,
+  );
 
   card.innerHTML = `
     <div class="card-header-dept">
       <h3 class="room-name">📍 ${room.name}</h3>
-      <span class="room-badge">${room.badge}</span>
+      <span class="room-badge">${room.badge || "Ativo"}</span>
     </div>
 
     <div class="card-metrics">
@@ -289,7 +328,7 @@ function createDepartmentCard(room) {
           </svg>
           <span class="metric-name">Temperatura</span>
         </div>
-        <span class="metric-data ${tempClass}">${room.temperature}°C</span>
+        <span class="metric-data ${tempClass}">${formatMetric(room.temperature, "°C")}</span>
       </div>
 
       <div class="metric-row">
@@ -299,7 +338,7 @@ function createDepartmentCard(room) {
           </svg>
           <span class="metric-name">Humidade</span>
         </div>
-        <span class="metric-data ${humidityClass}">${room.humidity}%</span>
+        <span class="metric-data ${humidityClass}">${formatMetric(room.humidity, "%")}</span>
       </div>
 
       <div class="metric-row">
@@ -317,17 +356,21 @@ function createDepartmentCard(room) {
           </svg>
           <span class="metric-name">Iluminação</span>
         </div>
-        <span class="metric-data">${room.lightingOn}/${room.lightingTotal} (${lightPercentage}%)</span>
+        <span class="metric-data">${
+          typeof room.lightingOn === "number"
+            ? `${lightOn}/${lightTotal} (${lightPercentage}%)`
+            : "N/A"
+        }</span>
       </div>
     </div>
 
-    <div class="card-status status-${room.status}">
-      ${getStatusIcon(room.status)}
-      <span>${room.statusText}</span>
+    <div class="card-status status-${status}">
+      ${getStatusIcon(status)}
+      <span>${room.statusText || getRoomStatusText(status)}</span>
     </div>
 
     <div class="card-updated">
-      Atualizado ${room.lastUpdate}
+      Atualizado ${room.lastUpdate || "há instantes"}
     </div>
 
     <div class="card-actions">
@@ -477,7 +520,8 @@ function loadUserInfo() {
   const userInfoElement = document.getElementById("user-info");
 
   if (user && userInfoElement) {
-    userInfoElement.textContent = `👤 ${user.name}`;
+    const displayName = user.name || user.nome || user.email || "Utilizador";
+    userInfoElement.textContent = `👤 ${displayName}`;
   }
 }
 

@@ -8,6 +8,13 @@ export const sequelize = new Sequelize(
     host: process.env.DB_HOST ?? "127.0.0.1",
     port: Number(process.env.DB_PORT) || 3306,
     dialect: (process.env.DB_DIALECT as "mysql" | undefined) ?? "mysql",
+    dialectOptions: {
+      charset: "utf8mb4",
+    },
+    define: {
+      charset: "utf8mb4",
+      collate: "utf8mb4_unicode_ci",
+    },
   },
 );
 

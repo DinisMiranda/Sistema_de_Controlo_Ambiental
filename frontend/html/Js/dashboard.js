@@ -224,10 +224,10 @@ async function updateRoomData(roomId) {
   }
 
   const temperatureSensor = getSensorByType(room, /temperatura/i);
-  const humiditySensor = getSensorByType(room, /humidade/i);
+  const humiditySensor = getSensorByType(room, /humidade|umidade/i);
   const lightSensor = getSensorByType(
     room,
-    /iluminacao|iluminação|luminosidade/i,
+    /luminosidade|iluminacao|iluminação|lux/i,
   );
   const co2Sensor = getSensorByType(room, /co2/i);
 
@@ -382,12 +382,17 @@ function animateValue(element, start, end, duration) {
   }, 16);
 }
 
+function getUserDisplayName(user) {
+  return user?.name || user?.nome || user?.email || "";
+}
+
 function initializeUserAvatar() {
   const user = JSON.parse(localStorage.getItem("user"));
   const avatarInitials = document.getElementById("user-initials");
+  const displayName = getUserDisplayName(user);
 
-  if (user && user.name && avatarInitials) {
-    const names = user.name.split(" ");
+  if (user && displayName && avatarInitials) {
+    const names = displayName.split(" ");
     const initials =
       names.length >= 2
         ? names[0][0] + names[names.length - 1][0]
@@ -402,7 +407,7 @@ function loadUserInfo() {
   const userInfoElement = document.getElementById("user-info");
 
   if (user && userInfoElement) {
-    userInfoElement.textContent = `👤 ${user.name}`;
+    userInfoElement.textContent = `👤 ${getUserDisplayName(user) || "Utilizador"}`;
   }
 }
 

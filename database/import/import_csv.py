@@ -78,6 +78,7 @@ def run_sql(cfg: dict[str, str], sql: str) -> None:
             "-i",
             cfg["container"],
             "mysql",
+            "--default-character-set=utf8mb4",
             f"-u{cfg['user']}",
             f"-p{cfg['password']}",
             cfg["database"],
@@ -85,6 +86,7 @@ def run_sql(cfg: dict[str, str], sql: str) -> None:
     else:
         cmd = [
             "mysql",
+            "--default-character-set=utf8mb4",
             f"-h{cfg['host']}",
             f"-P{cfg['port']}",
             f"-u{cfg['user']}",
