@@ -257,6 +257,31 @@ def import_atuadores(cfg: dict[str, str]) -> None:
     run_sql(cfg, sql)
     print(f"atuadores: {len(rows)} rows")
 
+def import_leituras_sensor(cfg: dict[str, str]) -> None:
+    rows = read_csv("leituras_sensor_examination.csv")
+    if not rows:
+        return
+    values = []
+    for index, row in enumerate(rows, start=1):
+        values.append(
+            "("
+            f"{index}, "
+            f"{row['id_sensor'].strip()}, "
+            f"{row['valor'].strip()}, "
+            f"{sql_literal(row['unidade'])}, "
+            f"{sql_literal(row['timestamp_leitura'])}"
+            ")"
+        )
+    sql = (
+        "INSERT INTO `leituras_sensor` "
+        "(`id_leitura`, `id_sensor`, `valor`, `unidade`, `timestamp_leitura`) VALUES\n"
+        + ",\n".join(values)
+        + ";\n"
+        f"ALTER TABLE `leituras_sensor` AUTO_INCREMENT = {len(rows) + 1};"
+    )
+    run_sql(cfg, sql)
+    print(f"leituras_sensor: {len(rows)} rows")
+
 
 IMPORTERS = {
     "tipos": import_tipos,
@@ -265,6 +290,7 @@ IMPORTERS = {
     "casa_administradores": import_casa_administradores,
     "sensores": import_sensores,
     "atuadores": import_atuadores,
+    "leituras_sensor": import_leituras_sensor,
 }
 
 
