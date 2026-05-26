@@ -123,3 +123,15 @@ To regenerate all seed CSVs:
 cd database/scripts
 ./generate_seed_csvs.sh
 ```
+
+## Quick start (integration)
+
+```bash
+docker compose up -d db
+docker exec -i sca-mysql mysql -u root -psca_root sistema_controlo_ambiental2 < database/schema.sql
+./database/import/import_csv.sh
+cd backend && cp .env.example .env && npm install && npm run dev
+cd frontend && python3 -m http.server 5173
+```
+
+Open `http://localhost:5173/html/login.html`. See `database/README.md` for import details.
