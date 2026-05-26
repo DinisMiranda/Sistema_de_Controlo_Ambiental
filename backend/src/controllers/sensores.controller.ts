@@ -1,31 +1,38 @@
 import { Request, Response } from "express";
 import { models } from "../models/sequelize/index.js";
+import { roomKeyFromLocation } from "../utils/room.js";
 
 function formatSensor(sensor: { get: (key: string) => unknown }) {
+  const localizacao = String(sensor.get("localizacao") ?? "");
   const idSensor = Number(sensor.get("id_sensor"));
   return {
     id_sensor: idSensor,
     id: idSensor,
     nome: sensor.get("nome"),
     tipo_sensor: sensor.get("tipo_sensor"),
-    localizacao: sensor.get("localizacao"),
+    localizacao,
     estado: sensor.get("estado"),
     data_instalacao: sensor.get("data_instalacao"),
     Tipos_classe: sensor.get("Tipos_classe"),
     Tipos_tipo: sensor.get("Tipos_tipo"),
+    roomId: roomKeyFromLocation(localizacao),
   };
 }
 
 export async function getAllSensores(req: Request, res: Response) {
+  const where: Record<string, unknown> = {};
   const sala = (req.query.sala ?? req.query.localizacao) as string | undefined;
+
   if (sala) {
     const sensores = await models.Sensor.findAll({ order: [["id_sensor", "ASC"]] });
+    const key = roomKeyFromLocation(sala);
     const filtered = sensores.filter(
-      (s) => String(s.get("localizacao")).toLowerCase() === sala.toLowerCase(),
+      (s) => roomKeyFromLocation(String(s.get("localizacao"))) === key,
     );
     return res.json(filtered.map(formatSensor));
   }
-  const rows = await models.Sensor.findAll({ order: [["id_sensor", "ASC"]] });
+
+  const rows = await models.Sensor.findAll({ where, order: [["id_sensor", "ASC"]] });
   res.json(rows.map(formatSensor));
 }
 
