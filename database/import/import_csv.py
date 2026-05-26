@@ -184,11 +184,27 @@ def import_utilizadores(cfg: dict[str, str]) -> None:
     run_sql(cfg, sql)
     print(f"Utilizadores: {len(rows)} rows")
 
+def import_casa_administradores(cfg: dict[str, str]) -> None:
+    rows = read_csv("casa_administradores_examination.csv")
+    if not rows:
+        return
+    values = []
+    for row in rows:
+        values.append(f"({row['id_casa'].strip()}, {row['id_utilizador'].strip()})")
+    sql = (
+        "INSERT INTO `Casa_Administradores` (`id_casa`, `id_utilizador`) VALUES\n"
+        + ",\n".join(values)
+        + ";"
+    )
+    run_sql(cfg, sql)
+    print(f"Casa_Administradores: {len(rows)} rows")
+
 
 IMPORTERS = {
     "tipos": import_tipos,
     "casas": import_casas,
     "utilizadores": import_utilizadores,
+    "casa_administradores": import_casa_administradores,
 }
 
 
