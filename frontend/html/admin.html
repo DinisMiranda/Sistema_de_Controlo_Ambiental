@@ -1,1308 +1,449 @@
 <!DOCTYPE html>
 <html lang="pt">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SCA — Admin</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
-    <link rel="stylesheet" href="Css/sca-theme.css" />
-    <link rel="stylesheet" href="Css/style.css" />
-    <script src="Js/config.js"></script>
-    <script src="Js/session.js" defer></script>
-    <script src="Js/layout.js" defer></script>
-    <script src="Js/admin.js" defer></script>
-  </head>
-  <body>
-    <div class="shell">
-      <aside class="sidebar">
-        <div class="logo">
-          <div class="logo-box"><i class="ti ti-leaf" aria-hidden="true"></i></div>
-          <div>
-            <div class="logo-name">SCA</div>
-            <div class="logo-ver">v2.1.0</div>
-          </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SCA — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="Css/sca-theme.css" />
+  <link rel="stylesheet" href="Css/admin.css" />
+  <script src="Js/config.js"></script>
+  <script src="Js/session.js" defer></script>
+  <script src="Js/layout.js" defer></script>
+  <script src="Js/admin.js" defer></script>
+</head>
+<body>
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-box"><i class="ti ti-leaf" aria-hidden="true"></i></div>
+      <div>
+        <div class="logo-name">SCA</div>
+        <div class="logo-ver">v2.1.0</div>
+      </div>
+    </div>
+    <nav>
+      <div class="nav-sect">overview</div>
+      <a class="nav-item" data-nav="dashboard" href="dashboard.html"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+      <a class="nav-item" data-nav="salas" href="departamento.html"><i class="ti ti-building"></i>Salas</a>
+      <div class="nav-sect">controlo</div>
+      <a class="nav-item" data-nav="relatorios" href="relatorio.html"><i class="ti ti-file-analytics"></i>Relatórios</a>
+      <div class="nav-sect">sistema</div>
+      <a class="nav-item" data-nav="sistema" href="sistema.html"><i class="ti ti-shield-check"></i>Sistema</a>
+      <a class="nav-item admin-link active" data-nav="admin" href="admin.html"><i class="ti ti-users"></i>Admin</a>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="user">
+        <div class="ava" id="user-initials">?</div>
+        <div>
+          <div class="uname" id="user-name">—</div>
+          <div class="urole" id="user-role">—</div>
         </div>
-        <nav>
-          <div class="nav-sect">overview</div>
-          <a class="nav-item" data-nav="dashboard" href="dashboard.html"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
-          <a class="nav-item" data-nav="salas" href="departamento.html"><i class="ti ti-building"></i>Salas</a>
-          <div class="nav-sect">controlo</div>
-          <a class="nav-item" data-nav="relatorios" href="relatorio.html"><i class="ti ti-file-analytics"></i>Relatórios</a>
-          <div class="nav-sect">sistema</div>
-          <a class="nav-item" data-nav="sistema" href="sistema.html"><i class="ti ti-shield-check"></i>Sistema</a>
-          <a class="nav-item admin-link active" data-nav="admin" href="admin.html"><i class="ti ti-users"></i>Admin</a>
-        </nav>
-        <div class="sidebar-foot">
-          <div class="user">
-            <div class="ava" id="user-initials">?</div>
-            <div>
-              <div class="uname" id="user-name">—</div>
-              <div class="urole" id="user-role">—</div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div>
+        <div class="page-ttl">Admin</div>
+        <div class="page-ts" id="timestamp">—</div>
+      </div>
+      <div class="tb-right">
+        <a class="tb-btn" href="dashboard.html" title="Dashboard" aria-label="Dashboard"><i class="ti ti-layout-dashboard"></i></a>
+        <button class="tb-btn" type="button" title="Sair" aria-label="Sair" id="logout-btn"><i class="ti ti-logout"></i></button>
+      </div>
+    </header>
+
+    <div class="body admin-body">
+
+      <div class="tabs">
+        <button class="tab-btn active" type="button" data-tab="users"><i class="ti ti-users"></i>Utilizadores</button>
+        <button class="tab-btn" type="button" data-tab="homes"><i class="ti ti-building"></i>Casas</button>
+        <button class="tab-btn" type="button" data-tab="sensors-actuators"><i class="ti ti-cpu"></i>Sensores &amp; Atuadores</button>
+        <button class="tab-btn" type="button" data-tab="parameters"><i class="ti ti-adjustments-horizontal"></i>Parâmetros</button>
+        <button class="tab-btn" type="button" data-tab="types"><i class="ti ti-tags"></i>Tipos</button>
+        <button class="tab-btn" type="button" data-tab="history"><i class="ti ti-history"></i>Histórico</button>
+      </div>
+
+      <div id="tab-users" class="tab-content active">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Utilizadores</div>
+            <div class="panel-actions">
+              <div class="search-wrap">
+                <i class="ti ti-search"></i>
+                <input class="search-input" type="search" id="users-search" placeholder="Procurar utilizador…" />
+              </div>
+              <button class="btn btn-ora" type="button" id="add-user"><i class="ti ti-plus"></i>Adicionar</button>
             </div>
           </div>
-        </div>
-      </aside>
-
-      <div class="main">
-        <header class="topbar">
-          <div>
-            <div class="page-ttl">Admin</div>
-            <div class="page-ts" id="timestamp">—</div>
+          <div class="tbl-wrap">
+            <table id="users-table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Email</th>
+                  <th>Departamento</th>
+                  <th>Role</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body">
+                <tr><td colspan="5"><div class="empty"><i class="ti ti-users"></i>A carregar utilizadores…</div></td></tr>
+              </tbody>
+            </table>
           </div>
-          <div class="tb-right">
-            <a class="tb-btn" href="dashboard.html" title="Dashboard" aria-label="Dashboard"><i class="ti ti-layout-dashboard"></i></a>
-            <button class="tb-btn" type="button" title="Sair" aria-label="Sair" id="logout-btn"><i class="ti ti-logout"></i></button>
+        </div>
+      </div>
+
+      <div id="tab-homes" class="tab-content">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Gestão de Casas</div>
+            <div class="panel-actions">
+              <button class="btn btn-ora" type="button" id="add-home"><i class="ti ti-plus"></i>Adicionar Casa</button>
+            </div>
           </div>
-        </header>
-        <div class="body">
-    <main class="content">
-      <!-- Tab Navigation -->
-      <div
-        style="
-          display: flex;
-          gap: 0.5rem;
-          margin-bottom: 2rem;
-          border-bottom: 2px solid var(--border);
-          overflow-x: auto;
-          padding-bottom: 0;
-        "
-      >
-        <button
-          class="tab-btn active"
-          data-tab="users"
-          style="
-            padding: 1rem 1.5rem;
-            background: none;
-            border: none;
-            border-bottom: 3px solid transparent;
-            color: var(--text-main);
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-          "
-        >
-          👥 Utilizadores
-        </button>
-        <button
-          class="tab-btn"
-          data-tab="homes"
-          style="
-            padding: 1rem 1.5rem;
-            background: none;
-            border: none;
-            border-bottom: 3px solid transparent;
-            color: var(--text-main);
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-          "
-        >
-          🏠 Casas
-        </button>
-        <button
-          class="tab-btn"
-          data-tab="sensors-actuators"
-          style="
-            padding: 1rem 1.5rem;
-            background: none;
-            border: none;
-            border-bottom: 3px solid transparent;
-            color: var(--text-main);
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-          "
-        >
-          📡 Sensores & Atuadores
-        </button>
-        <button
-          class="tab-btn"
-          data-tab="parameters"
-          style="
-            padding: 1rem 1.5rem;
-            background: none;
-            border: none;
-            border-bottom: 3px solid transparent;
-            color: var(--text-main);
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-          "
-        >
-          ⚙️ Parâmetros
-        </button>
-        <button
-          class="tab-btn"
-          data-tab="types"
-          style="
-            padding: 1rem 1.5rem;
-            background: none;
-            border: none;
-            border-bottom: 3px solid transparent;
-            color: var(--text-main);
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-          "
-        >
-          📋 Tipos
-        </button>
-        <button
-          class="tab-btn"
-          data-tab="history"
-          style="
-            padding: 1rem 1.5rem;
-            background: none;
-            border: none;
-            border-bottom: 3px solid transparent;
-            color: var(--text-main);
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-          "
-        >
-          📜 Histórico
-        </button>
-      </div>
-
-      <!-- USERS TAB -->
-      <div id="tab-users" class="tab-content active" style="display: block">
-        <div class="card">
-          <h2>Utilizadores</h2>
-          <button class="btn-primary" id="add-user">
-            Adicionar Utilizador
-          </button>
-          <table
-            id="users-table"
-            style="
-              width: 100%;
-              margin-top: 1rem;
-              color: var(--text-main);
-              border-collapse: collapse;
-            "
-          >
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>Email</th>
-                <th>Departamento</th>
-                <th>Role</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="users-table-body">
-              <!-- Rows will be populated by JavaScript -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- HOMES TAB -->
-      <div id="tab-homes" class="tab-content" style="display: none">
-        <div class="card">
-          <h2>Gestão de Casas</h2>
-          <button class="btn-primary" id="add-home">Adicionar Casa</button>
-          <table
-            id="homes-table"
-            style="
-              width: 100%;
-              margin-top: 1rem;
-              color: var(--text-main);
-              border-collapse: collapse;
-            "
-          >
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nome</th>
-                <th>Localização</th>
-                <th>Tipo</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="homes-table-body">
-              <tr>
-                <td>1</td>
-                <td>Auditório</td>
-                <td>Andar 1</td>
-                <td>Sala de Conferências</td>
-                <td style="text-align: center">
-                  <button
-                    class="edit-btn"
-                    style="
-                      background: none;
-                      border: none;
-                      color: var(--primary);
-                      font-size: 1.2rem;
-                      cursor: pointer;
-                      padding: 0;
-                      margin-right: 0.5rem;
-                    "
-                  >
-                    ✎
-                  </button>
-                  <button
-                    class="delete-btn"
-                    style="
-                      background: none;
-                      border: none;
-                      color: var(--error);
-                      font-size: 1.2rem;
-                      cursor: pointer;
-                      padding: 0;
-                    "
-                  >
-                    ✕
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>Laboratório A</td>
-                <td>Andar 2</td>
-                <td>Laboratório</td>
-                <td style="text-align: center">
-                  <button
-                    class="edit-btn"
-                    style="
-                      background: none;
-                      border: none;
-                      color: var(--primary);
-                      font-size: 1.2rem;
-                      cursor: pointer;
-                      padding: 0;
-                      margin-right: 0.5rem;
-                    "
-                  >
-                    ✎
-                  </button>
-                  <button
-                    class="delete-btn"
-                    style="
-                      background: none;
-                      border: none;
-                      color: var(--error);
-                      font-size: 1.2rem;
-                      cursor: pointer;
-                      padding: 0;
-                    "
-                  >
-                    ✕
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- SENSORS & ACTUATORS TAB -->
-      <div id="tab-sensors-actuators" class="tab-content" style="display: none">
-        <div class="card">
-          <h2>Sensores e Atuadores</h2>
-          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap">
-            <button class="btn-primary" id="add-sensor">
-              Adicionar Sensor
-            </button>
-            <button class="btn-primary" id="add-actuator">
-              Adicionar Atuador
-            </button>
+          <div class="tbl-wrap">
+            <table id="homes-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nome</th>
+                  <th>Localização</th>
+                  <th>Tipo</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="homes-table-body">
+                <tr><td colspan="5"><div class="empty"><i class="ti ti-building"></i>A carregar casas…</div></td></tr>
+              </tbody>
+            </table>
           </div>
-          <table
-            style="
-              width: 100%;
-              margin-top: 1rem;
-              color: var(--text-main);
-              border-collapse: collapse;
-            "
-          >
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nome</th>
-                <th>Tipo</th>
-                <th>Casa</th>
-                <th>Status</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="sensors-actuators-table-body">
-              <!-- Rows will be populated by JavaScript -->
-            </tbody>
-          </table>
         </div>
       </div>
 
-      <!-- PARAMETERS TAB -->
-      <div id="tab-parameters" class="tab-content" style="display: none">
-        <div class="card">
-          <h2>Parâmetros Automáticos</h2>
-          <button class="btn-primary" id="add-parameter">
-            Adicionar Parâmetro
-          </button>
-          <table
-            style="
-              width: 100%;
-              margin-top: 1rem;
-              color: var(--text-main);
-              border-collapse: collapse;
-            "
-          >
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nome</th>
-                <th>Descrição</th>
-                <th>Valor</th>
-                <th>ID Atuador</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="parameters-table-body">
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- TYPES TAB -->
-      <div id="tab-types" class="tab-content" style="display: none">
-        <div class="card">
-          <h2>Gestão de Tipos</h2>
-          <button class="btn-primary" id="add-type">Adicionar Tipo</button>
-          <table
-            style="
-              width: 100%;
-              margin-top: 1rem;
-              color: var(--text-main);
-              border-collapse: collapse;
-            "
-          >
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nome</th>
-                <th>Descrição</th>
-                <th>Categoria</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="types-table-body">
-              <tr>
-                <td>1</td>
-                <td>Temperatura</td>
-                <td>Sensor de temperatura ambiente</td>
-                <td>Sensor</td>
-                <td style="text-align: center">
-                  <button
-                    class="edit-btn"
-                    style="
-                      background: none;
-                      border: none;
-                      color: var(--primary);
-                      font-size: 1.2rem;
-                      cursor: pointer;
-                      padding: 0;
-                      margin-right: 0.5rem;
-                    "
-                  >
-                    ✎
-                  </button>
-                  <button
-                    class="delete-btn"
-                    style="
-                      background: none;
-                      border: none;
-                      color: var(--error);
-                      font-size: 1.2rem;
-                      cursor: pointer;
-                      padding: 0;
-                    "
-                  >
-                    ✕
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>Umidade</td>
-                <td>Sensor de umidade do ar</td>
-                <td>Sensor</td>
-                <td style="text-align: center">
-                  <button
-                    class="edit-btn"
-                    style="
-                      background: none;
-                      border: none;
-                      color: var(--primary);
-                      font-size: 1.2rem;
-                      cursor: pointer;
-                      padding: 0;
-                      margin-right: 0.5rem;
-                    "
-                  >
-                    ✎
-                  </button>
-                  <button
-                    class="delete-btn"
-                    style="
-                      background: none;
-                      border: none;
-                      color: var(--error);
-                      font-size: 1.2rem;
-                      cursor: pointer;
-                      padding: 0;
-                    "
-                  >
-                    ✕
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- HISTORY TAB -->
-      <div id="tab-history" class="tab-content" style="display: none">
-        <div class="card">
-          <h2>Histórico de Ações do Sistema</h2>
-          <div style="margin-bottom: 1rem">
-            <input
-              type="search"
-              id="history-search"
-              placeholder="Procurar no histórico..."
-              style="
-                width: 100%;
-                max-width: 300px;
-                padding: 0.5rem;
-                border: 1px solid var(--border);
-                border-radius: 4px;
-                background: var(--bg-main);
-                color: var(--text-main);
-              "
-            />
+      <div id="tab-sensors-actuators" class="tab-content">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Sensores e Atuadores</div>
+            <div class="panel-actions">
+              <button class="btn btn-ora" type="button" id="add-sensor"><i class="ti ti-plus"></i>Sensor</button>
+              <button class="btn btn-ghost" type="button" id="add-actuator"><i class="ti ti-plus"></i>Atuador</button>
+            </div>
           </div>
-          <table
-            style="
-              width: 100%;
-              margin-top: 1rem;
-              color: var(--text-main);
-              border-collapse: collapse;
-              font-size: 0.9rem;
-            "
-          >
-            <tr>
-              <th>Data/Hora</th>
-              <th>Utilizador</th>
-              <th>Ação</th>
-              <th>Tipo</th>
-              <th>Detalhes</th>
-            </tr>
-            <tr>
-              <td>2024-01-15 10:30:45</td>
-              <td>Carlos Pereira</td>
-              <td>Criar</td>
-              <td>Utilizador</td>
-              <td>Novo utilizador: João Silva</td>
-            </tr>
-            <tr>
-              <td>2024-01-15 09:15:22</td>
-              <td>Maria Sousa</td>
-              <td>Modificar</td>
-              <td>Sensor</td>
-              <td>Atualizado: Sensor Temperatura 1</td>
-            </tr>
-            <tr>
-              <td>2024-01-14 16:45:10</td>
-              <td>Carlos Pereira</td>
-              <td>Eliminar</td>
-              <td>Parâmetro</td>
-              <td>Removido: Parâmetro de Iluminação</td>
-            </tr>
-            <tr>
-              <td>2024-01-14 14:20:33</td>
-              <td>João Silva</td>
-              <td>Visualizar</td>
-              <td>Casa</td>
-              <td>Acesso ao Auditório</td>
-            </tr>
-          </table>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nome</th>
+                  <th>Tipo</th>
+                  <th>Casa</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="sensors-actuators-table-body">
+                <tr><td colspan="6"><div class="empty"><i class="ti ti-cpu"></i>A carregar dispositivos…</div></td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-    </main>
 
-    <!-- Modal for confirming deletion -->
-    <div
-      id="delete-modal"
-      style="
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 1001;
-        align-items: center;
-        justify-content: center;
-      "
-    >
-      <div
-        style="
-          background: var(--bg-secondary);
-          padding: 2rem;
-          border-radius: 8px;
-          text-align: center;
-          max-width: 300px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        "
-      >
-        <h3 style="color: var(--text-main); margin-top: 0">
-          Confirmar Eliminação
-        </h3>
-        <p style="color: var(--text-main); margin: 1rem 0">
-          Tem certeza de que deseja eliminar este utilizador?
-        </p>
-        <div style="display: flex; gap: 1rem; justify-content: center">
-          <button
-            id="confirm-delete-btn"
-            style="
-              padding: 0.5rem 1.5rem;
-              background: var(--error);
-              color: white;
-              border: none;
-              border-radius: 4px;
-              cursor: pointer;
-              font-weight: 600;
-            "
-          >
-            Eliminar
-          </button>
-          <button
-            id="cancel-delete-btn"
-            style="
-              padding: 0.5rem 1.5rem;
-              background: var(--border);
-              color: var(--text-main);
-              border: none;
-              border-radius: 4px;
-              cursor: pointer;
-              font-weight: 600;
-            "
-          >
-            Cancelar
-          </button>
+      <div id="tab-parameters" class="tab-content">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Parâmetros Automáticos</div>
+            <div class="panel-actions">
+              <button class="btn btn-ora" type="button" id="add-parameter"><i class="ti ti-plus"></i>Adicionar</button>
+            </div>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nome</th>
+                  <th>Descrição</th>
+                  <th>Valor</th>
+                  <th>Atuador</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="parameters-table-body">
+                <tr><td colspan="6"><div class="empty"><i class="ti ti-adjustments-horizontal"></i>A carregar parâmetros…</div></td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
+
+      <div id="tab-types" class="tab-content">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Gestão de Tipos</div>
+            <div class="panel-actions">
+              <button class="btn btn-ora" type="button" id="add-type"><i class="ti ti-plus"></i>Adicionar Tipo</button>
+            </div>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nome</th>
+                  <th>Descrição</th>
+                  <th>Categoria</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="types-table-body">
+                <tr><td colspan="5"><div class="empty"><i class="ti ti-tags"></i>A carregar tipos…</div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-history" class="tab-content">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Histórico de Ações</div>
+            <div class="panel-actions">
+              <div class="search-wrap">
+                <i class="ti ti-search"></i>
+                <input class="search-input" type="search" id="history-search" placeholder="Procurar no histórico…" />
+              </div>
+            </div>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Data / Hora</th>
+                  <th>Utilizador</th>
+                  <th>Ação</th>
+                  <th>Tipo</th>
+                  <th>Detalhes</th>
+                </tr>
+              </thead>
+              <tbody id="history-table-body">
+                <tr>
+                  <td class="mono">2024-01-15 10:30</td>
+                  <td class="primary">Carlos Pereira</td>
+                  <td><span class="badge badge-grn">Criar</span></td>
+                  <td>Utilizador</td>
+                  <td>Novo utilizador: João Silva</td>
+                </tr>
+                <tr>
+                  <td class="mono">2024-01-15 09:15</td>
+                  <td class="primary">Maria Sousa</td>
+                  <td><span class="badge badge-yel">Modificar</span></td>
+                  <td>Sensor</td>
+                  <td>Atualizado: Sensor Temperatura 1</td>
+                </tr>
+                <tr>
+                  <td class="mono">2024-01-14 16:45</td>
+                  <td class="primary">Carlos Pereira</td>
+                  <td><span class="badge badge-red">Eliminar</span></td>
+                  <td>Parâmetro</td>
+                  <td>Removido: Parâmetro de Iluminação</td>
+                </tr>
+                <tr>
+                  <td class="mono">2024-01-14 14:20</td>
+                  <td class="primary">João Silva</td>
+                  <td><span class="badge badge-grey">Visualizar</span></td>
+                  <td>Casa</td>
+                  <td>Acesso ao Auditório</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
     </div>
+  </div>
+</div>
 
-    <!-- Modal for adding user -->
-    <div
-      id="user-modal"
-      style="
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-      "
-    >
-      <div
-        style="
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          background: var(--bg-secondary);
-          padding: 2rem;
-          border-radius: 8px;
-          width: 90%;
-          max-width: 400px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        "
-      >
-        <h2 style="margin-top: 0; color: var(--text-main)">
-          Adicionar Novo Utilizador
-        </h2>
-        <form
-          id="user-form"
-          style="display: flex; flex-direction: column; gap: 1rem"
-        >
-          <div>
-            <label
-              for="user-name"
-              style="
-                display: block;
-                margin-bottom: 0.5rem;
-                color: var(--text-main);
-              "
-              >Nome:</label
-            >
-            <input
-              type="text"
-              id="user-name"
-              required
-              style="
-                width: 100%;
-                padding: 0.5rem;
-                border: 1px solid var(--border);
-                border-radius: 4px;
-                background: var(--bg-main);
-                color: var(--text-main);
-              "
-            />
-          </div>
-          <div>
-            <label
-              for="user-email"
-              style="
-                display: block;
-                margin-bottom: 0.5rem;
-                color: var(--text-main);
-              "
-              >Email:</label
-            >
-            <input
-              type="email"
-              id="user-email"
-              required
-              style="
-                width: 100%;
-                padding: 0.5rem;
-                border: 1px solid var(--border);
-                border-radius: 4px;
-                background: var(--bg-main);
-                color: var(--text-main);
-              "
-            />
-          </div>
-          <div>
-            <label
-              for="user-department"
-              style="
-                display: block;
-                margin-bottom: 0.5rem;
-                color: var(--text-main);
-              "
-              >Departamento:</label
-            >
-            <select
-              id="user-department"
-              class="form-control"
-              style="
-                width: 100%;
-                padding: 0.5rem;
-                border: 1px solid var(--border);
-                border-radius: 4px;
-                background: var(--bg-main);
-                color: var(--text-main);
-              "
-            >
-              <option value="">Select Department</option>
-              <option value="Administração">Administração</option>
-              <option value="Auditório">Auditório</option>
-              <option value="Laboratório A">Laboratório A</option>
-              <option value="Laboratório B">Laboratório B</option>
-            </select>
-          </div>
-          <div>
-            <label
-              for="user-role"
-              style="
-                display: block;
-                margin-bottom: 0.5rem;
-                color: var(--text-main);
-              "
-              >Role:</label
-            >
-            <select
-              id="user-role"
-              required
-              style="
-                width: 100%;
-                padding: 0.5rem;
-                border: 1px solid var(--border);
-                border-radius: 4px;
-                background: var(--bg-main);
-                color: var(--text-main);
-              "
-            >
-              <option value="User">User</option>
-              <option value="Admin">Admin</option>
-            </select>
-          </div>
-          <div>
-            <label
-              for="user-password"
-              style="
-                display: block;
-                margin-bottom: 0.5rem;
-                color: var(--text-main);
-              "
-              >Palavra-passe:</label
-            >
-            <input
-              type="password"
-              id="user-password"
-              required
-              style="
-                width: 100%;
-                padding: 0.5rem;
-                border: 1px solid var(--border);
-                border-radius: 4px;
-                background: var(--bg-main);
-                color: var(--text-main);
-              "
-            />
-          </div>
-          <div style="display: flex; gap: 1rem; justify-content: flex-end">
-            <button
-              type="button"
-              id="cancel-btn"
-              class="btn-primary"
-              style="background: var(--border); cursor: pointer"
-            >
-              Cancelar
-            </button>
-            <button type="submit" class="btn-primary" style="cursor: pointer">
-              Adicionar
-            </button>
-          </div>
-        </form>
-      </div>
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal" style="max-width:360px;">
+    <div class="modal-header">
+      <div class="modal-title">Confirmar Eliminação</div>
+      <button type="button" class="modal-close" data-close="delete-modal" aria-label="Fechar"><i class="ti ti-x"></i></button>
     </div>
+    <div class="confirm-body">
+      <div class="confirm-icon"><i class="ti ti-trash"></i></div>
+      <p>Tem a certeza que deseja eliminar <strong id="delete-target-name">este item</strong>? Esta ação não pode ser desfeita.</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-ghost" data-close="delete-modal">Cancelar</button>
+      <button type="button" class="btn btn-danger" id="confirm-delete-btn"><i class="ti ti-trash"></i>Eliminar</button>
+    </div>
+  </div>
+</div>
 
-    <!-- Modal for adding/editing Home -->
-    <div
-      id="home-modal"
-      class="modal"
-      style="
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-      "
-    >
-      <div
-        style="
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          background: var(--bg-secondary);
-          padding: 2rem;
-          border-radius: 8px;
-          width: 90%;
-          max-width: 400px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        "
-      >
-        <h2
-          style="margin-top: 0; color: var(--text-main)"
-          id="home-modal-title"
-        >
-          Adicionar Casa
-        </h2>
-        <form
-          id="home-form"
-          style="display: flex; flex-direction: column; gap: 1rem"
-        >
-          <div>
-            <label
-              style="
-                display: block;
-                margin-bottom: 0.5rem;
-                color: var(--text-main);
-              "
-              >Nome:</label
-            >
-            <input
-              type="text"
-              id="home-name"
-              required
-              style="
-                width: 100%;
-                padding: 0.5rem;
-                border: 1px solid var(--border);
-                border-radius: 4px;
-                background: var(--bg-main);
-                color: var(--text-main);
-              "
-            />
-          </div>
-          <div>
-            <label
-              style="
-                display: block;
-                margin-bottom: 0.5rem;
-                color: var(--text-main);
-              "
-              >Localização:</label
-            >
-            <input
-              type="text"
-              id="home-location"
-              required
-              style="
-                width: 100%;
-                padding: 0.5rem;
-                border: 1px solid var(--border);
-                border-radius: 4px;
-                background: var(--bg-main);
-                color: var(--text-main);
-              "
-            />
-          </div>
-          <div>
-            <label
-              style="
-                display: block;
-                margin-bottom: 0.5rem;
-                color: var(--text-main);
-              "
-              >Tipo:</label
-            >
-            <input
-              type="text"
-              id="home-type"
-              required
-              style="
-                width: 100%;
-                padding: 0.5rem;
-                border: 1px solid var(--border);
-                border-radius: 4px;
-                background: var(--bg-main);
-                color: var(--text-main);
-              "
-            />
-          </div>
-          <div style="display: flex; gap: 1rem; justify-content: flex-end">
-            <button
-              type="button"
-              id="home-cancel-btn"
-              class="btn-primary"
-              style="background: var(--border); cursor: pointer"
-            >
-              Cancelar
-            </button>
-            <button type="submit" class="btn-primary" style="cursor: pointer">
-              Guardar
-            </button>
-          </div>
-        </form>
-      </div>
+<div class="modal-overlay" id="user-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="user-modal-title">Adicionar Utilizador</div>
+      <button type="button" class="modal-close" data-close="user-modal" aria-label="Fechar"><i class="ti ti-x"></i></button>
     </div>
-
-    <!-- Modal for adding/editing Device (Sensor/Actuator) -->
-    <div
-      id="device-modal"
-      style="
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-      "
-    >
-      <div
-        style="
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          background: var(--bg-secondary);
-          padding: 2rem;
-          border-radius: 8px;
-          width: 90%;
-          max-width: 400px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        "
-      >
-        <h2
-          style="margin-top: 0; color: var(--text-main)"
-          id="device-modal-title"
-        >
-          Adicionar Sensor
-        </h2>
-        <form
-          id="device-form"
-          style="display: flex; flex-direction: column; gap: 1rem"
-        >
-          <input type="hidden" id="device-mode" value="sensor" />
-          <div>
-            <label
-              style="
-                display: block;
-                margin-bottom: 0.5rem;
-                color: var(--text-main);
-              "
-              >Nome:</label
-            >
-            <input
-              type="text"
-              id="device-name"
-              required
-              style="
-                width: 100%;
-                padding: 0.5rem;
-                border: 1px solid var(--border);
-                border-radius: 4px;
-                background: var(--bg-main);
-                color: var(--text-main);
-              "
-            />
-          </div>
-          <div>
-            <label
-              style="
-                display: block;
-                margin-bottom: 0.5rem;
-                color: var(--text-main);
-              "
-              >Tipo:</label
-            >
-            <select
-              id="device-type"
-              required
-              style="
-                width: 100%;
-                padding: 0.5rem;
-                border: 1px solid var(--border);
-                border-radius: 4px;
-                background: var(--bg-main);
-                color: var(--text-main);
-              "
-            >
-              <option value="">Selecionar tipo...</option>
-            </select>
-          </div>
-          <div>
-            <label
-              style="
-                display: block;
-                margin-bottom: 0.5rem;
-                color: var(--text-main);
-              "
-              >Casa/Localização:</label
-            >
-            <input
-              type="text"
-              id="device-home"
-              required
-              style="
-                width: 100%;
-                padding: 0.5rem;
-                border: 1px solid var(--border);
-                border-radius: 4px;
-                background: var(--bg-main);
-                color: var(--text-main);
-              "
-            />
-          </div>
-          <div style="display: flex; gap: 1rem; justify-content: flex-end">
-            <button
-              type="button"
-              id="device-cancel-btn"
-              class="btn-primary"
-              style="background: var(--border); cursor: pointer"
-            >
-              Cancelar
-            </button>
-            <button type="submit" class="btn-primary" style="cursor: pointer">
-              Guardar
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Modal for adding/editing Parameter -->
-    <div
-      id="parameter-modal"
-      style="
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-      "
-    >
-      <div
-        style="
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          background: var(--bg-secondary);
-          padding: 2rem;
-          border-radius: 8px;
-          width: 90%;
-          max-width: 400px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        "
-      >
-        <h2
-          style="margin-top: 0; color: var(--text-main)"
-          id="parameter-modal-title"
-        >
-          Adicionar Parâmetro
-        </h2>
-        <form
-          id="parameter-form"
-          style="display: flex; flex-direction: column; gap: 1rem"
-        >
-          <div>
-            <label
-              style="
-                display: block;
-                margin-bottom: 0.5rem;
-                color: var(--text-main);
-              "
-              >Nome:</label
-            >
-            <input
-              type="text"
-              id="parameter-name"
-              required
-              style="
-                width: 100%;
-                padding: 0.5rem;
-                border: 1px solid var(--border);
-                border-radius: 4px;
-                background: var(--bg-main);
-                color: var(--text-main);
-              "
-            />
-          </div>
-          <div>
-            <label
-              style="
-                display: block;
-                margin-bottom: 0.5rem;
-                color: var(--text-main);
-              "
-              >Descrição:</label
-            >
-            <input
-              type="text"
-              id="parameter-description"
-              required
-              style="
-                width: 100%;
-                padding: 0.5rem;
-                border: 1px solid var(--border);
-                border-radius: 4px;
-                background: var(--bg-main);
-                color: var(--text-main);
-              "
-            />
-          </div>
-          <div>
-            <label
-              style="
-                display: block;
-                margin-bottom: 0.5rem;
-                color: var(--text-main);
-              "
-              >Valor:</label
-            >
-            <input
-              type="text"
-              id="parameter-minValue"
-              required
-              style="
-                width: 100%;
-                padding: 0.5rem;
-                border: 1px solid var(--border);
-                border-radius: 4px;
-                background: var(--bg-main);
-                color: var(--text-main);
-              "
-            />
-          </div>
-          <div>
-            <label
-              style="
-                display: block;
-                margin-bottom: 0.5rem;
-                color: var(--text-main);
-              "
-              >Atuador:</label
-            >
-            <select
-              id="parameter-atuador"
-              required
-              style="
-                width: 100%;
-                padding: 0.5rem;
-                border: 1px solid var(--border);
-                border-radius: 4px;
-                background: var(--bg-main);
-                color: var(--text-main);
-              "
-            >
-              <option value="">Selecionar atuador...</option>
-            </select>
-          </div>
-          <div style="display: flex; gap: 1rem; justify-content: flex-end">
-            <button
-              type="button"
-              id="parameter-cancel-btn"
-              class="btn-primary"
-              style="background: var(--border); cursor: pointer"
-            >
-              Cancelar
-            </button>
-            <button type="submit" class="btn-primary" style="cursor: pointer">
-              Guardar
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Modal for adding/editing Type -->
-    <div
-      id="type-modal"
-      style="
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-      "
-    >
-      <div
-        style="
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          background: var(--bg-secondary);
-          padding: 2rem;
-          border-radius: 8px;
-          width: 90%;
-          max-width: 400px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        "
-      >
-        <h2
-          style="margin-top: 0; color: var(--text-main)"
-          id="type-modal-title"
-        >
-          Adicionar Tipo
-        </h2>
-        <form
-          id="type-form"
-          style="display: flex; flex-direction: column; gap: 1rem"
-        >
-          <div>
-            <label
-              style="
-                display: block;
-                margin-bottom: 0.5rem;
-                color: var(--text-main);
-              "
-              >Nome:</label
-            >
-            <input
-              type="text"
-              id="type-name"
-              required
-              style="
-                width: 100%;
-                padding: 0.5rem;
-                border: 1px solid var(--border);
-                border-radius: 4px;
-                background: var(--bg-main);
-                color: var(--text-main);
-              "
-            />
-          </div>
-          <div>
-            <label
-              style="
-                display: block;
-                margin-bottom: 0.5rem;
-                color: var(--text-main);
-              "
-              >Descrição:</label
-            >
-            <input
-              type="text"
-              id="type-description"
-              required
-              style="
-                width: 100%;
-                padding: 0.5rem;
-                border: 1px solid var(--border);
-                border-radius: 4px;
-                background: var(--bg-main);
-                color: var(--text-main);
-              "
-            />
-          </div>
-          <div>
-            <label
-              style="
-                display: block;
-                margin-bottom: 0.5rem;
-                color: var(--text-main);
-              "
-              >Categoria:</label
-            >
-            <select
-              id="type-category"
-              required
-              style="
-                width: 100%;
-                padding: 0.5rem;
-                border: 1px solid var(--border);
-                border-radius: 4px;
-                background: var(--bg-main);
-                color: var(--text-main);
-              "
-            >
-              <option value="Sensor">Sensor</option>
-              <option value="Atuador">Atuador</option>
-            </select>
-          </div>
-          <div style="display: flex; gap: 1rem; justify-content: flex-end">
-            <button
-              type="button"
-              id="type-cancel-btn"
-              class="btn-primary"
-              style="background: var(--border); cursor: pointer"
-            >
-              Cancelar
-            </button>
-            <button type="submit" class="btn-primary" style="cursor: pointer">
-              Guardar
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <form id="user-form">
+      <div class="form-group">
+        <div class="field">
+          <label for="input-user-name">Nome</label>
+          <input type="text" id="input-user-name" placeholder="Nome completo" required />
+        </div>
+        <div class="field">
+          <label for="input-user-email">Email</label>
+          <input type="email" id="input-user-email" placeholder="email@exemplo.com" required />
+        </div>
+        <div class="field">
+          <label for="input-user-password">Palavra-passe</label>
+          <input type="password" id="input-user-password" placeholder="••••••••" required />
         </div>
       </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" data-close="user-modal">Cancelar</button>
+        <button type="submit" class="btn btn-ora"><i class="ti ti-check"></i>Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="home-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="home-modal-title">Adicionar Casa</div>
+      <button type="button" class="modal-close" data-close="home-modal" aria-label="Fechar"><i class="ti ti-x"></i></button>
     </div>
-  </body>
+    <form id="home-form">
+      <div class="form-group">
+        <div class="field">
+          <label for="home-name">Nome</label>
+          <input type="text" id="home-name" placeholder="Ex: Laboratório A" required />
+        </div>
+        <div class="field">
+          <label for="home-location">Localização</label>
+          <input type="text" id="home-location" placeholder="Ex: Andar 2" required />
+        </div>
+        <div class="field">
+          <label for="home-type">Tipo</label>
+          <input type="text" id="home-type" placeholder="Ex: Laboratório" required />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" id="home-cancel-btn" data-close="home-modal">Cancelar</button>
+        <button type="submit" class="btn btn-ora"><i class="ti ti-check"></i>Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="device-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="device-modal-title">Adicionar Sensor</div>
+      <button type="button" class="modal-close" data-close="device-modal" aria-label="Fechar"><i class="ti ti-x"></i></button>
+    </div>
+    <form id="device-form">
+      <div class="form-group">
+        <div class="field">
+          <label for="device-name">Nome</label>
+          <input type="text" id="device-name" placeholder="Ex: Termómetro Sala 101" required />
+        </div>
+        <div class="field">
+          <label for="device-type">Tipo</label>
+          <select id="device-type" required>
+            <option value="">Selecionar tipo…</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="device-home">Casa / Localização</label>
+          <input type="text" id="device-home" placeholder="Ex: Sala 101" required />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" id="device-cancel-btn" data-close="device-modal">Cancelar</button>
+        <button type="submit" class="btn btn-ora"><i class="ti ti-check"></i>Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="parameter-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="parameter-modal-title">Adicionar Parâmetro</div>
+      <button type="button" class="modal-close" data-close="parameter-modal" aria-label="Fechar"><i class="ti ti-x"></i></button>
+    </div>
+    <form id="parameter-form">
+      <div class="form-group">
+        <div class="field">
+          <label for="parameter-name">Nome</label>
+          <input type="text" id="parameter-name" placeholder="Ex: Temp. máxima" required />
+        </div>
+        <div class="field">
+          <label for="parameter-description">Descrição</label>
+          <input type="text" id="parameter-description" placeholder="Breve descrição" required />
+        </div>
+        <div class="field">
+          <label for="parameter-minValue">Valor</label>
+          <input type="text" id="parameter-minValue" placeholder="Ex: 25" required />
+        </div>
+        <div class="field">
+          <label for="parameter-atuador">Atuador</label>
+          <select id="parameter-atuador" required>
+            <option value="">Selecionar atuador…</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" id="parameter-cancel-btn" data-close="parameter-modal">Cancelar</button>
+        <button type="submit" class="btn btn-ora"><i class="ti ti-check"></i>Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="type-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="type-modal-title">Adicionar Tipo</div>
+      <button type="button" class="modal-close" data-close="type-modal" aria-label="Fechar"><i class="ti ti-x"></i></button>
+    </div>
+    <form id="type-form">
+      <div class="form-group">
+        <div class="field">
+          <label for="type-name">Nome</label>
+          <input type="text" id="type-name" placeholder="Ex: Temperatura" required />
+        </div>
+        <div class="field">
+          <label for="type-description">Descrição</label>
+          <input type="text" id="type-description" placeholder="Breve descrição" required />
+        </div>
+        <div class="field">
+          <label for="type-category">Categoria</label>
+          <select id="type-category" required>
+            <option value="Sensor">Sensor</option>
+            <option value="Atuador">Atuador</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" id="type-cancel-btn" data-close="type-modal">Cancelar</button>
+        <button type="submit" class="btn btn-ora"><i class="ti ti-check"></i>Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+</body>
 </html>
