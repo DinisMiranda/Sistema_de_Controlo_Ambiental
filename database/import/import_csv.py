@@ -282,6 +282,34 @@ def import_leituras_sensor(cfg: dict[str, str]) -> None:
     run_sql(cfg, sql)
     print(f"leituras_sensor: {len(rows)} rows")
 
+def import_acoes_sistema(cfg: dict[str, str]) -> None:
+    rows = read_csv("acoes_sistema_examination.csv")
+    if not rows:
+        return
+    values = []
+    for row in rows:
+        motivo = row.get("motivo", "").strip()
+        values.append(
+            "("
+            f"{row['id_atuador'].strip()}, "
+            f"{sql_literal(row['tipo_acao'])}, "
+            f"{sql_literal(row['valor_aplicado'])}, "
+            f"{sql_literal(motivo) if motivo else 'NULL'}, "
+            f"{sql_literal(row['timestamp_acao'])}, "
+            f"{sql_literal(row['Tipos_classe'])}, "
+            f"{sql_literal(row['Tipos_tipo'])}"
+            ")"
+        )
+    sql = (
+        "INSERT INTO `acoes_sistema` "
+        "(`id_atuador`, `tipo_acao`, `valor_aplicado`, `motivo`, `timestamp_acao`, "
+        "`Tipos_classe`, `Tipos_tipo`) VALUES\n"
+        + ",\n".join(values)
+        + ";"
+    )
+    run_sql(cfg, sql)
+    print(f"acoes_sistema: {len(rows)} rows")
+
 
 IMPORTERS = {
     "tipos": import_tipos,
@@ -291,6 +319,7 @@ IMPORTERS = {
     "sensores": import_sensores,
     "atuadores": import_atuadores,
     "leituras_sensor": import_leituras_sensor,
+    "acoes_sistema": import_acoes_sistema,
 }
 
 
