@@ -18,21 +18,21 @@ A monitoring and control system for environmental sensors, actuators, and consum
 
 ## Project structure
 
-| Path | Purpose |
-|------|--------|
-| `frontend/` | Web UI — React, Vite, TypeScript |
-| `backend/` | REST API — Node.js, Express, TypeScript |
-| `database/` | MySQL schema and migration scripts |
-| `docs/` | Design docs, use cases, and references |
-| `scripts/` | Fake data generators (see `scripts/README.md`) |
-| `docker-compose.yml` | Local MySQL 8 service for development |
+| Path                 | Purpose                                        |
+| -------------------- | ---------------------------------------------- |
+| `frontend/`          | Web UI — React, Vite, TypeScript               |
+| `backend/`           | REST API — Node.js, Express, TypeScript        |
+| `database/`          | MySQL schema and migration scripts             |
+| `docs/`              | Design docs, use cases, and references         |
+| `scripts/`           | Fake data generators (see `scripts/README.md`) |
+| `docker-compose.yml` | Local MySQL 8 service for development          |
 
 ---
 
 ## Prerequisites
 
-- **Node.js** 18 or later  
-- **MySQL** 8 (or use the provided Docker setup)  
+- **Node.js** 18 or later
+- **MySQL** 8 (or use the provided Docker setup)
 - **npm** or **pnpm**
 
 ---
@@ -87,11 +87,11 @@ UI: **http://localhost:5173**
 
 ## Configuration
 
-| Component | Config file | Notes |
-|-----------|-------------|--------|
-| **Docker (DB)** | `docker-compose.env.example` → `.env` | Optional overrides; do not commit `.env`. |
-| **Backend** | `backend/.env.example` → `backend/.env` | Required. With default Docker: `DB_HOST=127.0.0.1`, `DB_USER=root`, `DB_PASSWORD=sca_root`, `DB_NAME=sistema_controlo_ambiental2`. |
-| **Frontend** | `frontend/.env.example` → `frontend/.env` | Optional in dev; Vite proxies `/api` to the backend. |
+| Component       | Config file                               | Notes                                                                                                                              |
+| --------------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **Docker (DB)** | `docker-compose.env.example` → `.env`     | Optional overrides; do not commit `.env`.                                                                                          |
+| **Backend**     | `backend/.env.example` → `backend/.env`   | Required. With default Docker: `DB_HOST=127.0.0.1`, `DB_USER=root`, `DB_PASSWORD=sca_root`, `DB_NAME=sistema_controlo_ambiental2`. |
+| **Frontend**    | `frontend/.env.example` → `frontend/.env` | Optional in dev; Vite proxies `/api` to the backend.                                                                               |
 
 ---
 
@@ -99,25 +99,25 @@ UI: **http://localhost:5173**
 
 Schema: **sistema_controlo_ambiental2**
 
-| Entity | Description |
-|--------|-------------|
-| **Tipos** | Type catalogue (referenced by sensors, actuators, actions). |
-| **Utilizadores** | System users (including admin flag). |
-| **sensores** / **atuadores** | Sensors and actuators (FK to Tipos). |
-| **leituras_sensor** | Sensor readings over time. |
-| **acoes_sistema** | Actions performed on actuators. |
-| **parametros_automaticos** | Configuration parameters (linked to actions). |
-| **registos_consumo** | Consumption per period (FK to sensores). |
+| Entity                       | Description                                                 |
+| ---------------------------- | ----------------------------------------------------------- |
+| **Tipos**                    | Type catalogue (referenced by sensors, actuators, actions). |
+| **Utilizadores**             | System users (including admin flag).                        |
+| **sensores** / **atuadores** | Sensors and actuators (FK to Tipos).                        |
+| **leituras_sensor**          | Sensor readings over time.                                  |
+| **acoes_sistema**            | Actions performed on actuators.                             |
+| **parametros_automaticos**   | Configuration parameters (linked to actions).               |
+| **registos_consumo**         | Consumption per period (FK to sensores).                    |
 
 ---
 
 ## Tech stack
 
-| Layer | Stack |
-|-------|--------|
-| Frontend | React, Vite, TypeScript |
-| Backend | Node.js, Express, TypeScript |
-| Database | MySQL 8 |
+| Layer    | Stack                        |
+| -------- | ---------------------------- |
+| Frontend | React, Vite, TypeScript      |
+| Backend  | Node.js, Express, TypeScript |
+| Database | MySQL 8                      |
 
 ---
 

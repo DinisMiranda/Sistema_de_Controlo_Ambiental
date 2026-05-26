@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import { Router } from "express";
 import { sensoresRouter } from "./sensores.routes.js";
 import { atuadoresRouter } from "./atuadores.routes.js";
@@ -7,6 +8,10 @@ import { leiturasRouter } from "./leituras.routes.js";
 import { acoesRouter } from "./acoes.routes.js";
 import { consumoRouter } from "./consumo.routes.js";
 import { parametrosRouter } from "./parametros.routes.js";
+import { roomsRouter} from "./rooms.js";
+import { departmentsRouter } from "./departments.routes.js";
+import { reportsRouter } from './reports.routes.js';
+import { usersRouter } from "./users.routes.js";
 
 export const apiRouter = Router();
 
@@ -16,5 +21,9 @@ apiRouter.use("/sensores", sensoresRouter);
 apiRouter.use("/atuadores", atuadoresRouter);
 apiRouter.use("/sensors", leiturasRouter);
 apiRouter.use("/actuators", acoesRouter);
-apiRouter.use("/", consumoRouter);
+apiRouter.use("/consumo", consumoRouter);
 apiRouter.use("/automatic-parameters", parametrosRouter);
+apiRouter.use("/salas", roomsRouter);
+apiRouter.use("/departments", departmentsRouter);
+apiRouter.use("/reports", reportsRouter);
+apiRouter.use("/users", usersRouter);

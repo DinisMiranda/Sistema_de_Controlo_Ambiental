@@ -1,286 +1,250 @@
+// ============================================
+// AUTH & INIT
+// ============================================
+
 const user = JSON.parse(localStorage.getItem("user"));
-if (!user || user.role !== "Admin") {
-  location.href = "login.html";
+
+const adminMenu = document.getElementById("admin-menu");
+if (adminMenu) {
+  adminMenu.style.display = user?.admin ? "block" : "none";
 }
 
-// Define the initial test users (matching auth.js for consistency)
-const TEST_USERS = [
-  {
-    name: "João Silva",
-    email: "joao@empresa.com",
-    department: "Auditório",
-    role: "User",
-    password: "joao123",
-  },
-  {
-    name: "Maria Sousa",
-    email: "maria@empresa.com",
-    department: "Lab A",
-    role: "User",
-    password: "maria123",
-  },
-  {
-    name: "Administrador",
-    email: "admin@edificio.com",
-    department: "Administração",
-    role: "Admin",
-    password: "admin123",
-  },
-];
+document.addEventListener("DOMContentLoaded", async () => {
+  const user = await requireAuth();
+  if (!user) return;
 
-// Function to get all users (test + admin-added users)
-function getAllUsers() {
-  let allUsers = [...TEST_USERS];
-  const addedUsers = JSON.parse(localStorage.getItem("addedUsers")) || [];
-  allUsers = allUsers.concat(addedUsers);
-  return allUsers;
-}
-
-// Initialize users array using the shared function
-let users = getAllUsers();
-
-// Function to save only added users to localStorage
-function saveUsers() {
-  const addedUsers = users.filter(
-    (user) => !TEST_USERS.some((testUser) => testUser.email === user.email),
-  );
-  localStorage.setItem("addedUsers", JSON.stringify(addedUsers));
-}
-
-// Function to populate table
-function populateTable() {
-  const table = document.querySelector("table");
-  // Clear existing rows except header
-  const rows = table.querySelectorAll("tr");
-  for (let i = 1; i < rows.length; i++) {
-    rows[i].remove();
-  }
-  // Add users
-  users.forEach((user) =>
-    addUserToTable(
-      user.name,
-      user.email,
-      user.department,
-      user.role,
-      user.password,
-    ),
-  );
-}
-
-// Get modal and form elements
-const userModal = document.getElementById("user-modal");
-const userForm = document.getElementById("user-form");
-const addUserBtn = document.getElementById("add-user");
-const cancelBtn = document.getElementById("cancel-btn");
-
-// Populate table on load
-populateTable();
-
-// Open modal when button is clicked
-addUserBtn.addEventListener("click", () => {
-  userModal.style.display = "flex";
-  userForm.reset();
-});
-
-// Close modal when cancel button is clicked
-cancelBtn.addEventListener("click", () => {
-  userModal.style.display = "none";
-});
-
-// Close modal when clicking outside the modal content
-userModal.addEventListener("click", (e) => {
-  if (e.target === userModal) {
-    userModal.style.display = "none";
-  }
-});
-
-// Handle form submission
-userForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-
-  // Get form values
-  const name = document.getElementById("user-name").value.trim();
-  const email = document.getElementById("user-email").value.trim();
-  const department = document.getElementById("user-department").value.trim();
-  const role = document.getElementById("user-role").value;
-  const password = document.getElementById("user-password").value;
-
-  // Validate inputs
-  if (!name || !email || !department || !password) {
-    alert("Por favor, preencha todos os campos.");
+  const isAdmin = user?.role?.toLowerCase() === "admin" || user?.admin === true;
+  if (!isAdmin) {
+    window.location.href = "dashboard.html";
     return;
   }
 
-  // Validate password strength
-  if (password.length < 6) {
-    alert("A password deve ter pelo menos 6 caracteres.");
-    return;
-  }
-
-  // Check if email already exists
-  if (users.some((u) => u.email === email)) {
-    alert("Este email já está registado.");
-    return;
-  }
-
-  // Add new user to users array
-  users.push({ name, email, department, role, password });
-  saveUsers();
-
-  // Add to table
-  addUserToTable(name, email, department, role, password);
-
-  // Close modal and reset form
-  userModal.style.display = "none";
-  userForm.reset();
-});
-
-// Function to add user to table
-function addUserToTable(name, email, department, role, password) {
-  const table = document.querySelector("table");
-  const newRow = table.insertRow(-1);
-
-  const roleColor =
-    role === "Admin" ? "var(--accent-orange)" : "var(--text-secondary)";
-
-  newRow.innerHTML = `
-    <td>${name}</td>
-    <td>${email}</td>
-    <td>${department}</td>
-    <td style="color: ${roleColor}">${role}</td>
-    <td style="text-align: center;"><button class="delete-btn" style="background: none; border: none; color: var(--error); font-size: 1.2rem; cursor: pointer; padding: 0;">✕</button></td>
-  `;
-
-  // Store password in data attribute (consider using secure method for production)
-  newRow.dataset.password = password;
-
-  // Add delete button event listener
-  const deleteBtn = newRow.querySelector(".delete-btn");
-  deleteBtn.addEventListener("click", () => deleteUserWithConfirmation(newRow));
+  try {
+  await loadUsers().then(populateUsersTable);
+} catch (e) {
+  console.error("Users:", e);
 }
 
-// Delete modal elements
-const deleteModal = document.getElementById("delete-modal");
-const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
-const cancelDeleteBtn = document.getElementById("cancel-delete-btn");
-let rowToDelete = null;
-
-// Function to delete user with confirmation
-function deleteUserWithConfirmation(row) {
-  rowToDelete = row;
-  deleteModal.style.display = "flex";
+try {
+  await loadSensorsAndActuators();
+} catch (e) {
+  console.error("Devices:", e);
 }
 
-// Confirm delete
-confirmDeleteBtn.addEventListener("click", () => {
-  if (rowToDelete) {
-    // Get email from row
-    const email = rowToDelete.cells[1].textContent;
-    // Remove from users array
-    users = users.filter((u) => u.email !== email);
-    saveUsers();
-    // Remove row
-    rowToDelete.remove();
-    deleteModal.style.display = "none";
-    rowToDelete = null;
-  }
-});
+try {
+  await loadSalas();
+} catch (e) {
+  console.error("Salas:", e);
+}
 
-// Cancel delete
-cancelDeleteBtn.addEventListener("click", () => {
-  deleteModal.style.display = "none";
-  rowToDelete = null;
-});
+try {
+  await loadParametros();
+} catch (e) {
+  console.error("Parametros:", e);
+}
 
-// Close delete modal when clicking outside
-deleteModal.addEventListener("click", (e) => {
-  if (e.target === deleteModal) {
-    deleteModal.style.display = "none";
-    rowToDelete = null;
-  }
-});
-
-// Add delete button event listeners to existing rows
-document.querySelectorAll(".delete-btn").forEach((btn) => {
-  btn.addEventListener("click", () =>
-    deleteUserWithConfirmation(btn.closest("tr")),
-  );
-});
-
-// Color existing rows based on role
-document.querySelectorAll("table tr:not(:first-child)").forEach((row) => {
-  const roleCell = row.cells[3];
-  if (roleCell) {
-    const role = roleCell.textContent.trim();
-    roleCell.style.color =
-      role === "Admin" ? "var(--accent-orange)" : "var(--text-secondary)";
-  }
+try {
+  await loadTipos();
+} catch (e) {
+  console.error("Tipos:", e);
+}
 });
 
 // ============================================
 // TAB MANAGEMENT
 // ============================================
 
-// Get all tab buttons and contents
 const tabButtons = document.querySelectorAll(".tab-btn");
 const tabContents = document.querySelectorAll(".tab-content");
 
-// Add click event listeners to tab buttons
 tabButtons.forEach((button) => {
   button.addEventListener("click", () => {
     const tabName = button.getAttribute("data-tab");
 
-    // Hide all tab contents
     tabContents.forEach((content) => {
       content.style.display = "none";
       content.classList.remove("active");
     });
 
-    // Remove active class from all buttons
     tabButtons.forEach((btn) => {
       btn.classList.remove("active");
       btn.style.borderBottomColor = "transparent";
     });
 
-    // Show selected tab content
     const selectedTab = document.getElementById(`tab-${tabName}`);
     if (selectedTab) {
       selectedTab.style.display = "block";
       selectedTab.classList.add("active");
     }
 
-    // Add active style to clicked button
     button.classList.add("active");
     button.style.borderBottomColor = "var(--primary)";
   });
 });
 
-// Set initial active tab button style
 const firstTabBtn = document.querySelector(".tab-btn.active");
 if (firstTabBtn) {
   firstTabBtn.style.borderBottomColor = "var(--primary)";
 }
 
 // ============================================
-// MODAL FUNCTIONS
+// USERS
 // ============================================
 
-// Home Modal
-const homeModal = document.getElementById("home-modal");
-const homeForm = document.getElementById("home-form");
+async function loadUsers() {
+  const response = await fetchWithAuth("/api/users");
+  if (!response.ok) {
+    console.error("Erro ao carregar utilizadores");
+    return [];
+  }
+  return response.json();
+}
+
+async function createUser(name, email, password) {
+  const response = await fetchWithAuth("/api/auth/register", {
+    method: "POST",
+    body: JSON.stringify({ nome: name, email, password }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const fieldInfo = data.fields ? ` (campos: ${data.fields.join(", ")})` : "";
+    throw new Error((data.error || "Erro ao criar utilizador") + fieldInfo);
+  }
+  return data;
+}
+
+async function deleteUser(userId) {
+  const response = await fetchWithAuth(`/api/users/${userId}`, { method: "DELETE" });
+  if (!response.ok) throw new Error("Erro ao apagar utilizador");
+}
+
+function populateUsersTable(users) {
+  const tbody = document.querySelector("#users-table tbody");
+  tbody.innerHTML = "";
+  users.forEach((u) => {
+    const row = tbody.insertRow();
+    row.innerHTML = `
+      <td>${u.nome}</td>
+      <td>${u.email}</td>
+      <td>${u.department || "—"}</td>
+      <td style="color: ${u.admin ? "var(--accent-orange)" : "var(--text-secondary)"}">
+        ${u.admin ? "Admin" : "User"}
+      </td>
+      <td style="text-align: center;">
+        <button class="delete-btn" style="background: none; border: none; color: var(--error); font-size: 1.2rem; cursor: pointer; padding: 0;">✕</button>
+      </td>
+    `;
+    row.querySelector(".delete-btn").addEventListener("click", () => handleDeleteUser(u.id_administrador));
+  });
+}
+
+async function handleDeleteUser(userId) {
+  if (!userId) { alert("Erro: ID do utilizador inválido."); return; }
+  if (!confirm("Tem a certeza que quer apagar este utilizador?")) return;
+  try {
+    await deleteUser(userId);
+    populateUsersTable(await loadUsers());
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+// User modal
+const userModal = document.getElementById("user-modal");
+const userForm = document.getElementById("user-form");
+
+document.getElementById("add-user")?.addEventListener("click", () => {
+  userForm.reset();
+  userModal.style.display = "flex";
+});
+
+document.getElementById("cancel-btn")?.addEventListener("click", () => {
+  userModal.style.display = "none";
+});
+
+userForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const name     = document.getElementById("user-name").value.trim();
+  const email    = document.getElementById("user-email").value.trim();
+  const password = document.getElementById("user-password").value;
+
+  if (!name || !email || !password) { alert("Por favor, preencha todos os campos."); return; }
+  if (password.length < 6) { alert("A password deve ter pelo menos 6 caracteres."); return; }
+
+  try {
+    await createUser(name, email, password);
+    userModal.style.display = "none";
+    userForm.reset();
+    populateUsersTable(await loadUsers());
+  } catch (err) {
+    alert(err.message);
+  }
+});
+
+// ============================================
+// SALAS (HOMES)
+// Note: /api/salas has no POST/PUT/DELETE — add/edit stay local for the session.
+// ============================================
+
+const homesTableBody = document.getElementById("homes-table-body");
+const homeModal      = document.getElementById("home-modal");
+const homeForm       = document.getElementById("home-form");
 const homeModalTitle = document.getElementById("home-modal-title");
-const homeCancelBtn = document.getElementById("home-cancel-btn");
+
+let salasCache    = [];
 let editingHomeId = null;
+
+async function loadSalas() {
+  try {
+    const response = await fetchWithAuth("/api/salas");
+    if (!response.ok) throw new Error("Erro ao carregar salas");
+    const salas = await response.json();
+    salasCache = salas.map((s, i) => ({
+      id:       s.id || i + 1,
+      name:     s.name,
+      location: s.location || "—",
+      type:     s.badge || "—",
+    }));
+    renderSalasTable();
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function renderSalasTable() {
+  homesTableBody.innerHTML = "";
+  salasCache.forEach(addSalaRow);
+}
+
+function addSalaRow(sala) {
+  const row = homesTableBody.insertRow(-1);
+  row.innerHTML = `
+    <td>${sala.id}</td>
+    <td>${sala.name}</td>
+    <td>${sala.location}</td>
+    <td>${sala.type}</td>
+    <td style="text-align: center;">
+      <button class="edit-btn"   style="background:none;border:none;color:var(--primary);font-size:1.2rem;cursor:pointer;padding:0;margin-right:.5rem;">✎</button>
+      <button class="delete-btn" style="background:none;border:none;color:var(--error);font-size:1.2rem;cursor:pointer;padding:0;">✕</button>
+    </td>
+  `;
+  row.querySelector(".edit-btn").addEventListener("click", () => openHomeModal(sala.id));
+  row.querySelector(".delete-btn").addEventListener("click", () => {
+    if (!confirm("Tem a certeza que quer apagar esta sala?")) return;
+    salasCache = salasCache.filter((s) => s.id !== sala.id);
+    renderSalasTable();
+  });
+}
 
 function openHomeModal(homeId = null) {
   editingHomeId = homeId;
   if (homeId) {
-    const home = homes.find((h) => h.id === homeId);
-    if (home) {
+    const sala = salasCache.find((s) => s.id === homeId);
+    if (sala) {
       homeModalTitle.textContent = "Editar Casa";
-      document.getElementById("home-name").value = home.name;
-      document.getElementById("home-location").value = home.location;
-      document.getElementById("home-type").value = home.type;
+      document.getElementById("home-name").value     = sala.name;
+      document.getElementById("home-location").value = sala.location;
+      document.getElementById("home-type").value     = sala.type;
     }
   } else {
     homeModalTitle.textContent = "Adicionar Casa";
@@ -289,638 +253,534 @@ function openHomeModal(homeId = null) {
   homeModal.style.display = "flex";
 }
 
+document.getElementById("add-home")?.addEventListener("click", () => openHomeModal());
+
 homeForm.addEventListener("submit", (e) => {
   e.preventDefault();
-  const name = document.getElementById("home-name").value.trim();
+  const name     = document.getElementById("home-name").value.trim();
   const location = document.getElementById("home-location").value.trim();
-  const type = document.getElementById("home-type").value.trim();
+  const type     = document.getElementById("home-type").value.trim();
 
-  if (!name || !location || !type) {
-    alert("Por favor, preencha todos os campos.");
-    return;
-  }
+  if (!name || !location || !type) { alert("Por favor, preencha todos os campos."); return; }
 
   if (editingHomeId) {
-    const home = homes.find((h) => h.id === editingHomeId);
-    if (home) {
-      home.name = name;
-      home.location = location;
-      home.type = type;
-      updateHomeRow(editingHomeId);
-    }
+    const sala = salasCache.find((s) => s.id === editingHomeId);
+    if (sala) { sala.name = name; sala.location = location; sala.type = type; }
   } else {
-    const newHome = {
-      id: Math.max(...homes.map((h) => h.id), 0) + 1,
-      name,
-      location,
-      type,
-    };
-    homes.push(newHome);
-    addHomeRow(newHome);
+    const newId = salasCache.length ? Math.max(...salasCache.map((s) => s.id)) + 1 : 1;
+    salasCache.push({ id: newId, name, location, type });
   }
 
+  renderSalasTable();
   homeModal.style.display = "none";
   homeForm.reset();
 });
 
-homeCancelBtn.addEventListener("click", () => {
+document.getElementById("home-cancel-btn")?.addEventListener("click", () => {
   homeModal.style.display = "none";
 });
+homeModal.addEventListener("click", (e) => { if (e.target === homeModal) homeModal.style.display = "none"; });
 
-homeModal.addEventListener("click", (e) => {
-  if (e.target === homeModal) {
-    homeModal.style.display = "none";
-  }
-});
+// ============================================
+// PARAMETERS  →  /api/automatic-parameters
+// Fields: id_parametro, nome_parametro, valor_parametro, descricao, atuadores_id_atuador
+// ============================================
 
-// Device Modal
-const deviceModal = document.getElementById("device-modal");
-const deviceForm = document.getElementById("device-form");
-const deviceModalTitle = document.getElementById("device-modal-title");
-const deviceCancelBtn = document.getElementById("device-cancel-btn");
-let editingDeviceId = null;
-let deviceType = "sensor"; // sensor or actuator
-
-function openDeviceModal(deviceId = null, type = "sensor") {
-  editingDeviceId = deviceId;
-  deviceType = type;
-  if (deviceId) {
-    const device = devices.find((d) => d.id === deviceId);
-    if (device) {
-      deviceModalTitle.textContent =
-        "Editar " + (type === "sensor" ? "Sensor" : "Atuador");
-      document.getElementById("device-name").value = device.name;
-      document.getElementById("device-type").value = device.type;
-      document.getElementById("device-home").value = device.home;
-    }
-  } else {
-    deviceModalTitle.textContent =
-      "Adicionar " + (type === "sensor" ? "Sensor" : "Atuador");
-    deviceForm.reset();
-  }
-  deviceModal.style.display = "flex";
-}
-
-deviceForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const name = document.getElementById("device-name").value.trim();
-  const type = document.getElementById("device-type").value.trim();
-  const home = document.getElementById("device-home").value.trim();
-
-  if (!name || !type || !home) {
-    alert("Por favor, preencha todos os campos.");
-    return;
-  }
-
-  if (editingDeviceId) {
-    const device = devices.find((d) => d.id === editingDeviceId);
-    if (device) {
-      device.name = name;
-      device.type = type;
-      device.home = home;
-      updateDeviceRow(editingDeviceId);
-    }
-  } else {
-    const prefix = deviceType === "sensor" ? "S" : "A";
-    const newDevice = {
-      id:
-        prefix +
-        String(
-          Math.max(
-            ...devices
-              .filter((d) => d.id.startsWith(prefix))
-              .map((d) => parseInt(d.id.substring(1))),
-            0,
-          ) + 1,
-        ).padStart(3, "0"),
-      name,
-      type,
-      home,
-      status: "Ativo",
-    };
-    devices.push(newDevice);
-    addDeviceRow(newDevice);
-  }
-
-  deviceModal.style.display = "none";
-  deviceForm.reset();
-});
-
-deviceCancelBtn.addEventListener("click", () => {
-  deviceModal.style.display = "none";
-});
-
-deviceModal.addEventListener("click", (e) => {
-  if (e.target === deviceModal) {
-    deviceModal.style.display = "none";
-  }
-});
-
-// Parameter Modal
-const parameterModal = document.getElementById("parameter-modal");
-const parameterForm = document.getElementById("parameter-form");
+const parametersTableBody = document.getElementById("parameters-table-body");
+const parameterModal      = document.getElementById("parameter-modal");
+const parameterForm       = document.getElementById("parameter-form");
 const parameterModalTitle = document.getElementById("parameter-modal-title");
-const parameterCancelBtn = document.getElementById("parameter-cancel-btn");
+
 let editingParameterId = null;
 
-function openParameterModal(parameterId = null) {
-  editingParameterId = parameterId;
-  if (parameterId) {
-    const param = parameters.find((p) => p.id === parameterId);
-    if (param) {
-      parameterModalTitle.textContent = "Editar Parâmetro";
-      document.getElementById("parameter-name").value = param.name;
-      document.getElementById("parameter-description").value =
-        param.description;
-      document.getElementById("parameter-minValue").value = param.minValue;
-      document.getElementById("parameter-maxValue").value = param.maxValue;
+async function loadParametros() {
+  try {
+    const response = await fetchWithAuth("/api/automatic-parameters");
+    if (!response.ok) throw new Error(`Erro ${response.status} ao carregar parâmetros`);
+    const params = await response.json();
+    renderParametersTable(params);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function renderParametersTable(params) {
+  parametersTableBody.innerHTML = "";
+  params.forEach(addParameterRow);
+}
+
+function addParameterRow(param) {
+  const row = parametersTableBody.insertRow(-1);
+  row.innerHTML = `
+    <td>${param.id_parametro}</td>
+    <td>${param.nome_parametro}</td>
+    <td>${param.descricao || "—"}</td>
+    <td>${param.valor_parametro}</td>
+    <td>${param.atuadores_id_atuador}</td>
+    <td style="text-align: center;">
+      <button class="edit-btn"   style="background:none;border:none;color:var(--primary);font-size:1.2rem;cursor:pointer;padding:0;margin-right:.5rem;">✎</button>
+      <button class="delete-btn" style="background:none;border:none;color:var(--error);font-size:1.2rem;cursor:pointer;padding:0;">✕</button>
+    </td>
+  `;
+  row.querySelector(".edit-btn").addEventListener("click", () => openParameterModal(param.id_parametro, param));
+  row.querySelector(".delete-btn").addEventListener("click", async () => {
+    if (!confirm("Tem a certeza que quer apagar este parâmetro?")) return;
+    
+    try {
+      const response = await fetchWithAuth(
+        `/api/automatic-parameters/${param.id_parametro}`,
+        { method: "DELETE" }
+      );
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.error || "Erro ao apagar parâmetro");
     }
+
+    await loadParametros();
+
+  } catch (err) {
+    alert(err.message);
+  }
+  });
+}
+
+const DEFAULT_ATUADORES = [
+  { nome: "Iluminação Principal", tipo_atuador: "Iluminação",  localizacao: "Geral" },
+  { nome: "Climatização Central", tipo_atuador: "Temperatura",     localizacao: "Geral" },
+  { nome: "Ventilação Central",   tipo_atuador: "Ventilação",          localizacao: "Geral" },
+];
+
+async function seedDefaultAtuadores() {
+  for (const data of DEFAULT_ATUADORES) {
+    await createAtuador(data);
+  }
+}
+
+async function populateAtuadorSelect(select, param = null) {
+  select.innerHTML = '<option value="">A carregar atuadores...</option>';
+  select.disabled = true;
+
+  const existing = document.getElementById("atuador-seed-hint");
+  if (existing) existing.remove();
+
+  try {
+    const atuadores = await loadAtuadores();
+
+    if (!atuadores || atuadores.length === 0) {
+      select.innerHTML = '<option value="">Nenhum atuador disponível</option>';
+      select.disabled = false;
+
+      const hint = document.createElement("div");
+      hint.id = "atuador-seed-hint";
+      hint.style.cssText = "margin-top:0.5rem;display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;";
+      hint.innerHTML = `
+        <span style="color:var(--text-secondary);font-size:0.85rem;">Sem atuadores na base de dados.</span>
+        <button type="button" id="seed-atuadores-btn" class="btn-primary" style="font-size:0.8rem;padding:0.3rem 0.8rem;cursor:pointer;">
+          ➕ Criar atuadores padrão
+        </button>
+      `;
+      select.parentElement.appendChild(hint);
+
+      document.getElementById("seed-atuadores-btn").addEventListener("click", async () => {
+        hint.innerHTML = '<span style="color:var(--text-secondary);font-size:0.85rem;">A criar atuadores...</span>';
+        try {
+          await seedDefaultAtuadores();
+          hint.remove();
+          await populateAtuadorSelect(select, param);
+          await loadSensorsAndActuators();
+        } catch (err) {
+          hint.innerHTML = `<span style="color:var(--error);font-size:0.85rem;">Erro: ${err.message}</span>`;
+        }
+      });
+      return;
+    }
+
+    select.innerHTML = '<option value="">Selecionar atuador...</option>';
+    atuadores.forEach((a) => {
+      const opt = document.createElement("option");
+      opt.value = a.id_atuador;
+      opt.textContent = `${a.nome} — ${a.tipo_atuador || "Atuador"} | ${a.localizacao || "—"} | ${a.estado || "—"}`;
+      if (param && a.id_atuador === param.atuadores_id_atuador) opt.selected = true;
+      select.appendChild(opt);
+    });
+  } catch (err) {
+    console.error("Erro ao carregar atuadores:", err);
+    select.innerHTML = `<option value="">Erro: ${err.message}</option>`;
+  } finally {
+    select.disabled = false;
+  }
+}
+
+async function openParameterModal(parameterId = null, param = null) {
+  editingParameterId = parameterId;
+
+  if (parameterId && param) {
+    parameterModalTitle.textContent = "Editar Parâmetro";
+    document.getElementById("parameter-name").value        = param.nome_parametro;
+    document.getElementById("parameter-description").value = param.descricao || "";
+    document.getElementById("parameter-minValue").value    = param.valor_parametro;
   } else {
     parameterModalTitle.textContent = "Adicionar Parâmetro";
     parameterForm.reset();
   }
+
   parameterModal.style.display = "flex";
+
+  const select = document.getElementById("parameter-atuador");
+  if (select) await populateAtuadorSelect(select, param);
 }
 
-parameterForm.addEventListener("submit", (e) => {
+document.getElementById("add-parameter")?.addEventListener("click", () => openParameterModal());
+
+parameterForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const name = document.getElementById("parameter-name").value.trim();
-  const description = document
-    .getElementById("parameter-description")
-    .value.trim();
-  const minValue = document.getElementById("parameter-minValue").value.trim();
-  const maxValue = document.getElementById("parameter-maxValue").value.trim();
 
-  if (!name || !description || !minValue || !maxValue) {
-    alert("Por favor, preencha todos os campos.");
-    return;
-  }
+  const nome_parametro       = document.getElementById("parameter-name").value.trim();
+  const descricao            = document.getElementById("parameter-description").value.trim();
+  const valor_parametro      = document.getElementById("parameter-minValue").value.trim();
+  const atuadores_id_atuador = document.getElementById("parameter-atuador").value;
 
-  if (editingParameterId) {
-    const param = parameters.find((p) => p.id === editingParameterId);
-    if (param) {
-      param.name = name;
-      param.description = description;
-      param.minValue = minValue;
-      param.maxValue = maxValue;
-      updateParameterRow(editingParameterId);
+  if (!nome_parametro || !valor_parametro) { alert("Por favor, preencha o nome e o valor."); return; }
+  if (!atuadores_id_atuador) { alert("Por favor, selecione um atuador."); return; }
+
+  try {
+    if (editingParameterId) {
+      const response = await fetchWithAuth(`/api/automatic-parameters/${editingParameterId}`, {
+        method: "PATCH",
+        body: JSON.stringify({ nome_parametro, valor_parametro, descricao, atuadores_id_atuador: Number(atuadores_id_atuador) }),
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || "Erro ao atualizar parâmetro");
+      }
+    } else {
+      const response = await fetchWithAuth("/api/automatic-parameters", {
+        method: "POST",
+        body: JSON.stringify({ nome_parametro, valor_parametro, descricao, atuadores_id_atuador: Number(atuadores_id_atuador) }),
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || "Erro ao criar parâmetro");
+      }
     }
-  } else {
-    const newParam = {
-      id: Math.max(...parameters.map((p) => p.id), 0) + 1,
-      name,
-      description,
-      minValue,
-      maxValue,
-    };
-    parameters.push(newParam);
-    addParameterRow(newParam);
-  }
 
-  parameterModal.style.display = "none";
-  parameterForm.reset();
-});
-
-parameterCancelBtn.addEventListener("click", () => {
-  parameterModal.style.display = "none";
-});
-
-parameterModal.addEventListener("click", (e) => {
-  if (e.target === parameterModal) {
     parameterModal.style.display = "none";
+    parameterForm.reset();
+    await loadParametros();
+  } catch (err) {
+    alert(err.message);
   }
 });
 
-// Type Modal
-const typeModal = document.getElementById("type-modal");
-const typeForm = document.getElementById("type-form");
-const typeModalTitle = document.getElementById("type-modal-title");
-const typeCancelBtn = document.getElementById("type-cancel-btn");
-let editingTypeId = null;
+document.getElementById("parameter-cancel-btn")?.addEventListener("click", () => {
+  parameterModal.style.display = "none";
+});
+parameterModal.addEventListener("click", (e) => { if (e.target === parameterModal) parameterModal.style.display = "none"; });
 
-function openTypeModal(typeId = null) {
-  editingTypeId = typeId;
-  if (typeId) {
-    const type = types.find((t) => t.id === typeId);
-    if (type) {
-      typeModalTitle.textContent = "Editar Tipo";
-      document.getElementById("type-name").value = type.name;
-      document.getElementById("type-description").value = type.description;
-      document.getElementById("type-category").value = type.category;
+// ============================================
+// TYPES  →  /api/tipos
+// Fields: classe (category), tipo (name), descricao
+// Composite PK: classe + tipo
+// ============================================
+
+const typesTableBody = document.getElementById("types-table-body");
+const typeModal      = document.getElementById("type-modal");
+const typeForm       = document.getElementById("type-form");
+const typeModalTitle = document.getElementById("type-modal-title");
+
+let editingType = null; // { classe, tipo }
+
+async function loadTipos() {
+  try {
+    const response = await fetchWithAuth("/api/tipos");
+    if (!response.ok) throw new Error(`Erro ${response.status} ao carregar tipos`);
+    const tipos = await response.json();
+    renderTypesTable(tipos);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function renderTypesTable(tipos) {
+  typesTableBody.innerHTML = "";
+  tipos.forEach(addTypeRow);
+}
+
+function addTypeRow(tipo) {
+  const row = typesTableBody.insertRow(-1);
+  row.innerHTML = `
+    <td>${tipo.classe}</td>
+    <td>${tipo.tipo}</td>
+    <td>${tipo.descricao}</td>
+    <td>${tipo.classe}</td>
+    <td style="text-align: center;">
+      <button class="edit-btn"   style="background:none;border:none;color:var(--primary);font-size:1.2rem;cursor:pointer;padding:0;margin-right:.5rem;">✎</button>
+      <button class="delete-btn" style="background:none;border:none;color:var(--error);font-size:1.2rem;cursor:pointer;padding:0;">✕</button>
+    </td>
+  `;
+  row.querySelector(".edit-btn").addEventListener("click", () => openTypeModal(tipo));
+  row.querySelector(".delete-btn").addEventListener("click", async () => {
+    if (!confirm("Tem a certeza que quer apagar este tipo?")) return;
+    try {
+      const response = await fetchWithAuth(
+        `/api/tipos/${encodeURIComponent(tipo.classe)}/${encodeURIComponent(tipo.tipo)}`,
+        { method: "DELETE" }
+      );
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || "Erro ao apagar tipo");
+      }
+      await loadTipos();
+    } catch (err) {
+      alert(err.message);
     }
+  });
+}
+
+function openTypeModal(tipo = null) {
+  if (tipo) {
+    editingType = { classe: tipo.classe, tipo: tipo.tipo };
+    typeModalTitle.textContent = "Editar Tipo";
+    document.getElementById("type-name").value        = tipo.tipo;
+    document.getElementById("type-description").value = tipo.descricao;
+    document.getElementById("type-category").value    = tipo.classe;
   } else {
+    editingType = null;
     typeModalTitle.textContent = "Adicionar Tipo";
     typeForm.reset();
   }
   typeModal.style.display = "flex";
 }
 
-typeForm.addEventListener("submit", (e) => {
+document.getElementById("add-type").addEventListener("click", () => openTypeModal());
+
+typeForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const name = document.getElementById("type-name").value.trim();
-  const description = document.getElementById("type-description").value.trim();
-  const category = document.getElementById("type-category").value;
 
-  if (!name || !description || !category) {
-    alert("Por favor, preencha todos os campos.");
-    return;
-  }
+  const tipo     = document.getElementById("type-name").value.trim();
+  const descricao = document.getElementById("type-description").value.trim();
+  const classe   = document.getElementById("type-category").value;
 
-  if (editingTypeId) {
-    const type = types.find((t) => t.id === editingTypeId);
-    if (type) {
-      type.name = name;
-      type.description = description;
-      type.category = category;
-      updateTypeRow(editingTypeId);
+  if (!tipo || !descricao || !classe) { alert("Por favor, preencha todos os campos."); return; }
+
+  try {
+    if (editingType) {
+      const response = await fetchWithAuth(
+        `/api/tipos/${encodeURIComponent(editingType.classe)}/${encodeURIComponent(editingType.tipo)}`,
+        { method: "PATCH", body: JSON.stringify({ classe, tipo, descricao }) }
+      );
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || "Erro ao atualizar tipo");
+      }
+    } else {
+      const response = await fetchWithAuth("/api/tipos", {
+        method: "POST",
+        body: JSON.stringify({ classe, tipo, descricao }),
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || "Erro ao criar tipo");
+      }
     }
-  } else {
-    const newType = {
-      id: Math.max(...types.map((t) => t.id), 0) + 1,
-      name,
-      description,
-      category,
-    };
-    types.push(newType);
-    addTypeRow(newType);
-  }
 
-  typeModal.style.display = "none";
-  typeForm.reset();
-});
-
-typeCancelBtn.addEventListener("click", () => {
-  typeModal.style.display = "none";
-});
-
-typeModal.addEventListener("click", (e) => {
-  if (e.target === typeModal) {
     typeModal.style.display = "none";
+    typeForm.reset();
+    await loadTipos();
+  } catch (err) {
+    alert(err.message);
   }
 });
 
-// ============================================
-// HOMES MANAGEMENT
-// ============================================
-
-const homesTable = document.querySelector("#tab-homes table");
-let homes = [
-  {
-    id: 1,
-    name: "Auditório",
-    location: "Andar 1",
-    type: "Sala de Conferências",
-  },
-  { id: 2, name: "Laboratório A", location: "Andar 2", type: "Laboratório" },
-];
-
-document.getElementById("add-home")?.addEventListener("click", () => {
-  openHomeModal();
+document.getElementById("type-cancel-btn")?.addEventListener("click", () => {
+  typeModal.style.display = "none";
 });
+typeModal.addEventListener("click", (e) => { if (e.target === typeModal) typeModal.style.display = "none"; });
 
-function addHomeRow(home) {
-  const newRow = homesTable.insertRow(-1);
-  newRow.innerHTML = `
-    <td>${home.id}</td>
-    <td>${home.name}</td>
-    <td>${home.location}</td>
-    <td>${home.type}</td>
-    <td style="text-align: center;">
-      <button class="edit-btn" style="background: none; border: none; color: var(--primary); font-size: 1.2rem; cursor: pointer; padding: 0; margin-right: 0.5rem;">✎</button>
-      <button class="delete-btn" style="background: none; border: none; color: var(--error); font-size: 1.2rem; cursor: pointer; padding: 0;">✕</button>
-    </td>
-  `;
+// ============================================
+// SENSORS & ACTUATORS
+// ============================================
 
-  const deleteBtn = newRow.querySelector(".delete-btn");
-  const editBtn = newRow.querySelector(".edit-btn");
+const deviceModal      = document.getElementById("device-modal");
+const deviceForm       = document.getElementById("device-form");
+const deviceModalTitle = document.getElementById("device-modal-title");
 
-  deleteBtn.addEventListener("click", () => {
-    homes = homes.filter((h) => h.id !== home.id);
-    newRow.remove();
-  });
+let deviceType = "sensor";
 
-  editBtn.addEventListener("click", () => {
-    openHomeModal(home.id);
-  });
+async function loadSensores() {
+  const response = await fetchWithAuth("/api/sensores");
+  if (!response.ok) throw new Error("Erro ao carregar sensores");
+  return response.json();
 }
 
-function updateHomeRow(homeId) {
-  const rows = homesTable.querySelectorAll("tr");
-  for (let i = 1; i < rows.length; i++) {
-    if (parseInt(rows[i].cells[0].textContent) === homeId) {
-      const home = homes.find((h) => h.id === homeId);
-      rows[i].cells[1].textContent = home.name;
-      rows[i].cells[2].textContent = home.location;
-      rows[i].cells[3].textContent = home.type;
-      break;
-    }
+async function loadAtuadores() {
+  const response = await fetchWithAuth("/api/atuadores");
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new Error(`Erro ${response.status} ao carregar atuadores: ${data.error || response.statusText}`);
   }
+  return response.json();
 }
 
-// ============================================
-// SENSORS & ACTUATORS MANAGEMENT
-// ============================================
+async function createSensor(data) {
+  const response = await fetchWithAuth("/api/sensores", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      nome:        data.nome,
+      tipo_sensor: data.tipo_sensor,
+      localizacao: data.localizacao,
+      estado:      "ativo",
+      Tipos_classe: "Sensor",
+      Tipos_tipo:   data.tipo_sensor,
+    }),
+  });
+  const res = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(res.error || "Erro ao criar sensor");
+  return res;
+}
 
-const sensorsTable = document.querySelector("#tab-sensors-actuators table");
-let devices = [
-  {
-    id: "S001",
-    name: "Sensor Temperatura 1",
-    type: "Temperatura",
-    home: "Auditório",
-    status: "Ativo",
-  },
-  {
-    id: "A001",
-    name: "Ar Condicionado 1",
-    type: "Atuador",
-    home: "Auditório",
-    status: "Ativo",
-  },
-];
+async function createAtuador(data) {
+  const payload = {
+    nome:         data.nome,
+    tipo_atuador: data.tipo_atuador,
+    localizacao:  data.localizacao,
+    estado:       "ativo",
+    Tipos_classe: "Atuador",
+    Tipos_tipo:   data.tipo_atuador,
+  };
 
-document.getElementById("add-sensor")?.addEventListener("click", () => {
-  openDeviceModal(null, "sensor");
-});
+  console.log("Sending actuator:", payload);
 
-document.getElementById("add-actuator")?.addEventListener("click", () => {
-  openDeviceModal(null, "actuator");
-});
-
-function addDeviceRow(device) {
-  const newRow = sensorsTable.insertRow(-1);
-  const statusColor =
-    device.status === "Ativo" ? "var(--success)" : "var(--error)";
-
-  newRow.innerHTML = `
-    <td>${device.id}</td>
-    <td>${device.name}</td>
-    <td>${device.type}</td>
-    <td>${device.home}</td>
-    <td><span style="color: ${statusColor}; font-weight: bold;">● ${device.status}</span></td>
-    <td style="text-align: center;">
-      <button class="edit-btn" style="background: none; border: none; color: var(--primary); font-size: 1.2rem; cursor: pointer; padding: 0; margin-right: 0.5rem;">✎</button>
-      <button class="delete-btn" style="background: none; border: none; color: var(--error); font-size: 1.2rem; cursor: pointer; padding: 0;">✕</button>
-    </td>
-  `;
-
-  const deleteBtn = newRow.querySelector(".delete-btn");
-  const editBtn = newRow.querySelector(".edit-btn");
-
-  deleteBtn.addEventListener("click", () => {
-    devices = devices.filter((d) => d.id !== device.id);
-    newRow.remove();
+  const response = await fetchWithAuth("/api/atuadores", {
+    method: "POST",
+    body: JSON.stringify(payload),
   });
 
-  editBtn.addEventListener("click", () => {
-    const type = device.id.startsWith("S") ? "sensor" : "actuator";
-    openDeviceModal(device.id, type);
-  });
-}
+  const res = await response.json().catch(() => ({}));
 
-function updateDeviceRow(deviceId) {
-  const rows = sensorsTable.querySelectorAll("tr");
-  for (let i = 1; i < rows.length; i++) {
-    if (rows[i].cells[0].textContent === deviceId) {
-      const device = devices.find((d) => d.id === deviceId);
-      rows[i].cells[1].textContent = device.name;
-      rows[i].cells[2].textContent = device.type;
-      rows[i].cells[3].textContent = device.home;
-      break;
-    }
-  }
-}
-
-// ============================================
-// PARAMETERS MANAGEMENT
-// ============================================
-
-const parametersTable = document.querySelector("#tab-parameters table");
-let parameters = [
-  {
-    id: 1,
-    name: "Temperatura Ideal",
-    description: "Temperatura recomendada para conforto",
-    minValue: "18°C",
-    maxValue: "24°C",
-  },
-  {
-    id: 2,
-    name: "Humidade Ideal",
-    description: "Umidade recomendada para ambiente",
-    minValue: "40%",
-    maxValue: "60%",
-  },
-];
-
-document.getElementById("add-parameter")?.addEventListener("click", () => {
-  openParameterModal();
-});
-
-function addParameterRow(param) {
-  const newRow = parametersTable.insertRow(-1);
-  newRow.innerHTML = `
-    <td>${param.id}</td>
-    <td>${param.name}</td>
-    <td>${param.description}</td>
-    <td>${param.minValue}</td>
-    <td>${param.maxValue}</td>
-    <td style="text-align: center;">
-      <button class="edit-btn" style="background: none; border: none; color: var(--primary); font-size: 1.2rem; cursor: pointer; padding: 0; margin-right: 0.5rem;">✎</button>
-      <button class="delete-btn" style="background: none; border: none; color: var(--error); font-size: 1.2rem; cursor: pointer; padding: 0;">✕</button>
-    </td>
-  `;
-
-  const deleteBtn = newRow.querySelector(".delete-btn");
-  const editBtn = newRow.querySelector(".edit-btn");
-
-  deleteBtn.addEventListener("click", () => {
-    parameters = parameters.filter((p) => p.id !== param.id);
-    newRow.remove();
-  });
-
-  editBtn.addEventListener("click", () => {
-    openParameterModal(param.id);
-  });
-}
-
-function updateParameterRow(parameterId) {
-  const rows = parametersTable.querySelectorAll("tr");
-  for (let i = 1; i < rows.length; i++) {
-    if (parseInt(rows[i].cells[0].textContent) === parameterId) {
-      const param = parameters.find((p) => p.id === parameterId);
-      rows[i].cells[1].textContent = param.name;
-      rows[i].cells[2].textContent = param.description;
-      rows[i].cells[3].textContent = param.minValue;
-      rows[i].cells[4].textContent = param.maxValue;
-      break;
-    }
-  }
-}
-
-// ============================================
-// TYPES MANAGEMENT
-// ============================================
-
-const typesTable = document.querySelector("#tab-types table");
-let types = [
-  {
-    id: 1,
-    name: "Temperatura",
-    description: "Sensor de temperatura ambiente",
-    category: "Sensor",
-  },
-  {
-    id: 2,
-    name: "Umidade",
-    description: "Sensor de umidade do ar",
-    category: "Sensor",
-  },
-];
-
-document.getElementById("add-type")?.addEventListener("click", () => {
-  openTypeModal();
-});
-
-function addTypeRow(type) {
-  const newRow = typesTable.insertRow(-1);
-  newRow.innerHTML = `
-    <td>${type.id}</td>
-    <td>${type.name}</td>
-    <td>${type.description}</td>
-    <td>${type.category}</td>
-    <td style="text-align: center;">
-      <button class="edit-btn" style="background: none; border: none; color: var(--primary); font-size: 1.2rem; cursor: pointer; padding: 0; margin-right: 0.5rem;">✎</button>
-      <button class="delete-btn" style="background: none; border: none; color: var(--error); font-size: 1.2rem; cursor: pointer; padding: 0;">✕</button>
-    </td>
-  `;
-
-  const deleteBtn = newRow.querySelector(".delete-btn");
-  const editBtn = newRow.querySelector(".edit-btn");
-
-  deleteBtn.addEventListener("click", () => {
-    types = types.filter((t) => t.id !== type.id);
-    newRow.remove();
-  });
-
-  editBtn.addEventListener("click", () => {
-    openTypeModal(type.id);
-  });
-}
-
-function updateTypeRow(typeId) {
-  const rows = typesTable.querySelectorAll("tr");
-  for (let i = 1; i < rows.length; i++) {
-    if (parseInt(rows[i].cells[0].textContent) === typeId) {
-      const type = types.find((t) => t.id === typeId);
-      rows[i].cells[1].textContent = type.name;
-      rows[i].cells[2].textContent = type.description;
-      rows[i].cells[3].textContent = type.category;
-      break;
-    }
-  }
-}
-
-// ============================================
-// ATTACH EDIT/DELETE TO INITIAL ROWS
-// ============================================
-
-// Homes initial rows
-const homesInitialRows = document.querySelectorAll(
-  "#tab-homes table tbody tr, #tab-homes table tr:not(:first-child)",
-);
-homesInitialRows.forEach((row) => {
-  const editBtn = row.querySelector(".edit-btn");
-  const deleteBtn = row.querySelector(".delete-btn");
-
-  if (editBtn) {
-    editBtn.addEventListener("click", () => {
-      const id = parseInt(row.cells[0].textContent);
-      openHomeModal(id);
-    });
+  if (!response.ok) {
+    throw new Error(
+      res.error || res.message || "Erro ao criar atuador"
+    );
   }
 
-  if (deleteBtn) {
-    deleteBtn.addEventListener("click", () => {
-      const id = parseInt(row.cells[0].textContent);
-      homes = homes.filter((h) => h.id !== id);
-      row.remove();
-    });
-  }
-});
+  return res;
+}
 
-// Sensors/Actuators initial rows
-const devicesInitialRows = document.querySelectorAll(
-  "#tab-sensors-actuators table tbody tr, #tab-sensors-actuators table tr:not(:first-child)",
-);
-devicesInitialRows.forEach((row) => {
-  const editBtn = row.querySelector(".edit-btn");
-  const deleteBtn = row.querySelector(".delete-btn");
+async function deleteSensor(id) {
+  const response = await fetchWithAuth(`/api/sensores/${id}`, { method: "DELETE" });
+  if (!response.ok) throw new Error("Erro ao apagar sensor");
+}
 
-  if (editBtn) {
-    editBtn.addEventListener("click", () => {
-      const id = row.cells[0].textContent;
-      const device = devices.find((d) => d.id === id);
-      if (device) {
-        const type = device.id.startsWith("S") ? "sensor" : "actuator";
-        openDeviceModal(id, type);
+async function deleteAtuador(id) {
+  const response = await fetchWithAuth(`/api/atuadores/${id}`, { method: "DELETE" });
+  if (!response.ok) throw new Error("Erro ao apagar atuador");
+}
+
+function createStatusBadge(status) {
+  const isActive = status === true || status === "ativo" || status === "Ativo" || status === "active";
+  return `<span style="color:${isActive ? "var(--success)" : "var(--error)"};font-weight:bold;">● ${isActive ? "Ativo" : "Inativo"}</span>`;
+}
+
+function populateSensorsActuatorsTable(sensores, atuadores) {
+  const tbody = document.getElementById("sensors-actuators-table-body");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+
+  const rows = [
+    ...sensores.map((s) => ({ id: s.id_sensor,  kind: "sensor",  nome: s.nome, tipo: s.tipo_sensor  || "Sensor",  localizacao: s.localizacao || "—", estado: s.estado })),
+    ...atuadores.map((a) => ({ id: a.id_atuador, kind: "atuador", nome: a.nome, tipo: a.tipo_atuador || "Atuador", localizacao: a.localizacao || "—", estado: a.estado })),
+  ];
+
+  rows.forEach((item) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${item.id}</td>
+      <td>${item.nome}</td>
+      <td>${item.tipo}</td>
+      <td>${item.localizacao}</td>
+      <td>${createStatusBadge(item.estado)}</td>
+      <td style="text-align:center;">
+        <button class="delete-btn" style="background:none;border:none;color:var(--error);font-size:1.2rem;cursor:pointer;padding:0;">✕</button>
+      </td>
+    `;
+    row.querySelector(".delete-btn").addEventListener("click", async () => {
+      if (!confirm("Tem a certeza que quer apagar este dispositivo?")) return;
+      try {
+        item.kind === "sensor" ? await deleteSensor(item.id) : await deleteAtuador(item.id);
+        await loadSensorsAndActuators();
+      } catch (err) {
+        alert(err.message);
       }
     });
-  }
+    tbody.appendChild(row);
+  });
+}
 
-  if (deleteBtn) {
-    deleteBtn.addEventListener("click", () => {
-      const id = row.cells[0].textContent;
-      devices = devices.filter((d) => d.id !== id);
-      row.remove();
-    });
+async function loadSensorsAndActuators() {
+  try {
+    const [sensores, atuadores] = await Promise.all([loadSensores(), loadAtuadores()]);
+    populateSensorsActuatorsTable(sensores, atuadores);
+  } catch (err) {
+    console.error("Erro ao carregar sensores/atuadores:", err);
   }
+}
+
+const SENSOR_TIPOS = [
+  { value: "Luminosidade",           label: "Luminosidade" },
+  { value: "Temperatura_ambiente",   label: "Temperatura Ambiente" },
+  { value: "Humidade_relativa",      label: "Humidade Relativa" },
+  { value: "Consumo_energetico_kWh", label: "Consumo Energético (kWh)" },
+];
+
+const ATUADOR_TIPOS = [
+  { value: "Iluminação",    label: "Iluminação" },
+  { value: "Temperatura",      label: "Temperatura" },
+  { value: "Ventilação",           label: "Ventilação" },
+];
+
+function openDeviceModal(type = "sensor") {
+  deviceType = type;
+  deviceModalTitle.textContent = type === "sensor" ? "Adicionar Sensor" : "Adicionar Atuador";
+  deviceForm.reset();
+
+  const typeSelect = document.getElementById("device-type");
+  const options = type === "sensor" ? SENSOR_TIPOS : ATUADOR_TIPOS;
+  typeSelect.innerHTML = '<option value="">Selecionar tipo...</option>' +
+    options.map(o => `<option value="${o.value}">${o.label}</option>`).join("");
+
+  deviceModal.style.display = "flex";
+}
+
+document.getElementById("add-sensor")?.addEventListener("click",   () => openDeviceModal("sensor"));
+document.getElementById("add-actuator")?.addEventListener("click", () => openDeviceModal("actuator"));
+
+document.getElementById("device-cancel-btn")?.addEventListener("click", () => {
+  deviceModal.style.display = "none";
 });
+deviceModal.addEventListener("click", (e) => { if (e.target === deviceModal) deviceModal.style.display = "none"; });
 
-// Parameters initial rows
-const parametersInitialRows = document.querySelectorAll(
-  "#tab-parameters table tbody tr, #tab-parameters table tr:not(:first-child)",
-);
-parametersInitialRows.forEach((row) => {
-  const editBtn = row.querySelector(".edit-btn");
-  const deleteBtn = row.querySelector(".delete-btn");
+deviceForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-  if (editBtn) {
-    editBtn.addEventListener("click", () => {
-      const id = parseInt(row.cells[0].textContent);
-      openParameterModal(id);
-    });
-  }
+  const nome      = document.getElementById("device-name").value.trim();
+  const tipo      = document.getElementById("device-type").value.trim();
+  const localizacao = document.getElementById("device-home").value.trim();
 
-  if (deleteBtn) {
-    deleteBtn.addEventListener("click", () => {
-      const id = parseInt(row.cells[0].textContent);
-      parameters = parameters.filter((p) => p.id !== id);
-      row.remove();
-    });
-  }
-});
+  if (!nome || !tipo || !localizacao) { alert("Preencha todos os campos."); return; }
 
-// Types initial rows
-const typesInitialRows = document.querySelectorAll(
-  "#tab-types table tbody tr, #tab-types table tr:not(:first-child)",
-);
-typesInitialRows.forEach((row) => {
-  const editBtn = row.querySelector(".edit-btn");
-  const deleteBtn = row.querySelector(".delete-btn");
-
-  if (editBtn) {
-    editBtn.addEventListener("click", () => {
-      const id = parseInt(row.cells[0].textContent);
-      openTypeModal(id);
-    });
-  }
-
-  if (deleteBtn) {
-    deleteBtn.addEventListener("click", () => {
-      const id = parseInt(row.cells[0].textContent);
-      types = types.filter((t) => t.id !== id);
-      row.remove();
-    });
+  try {
+    if (deviceType === "sensor") {
+      await createSensor({ nome, tipo_sensor: tipo, localizacao });
+    } else {
+      await createAtuador({ nome, tipo_atuador: tipo, localizacao });
+    }
+    deviceModal.style.display = "none";
+    await loadSensorsAndActuators();
+  } catch (err) {
+    console.error(err);
+    alert(err.message);
   }
 });

@@ -2,7 +2,12 @@ import { Request, Response } from "express";
 import { models } from "../models/sequelize/index.js";
 
 export async function getAllTipos(_req: Request, res: Response) {
-  const rows = await models.Tipo.findAll({ order: [["classe", "ASC"], ["tipo", "ASC"]] });
+  const rows = await models.Tipo.findAll({
+    order: [
+      ["classe", "ASC"],
+      ["tipo", "ASC"],
+    ],
+  });
   res.json(rows);
 }
 
@@ -18,7 +23,9 @@ export async function getTipoById(req: Request, res: Response) {
 export async function createTipo(req: Request, res: Response) {
   const { classe, tipo, descricao } = req.body;
   if (!classe || !tipo || !descricao) {
-    return res.status(400).json({ error: "classe, tipo e descricao são obrigatórios" });
+    return res
+      .status(400)
+      .json({ error: "classe, tipo e descricao são obrigatórios" });
   }
   const created = await models.Tipo.create({ classe, tipo, descricao });
   res.status(201).json(created);

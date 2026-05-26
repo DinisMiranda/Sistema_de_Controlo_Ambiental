@@ -4,5 +4,5 @@ import { requireAdmin, requireAuth } from "../middlewares/auth.middleware.js";
 
 export const consumoRouter = Router();
 
-consumoRouter.get("/sensors/:id/consumption", getConsumoBySensor);
-consumoRouter.get("/consumption", requireAuth, requireAdmin, getAllConsumo);
+consumoRouter.get("api/consumo/sensors/:id/consumption", getConsumoBySensor);
+consumoRouter.get("api/consumo/consumption", requireAuth, requireAdmin, getAllConsumo);

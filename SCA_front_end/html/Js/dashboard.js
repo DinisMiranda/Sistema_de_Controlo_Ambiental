@@ -1,67 +1,173 @@
-// ========================================
-// DADOS SIMULADOS DAS SALAS
-// ========================================
+let roomsData = {};
 
-const rooms = {
-  "sala-101": {
-    name: "Sala 101",
-    temperature: "22.5",
-    humidity: "45",
-    airQuality: "Boa",
-    status: "comfortable",
-  },
-  "sala-102": {
-    name: "Sala 102",
-    temperature: "23.1",
-    humidity: "42",
-    airQuality: "Boa",
-    status: "comfortable",
-  },
-  "sala-201": {
-    name: "Sala 201",
-    temperature: "21.8",
-    humidity: "48",
-    airQuality: "Moderada",
-    status: "comfortable",
-  },
-  auditorio: {
-    name: "Auditório Principal",
-    temperature: "24.5",
-    humidity: "38",
-    airQuality: "Boa",
-    status: "attention",
-  },
-  laboratorio: {
-    name: "Laboratório A",
-    temperature: "20.2",
-    humidity: "52",
-    airQuality: "Excelente",
-    status: "comfortable",
-  },
-};
+function formatRoomKey(location) {
+  return String(location)
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "");
+}
 
-// ========================================
-// INICIALIZAÇÃO
-// ========================================
+async function fetchSensorRooms() {
+  try {
+    const response = await fetchWithAuth("/api/sensores");
 
-document.addEventListener("DOMContentLoaded", function () {
+    if (!response.ok) {
+      console.error("Não foi possível carregar os sensores do backend.");
+      return {};
+    }
+
+    const data = await response.json();
+    console.log("Resposta da API de sensores:", data);
+    console.log(data);
+    console.log("TYPE:", typeof data);
+    console.log("IS ARRAY:", Array.isArray(data));
+
+    const sensors = Array.isArray(data)
+      ? data
+      : Array.isArray(data.data)
+        ? data.data
+        : Array.isArray(data.sensores)
+          ? data.sensores
+          : [];
+    console.log("Sensores processados:", sensors);
+
+    const rooms = {};
+
+    sensors.forEach((sensor) => {
+      const location = sensor.localizacao || "Desconhecido";
+      const roomKey = formatRoomKey(location);
+
+      if (!rooms[roomKey]) {
+        rooms[roomKey] = {
+          id: roomKey,
+          name: location,
+          sensors: [],
+        };
+      }
+
+      rooms[roomKey].sensors.push(sensor);
+    });
+
+    return rooms;
+  } catch (error) {
+    console.error("Erro ao buscar dados de sensores:", error);
+    return {};
+  }
+}
+
+function getSensorByType(room, typeRegExp) {
+  if (!room || !Array.isArray(room.sensors)) return null;
+
+  return room.sensors.find((sensor) => {
+    const type =
+      sensor.tipo_sensor || sensor.tipo || sensor.tipo_sensores || "";
+
+    return typeRegExp.test(type);
+  });
+}
+
+async function fetchLatestReading(sensorId) {
+  if (!sensorId) return null;
+  try {
+    const response = await fetchWithAuth(`/api/sensores/${sensorId}/readings`);
+    if (!response.ok) return null;
+    const readings = await response.json();
+    if (!Array.isArray(readings) || readings.length === 0) return null;
+    return readings[readings.length - 1];
+  } catch (error) {
+    console.error("Erro ao carregar leituras do sensor:", error);
+    return null;
+  }
+}
+
+function parseReadingValue(reading) {
+  if (!reading || reading.valor === undefined || reading.valor === null) {
+    return null;
+  }
+
+  const value = Number(reading.valor);
+  return Number.isFinite(value) ? value : reading.valor;
+}
+
+function determineRoomStatus(temperature, humidity, co2) {
+  if (
+    (typeof temperature === "number" &&
+      (temperature < 18 || temperature > 26)) ||
+    (typeof humidity === "number" && (humidity < 35 || humidity > 65)) ||
+    (typeof co2 === "number" && co2 > 1000)
+  ) {
+    return "alert";
+  }
+
+  if (
+    (typeof temperature === "number" &&
+      (temperature < 20 || temperature > 24)) ||
+    (typeof humidity === "number" && (humidity < 40 || humidity > 60)) ||
+    (typeof co2 === "number" && co2 > 800)
+  ) {
+    return "attention";
+  }
+
+  return "comfortable";
+}
+
+function getStatusText(status) {
+  switch (status) {
+    case "alert":
+      return "Atenção — Revisão Necessária";
+    case "attention":
+      return "Atenção — Monitorar Condições";
+    default:
+      return "Ambiente Confortável";
+  }
+}
+
+function getAirQualityLabel(co2) {
+  if (typeof co2 !== "number") return "Desconhecida";
+  if (co2 <= 800) return "Boa";
+  if (co2 <= 1000) return "Moderada";
+  return "Péssima";
+}
+
+async function initializeDashboard() {
+  roomsData = await fetchSensorRooms();
+  populateRoomSelector();
+
+  const roomKeys = Object.keys(roomsData);
+  if (roomKeys.length > 0) {
+    await updateRoomData(roomKeys[0]);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const user = await requireAuth();
+  if (!user) return;
+
   initializeHeader();
-  initializeRoomSelector();
   initializeUserAvatar();
   loadUserInfo();
   setupLogout();
-  checkAdminAccess();
   initializeControlMode();
-});
-// ========================================
-// HEADER E SELETOR DE SALA
-// ========================================
 
+  const adminLink = document.querySelector(".admin-link");
+
+  if (adminLink) {
+    const isAdmin =
+      user && String(user.role || "").toLowerCase() === "admin";
+
+    if (!isAdmin) {
+      adminLink.style.display = "none";
+    }
+  }
+
+  await initializeDashboard();
+});
 function initializeHeader() {
   console.log("Header inicializado");
 }
 
-function initializeRoomSelector() {
+function populateRoomSelector() {
   const roomSelect = document.getElementById("room-select");
 
   if (!roomSelect) {
@@ -69,159 +175,164 @@ function initializeRoomSelector() {
     return;
   }
 
-  // Evento de mudança de sala
-  roomSelect.addEventListener("change", function (e) {
-    const selectedRoom = e.target.value;
-    updateRoomData(selectedRoom);
+  roomSelect.innerHTML = "";
+
+  if (Object.keys(roomsData).length === 0) {
+    roomSelect.innerHTML = '<option value="">Nenhuma sala encontrada</option>';
+    return;
+  }
+
+  Object.values(roomsData).forEach((room) => {
+    const option = document.createElement("option");
+    option.value = room.id;
+    option.textContent = room.name;
+    roomSelect.appendChild(option);
   });
 
-  // Carregar dados da sala inicial
-  updateRoomData(roomSelect.value);
+  roomSelect.onchange = function (e) {
+    updateRoomData(e.target.value);
+  };
 }
 
-// ========================================
-// DADOS SIMULADOS DAS SALAS (ATUALIZADO)
-// ========================================
+async function loadRoomsData(roomID) {
+  try {
+    const response = await fetchWithAuth(`/api/sensores?sala=${roomID}`);
+    const data = await response.json();
 
-const roomsData = {
-  "sala-101": {
-    name: "Sala 101",
-    temperature: 22.5,
-    humidity: 45,
-    airQuality: "Boa",
-    status: "comfortable",
-    statusText: "Ambiente Confortável",
-    statusIcon: "check",
-  },
-  "sala-102": {
-    name: "Sala 102",
-    temperature: 23.1,
-    humidity: 42,
-    airQuality: "Boa",
-    status: "comfortable",
-    statusText: "Ambiente Confortável",
-    statusIcon: "check",
-  },
-  "sala-201": {
-    name: "Sala 201",
-    temperature: 21.8,
-    humidity: 48,
-    airQuality: "Moderada",
-    status: "comfortable",
-    statusText: "Ambiente Confortável",
-    statusIcon: "check",
-  },
-  auditorio: {
-    name: "Auditório Principal",
-    temperature: 26.5,
-    humidity: 38,
-    airQuality: "Boa",
-    status: "attention",
-    statusText: "Temperatura Elevada",
-    statusIcon: "warning",
-  },
-  laboratorio: {
-    name: "Laboratório A",
-    temperature: 20.2,
-    humidity: 52,
-    airQuality: "Excelente",
-    status: "comfortable",
-    statusText: "Condições Ideais",
-    statusIcon: "check",
-  },
-};
+    updateDashboard(data);
+  } catch (error) {
+    console.error("Erro ao carregar dados das salas:", error);
+    return [];
+  }
+}
 
-// ========================================
-// ATUALIZAR DADOS DA SALA (MELHORADO)
-// ========================================
+function updateDashboard(data) {
+  document.getElementById("temperature").textContent = data.temperatura + "°C";
 
-function updateRoomData(roomId) {
-  const roomData = roomsData[roomId];
+  document.getElementById("humidity").textContent = data.humidade + "%";
 
-  if (!roomData) {
+  document.getElementById("light").textContent = data.iluminacao + "%";
+}
+
+async function updateRoomData(roomId) {
+  const room = roomsData[roomId];
+  if (!room) {
     console.error("Dados da sala não encontrados:", roomId);
     return;
   }
 
-  // Atualizar título
+  const temperatureSensor = getSensorByType(room, /temperatura/i);
+  const humiditySensor = getSensorByType(room, /humidade/i);
+  const lightSensor = getSensorByType(
+    room,
+    /iluminacao|iluminação|luminosidade/i,
+  );
+  const co2Sensor = getSensorByType(room, /co2/i);
+
+  const [temperatureReading, humidityReading, lightReading, co2Reading] =
+    await Promise.all([
+      fetchLatestReading(temperatureSensor?.id_sensor),
+      fetchLatestReading(humiditySensor?.id_sensor),
+      fetchLatestReading(lightSensor?.id_sensor),
+      fetchLatestReading(co2Sensor?.id_sensor),
+    ]);
+
+  const temperature = parseReadingValue(temperatureReading);
+  const humidity = parseReadingValue(humidityReading);
+  const lightValue = parseReadingValue(lightReading);
+  const co2 = parseReadingValue(co2Reading);
+
+  const airQuality = getAirQualityLabel(co2);
+  const status = determineRoomStatus(temperature, humidity, co2);
+  const statusText = getStatusText(status);
+  const statusIcon =
+    status === "comfortable"
+      ? "check"
+      : status === "attention"
+        ? "warning"
+        : "alert";
+
   const roomTitle = document.getElementById("current-room-title");
   if (roomTitle) {
-    roomTitle.textContent = `Condições Atuais - ${roomData.name}`;
+    roomTitle.textContent = `Condições Atuais - ${room.name}`;
   }
 
-  // Atualizar Temperatura
   const tempValue = document.getElementById("temperature-value");
   if (tempValue) {
-    animateValue(
-      tempValue,
-      parseFloat(tempValue.textContent) || 0,
-      roomData.temperature,
-      500,
-    );
+    const target = typeof temperature === "number" ? temperature : 0;
+    if (typeof temperature === "number") {
+      animateValue(
+        tempValue,
+        parseFloat(tempValue.textContent) || 0,
+        temperature,
+        500,
+      );
+    } else {
+      tempValue.textContent = "N/A";
+    }
   }
 
-  // Atualizar Umidade
   const humidityValue = document.getElementById("humidity-value");
+
   if (humidityValue) {
-    animateValue(
-      humidityValue,
-      parseFloat(humidityValue.textContent) || 0,
-      roomData.humidity,
-      500,
-    );
+    if (typeof humidity === "number") {
+      animateValue(
+        humidityValue,
+        parseFloat(humidityValue.textContent) || 0,
+        humidity,
+        500,
+      );
+    } else {
+      humidityValue.textContent = "N/A";
+    }
   }
 
-  // Atualizar Qualidade do Ar
   const airQualityValue = document.getElementById("air-quality-value");
   if (airQualityValue) {
-    airQualityValue.textContent = roomData.airQuality;
+    airQualityValue.textContent = airQuality;
   }
 
-  // Atualizar Status de Conforto
-  updateComfortStatus(
-    roomData.status,
-    roomData.statusText,
-    roomData.statusIcon,
-  );
+  const lightPercentage = document.getElementById("light-percentage");
+  if (lightPercentage) {
+    lightPercentage.textContent =
+      typeof lightValue === "number" ? `${Math.round(lightValue)}` : "N/A";
+  }
 
-  console.log("✅ Sala atualizada:", roomData.name);
+  const lightInfo = document.querySelector(".light-info");
+  if (lightInfo) {
+    lightInfo.textContent =
+      typeof lightValue === "number"
+        ? `Luminosidade atual: ${Math.round(lightValue)} ${lightReading?.unidade || ""}`
+        : "Luminosidade indisponível";
+  }
+
+  updateComfortStatus(status, statusText, statusIcon);
+
+  console.log("✅ Sala atualizada:", room.name);
 }
-
-// ========================================
-// ATUALIZAR STATUS DE CONFORTO
-// ========================================
 
 function updateComfortStatus(status, text, icon) {
   const statusIndicator = document.querySelector(".status-indicator");
 
   if (!statusIndicator) return;
 
-  // Remover classes anteriores
   statusIndicator.classList.remove(
     "status-comfortable",
     "status-attention",
     "status-alert",
   );
-
-  // Adicionar nova classe
   statusIndicator.classList.add(`status-${status}`);
 
-  // Atualizar texto
   const statusText = statusIndicator.querySelector(".status-text");
   if (statusText) {
     statusText.textContent = text;
   }
 
-  // Atualizar ícone
   const statusIconElement = statusIndicator.querySelector(".status-icon");
   if (statusIconElement) {
     statusIconElement.innerHTML = getStatusIcon(icon);
   }
 }
-
-// ========================================
-// ÍCONES SVG PARA STATUS
-// ========================================
 
 function getStatusIcon(iconType) {
   const icons = {
@@ -244,13 +355,9 @@ function getStatusIcon(iconType) {
   return icons[iconType] || icons.check;
 }
 
-// ========================================
-// ANIMAÇÃO DE VALORES NUMÉRICOS
-// ========================================
-
 function animateValue(element, start, end, duration) {
   const range = end - start;
-  const increment = range / (duration / 16); // 60 FPS
+  const increment = range / (duration / 16);
   let current = start;
 
   const timer = setInterval(() => {
@@ -264,45 +371,20 @@ function animateValue(element, start, end, duration) {
       clearInterval(timer);
     }
 
-    // Formatar com 1 casa decimal se for número decimal
-    const displayValue = Number.isInteger(end)
-      ? Math.round(current)
-      : current.toFixed(1);
+    const displayValue = Number.isFinite(end)
+      ? Number.isInteger(end)
+        ? Math.round(current)
+        : current.toFixed(1)
+      : end;
     element.textContent = displayValue;
   }, 16);
 }
-
-// Atualizar título do card
-const roomTitle = document.getElementById("current-room-title");
-if (roomTitle) {
-  roomTitle.textContent = `Condições Atuais - ${roomData.name}`;
-}
-
-// Atualizar métricas (você pode expandir isso depois)
-console.log("Sala atualizada:", roomData.name);
-console.log("Temperatura:", roomData.temperature);
-console.log("Humidade:", roomData.humidity);
-console.log("Qualidade do Ar:", roomData.airQuality);
-
-// Animação sutil ao trocar
-const card = document.querySelector(".card");
-if (card) {
-  card.style.opacity = "0.7";
-  setTimeout(() => {
-    card.style.opacity = "1";
-  }, 150);
-}
-
-// ========================================
-// AVATAR DO UTILIZADOR
-// ========================================
 
 function initializeUserAvatar() {
   const user = JSON.parse(localStorage.getItem("user"));
   const avatarInitials = document.getElementById("user-initials");
 
   if (user && user.name && avatarInitials) {
-    // Pegar iniciais do nome (ex: "João Silva" → "JS")
     const names = user.name.split(" ");
     const initials =
       names.length >= 2
@@ -313,10 +395,6 @@ function initializeUserAvatar() {
   }
 }
 
-// ========================================
-// INFO DO UTILIZADOR (já existente)
-// ========================================
-
 function loadUserInfo() {
   const user = JSON.parse(localStorage.getItem("user"));
   const userInfoElement = document.getElementById("user-info");
@@ -326,43 +404,17 @@ function loadUserInfo() {
   }
 }
 
-// ========================================
-// LOGOUT (já existente)
-// ========================================
-
 function setupLogout() {
   const logoutBtn = document.getElementById("logout-btn");
 
   if (logoutBtn) {
-    logoutBtn.addEventListener("click", function () {
+    logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("token");
       localStorage.removeItem("user");
       window.location.href = "login.html";
     });
   }
 }
-
-// ========================================
-// CONTROLO DE ACESSO ADMIN
-// ========================================
-
-function checkAdminAccess() {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const adminLink = document.querySelector(".admin-link");
-
-  // Mostrar admin link apenas se o utilizador for admin
-  if (adminLink) {
-    if (
-      user.role === "Admin"
-    ) {
-      adminLink.style.display = "block";
-    } else {
-      adminLink.style.display = "none";
-    }
-  }
-}
-// ========================================
-// CONTROLE DE MODO
-// ========================================
 
 function initializeControlMode() {
   const toggleModeBtn = document.getElementById("toggle-mode");
@@ -371,7 +423,6 @@ function initializeControlMode() {
 
   if (!toggleModeBtn || !controlModeSpan || !modeDescription) return;
 
-  // Buscar modo guardado ou usar Automático por defeito
   let currentMode = localStorage.getItem("controlMode") || "Automático";
 
   function updateModeUI(mode) {
@@ -399,4 +450,3 @@ function initializeControlMode() {
     updateModeUI(currentMode);
   });
 }
-

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="Css/style.css" />
+    <script src="Js/session.js" defer></script>
     <script src="Js/admin.js" defer></script>
   </head>
   <body>
@@ -156,6 +157,7 @@
             Adicionar Utilizador
           </button>
           <table
+            id="users-table"
             style="
               width: 100%;
               margin-top: 1rem;
@@ -163,76 +165,18 @@
               border-collapse: collapse;
             "
           >
-            <tr>
-              <th>Nome</th>
-              <th>Email</th>
-              <th>Departamento</th>
-              <th>Role</th>
-              <th>Ações</th>
-            </tr>
-            <tr>
-              <td>João Silva</td>
-              <td>joao@edificio.com</td>
-              <td>Auditório</td>
-              <td style="color: var(--text-secondary)">User</td>
-              <td style="text-align: center">
-                <button
-                  class="delete-btn"
-                  style="
-                    background: none;
-                    border: none;
-                    color: var(--error);
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                    padding: 0;
-                  "
-                >
-                  ✕
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td>Maria Sousa</td>
-              <td>maria@edificio.com</td>
-              <td>Lab A</td>
-              <td style="color: var(--text-secondary)">User</td>
-              <td style="text-align: center">
-                <button
-                  class="delete-btn"
-                  style="
-                    background: none;
-                    border: none;
-                    color: var(--error);
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                    padding: 0;
-                  "
-                >
-                  ✕
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td>Carlos Pereira</td>
-              <td>admin@edificio.com</td>
-              <td>Administração</td>
-              <td style="color: var(--accent-orange)">Admin</td>
-              <td style="text-align: center">
-                <button
-                  class="delete-btn"
-                  style="
-                    background: none;
-                    border: none;
-                    color: var(--error);
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                    padding: 0;
-                  "
-                >
-                  ✕
-                </button>
-              </td>
-            </tr>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Departamento</th>
+                <th>Role</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="users-table-body">
+              <!-- Rows will be populated by JavaScript -->
+            </tbody>
           </table>
         </div>
       </div>
@@ -243,6 +187,7 @@
           <h2>Gestão de Casas</h2>
           <button class="btn-primary" id="add-home">Adicionar Casa</button>
           <table
+            id="homes-table"
             style="
               width: 100%;
               margin-top: 1rem;
@@ -250,83 +195,87 @@
               border-collapse: collapse;
             "
           >
-            <tr>
-              <th>ID</th>
-              <th>Nome</th>
-              <th>Localização</th>
-              <th>Tipo</th>
-              <th>Ações</th>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td>Auditório</td>
-              <td>Andar 1</td>
-              <td>Sala de Conferências</td>
-              <td style="text-align: center">
-                <button
-                  class="edit-btn"
-                  style="
-                    background: none;
-                    border: none;
-                    color: var(--primary);
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                    padding: 0;
-                    margin-right: 0.5rem;
-                  "
-                >
-                  ✎
-                </button>
-                <button
-                  class="delete-btn"
-                  style="
-                    background: none;
-                    border: none;
-                    color: var(--error);
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                    padding: 0;
-                  "
-                >
-                  ✕
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>Laboratório A</td>
-              <td>Andar 2</td>
-              <td>Laboratório</td>
-              <td style="text-align: center">
-                <button
-                  class="edit-btn"
-                  style="
-                    background: none;
-                    border: none;
-                    color: var(--primary);
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                    padding: 0;
-                    margin-right: 0.5rem;
-                  "
-                >
-                  ✎
-                </button>
-                <button
-                  class="delete-btn"
-                  style="
-                    background: none;
-                    border: none;
-                    color: var(--error);
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                    padding: 0;
-                  "
-                >
-                  ✕
-                </button>
-              </td>
-            </tr>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Localização</th>
+                <th>Tipo</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="homes-table-body">
+              <tr>
+                <td>1</td>
+                <td>Auditório</td>
+                <td>Andar 1</td>
+                <td>Sala de Conferências</td>
+                <td style="text-align: center">
+                  <button
+                    class="edit-btn"
+                    style="
+                      background: none;
+                      border: none;
+                      color: var(--primary);
+                      font-size: 1.2rem;
+                      cursor: pointer;
+                      padding: 0;
+                      margin-right: 0.5rem;
+                    "
+                  >
+                    ✎
+                  </button>
+                  <button
+                    class="delete-btn"
+                    style="
+                      background: none;
+                      border: none;
+                      color: var(--error);
+                      font-size: 1.2rem;
+                      cursor: pointer;
+                      padding: 0;
+                    "
+                  >
+                    ✕
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Laboratório A</td>
+                <td>Andar 2</td>
+                <td>Laboratório</td>
+                <td style="text-align: center">
+                  <button
+                    class="edit-btn"
+                    style="
+                      background: none;
+                      border: none;
+                      color: var(--primary);
+                      font-size: 1.2rem;
+                      cursor: pointer;
+                      padding: 0;
+                      margin-right: 0.5rem;
+                    "
+                  >
+                    ✎
+                  </button>
+                  <button
+                    class="delete-btn"
+                    style="
+                      background: none;
+                      border: none;
+                      color: var(--error);
+                      font-size: 1.2rem;
+                      cursor: pointer;
+                      padding: 0;
+                    "
+                  >
+                    ✕
+                  </button>
+                </td>
+              </tr>
+            </tbody>
           </table>
         </div>
       </div>
@@ -351,94 +300,19 @@
               border-collapse: collapse;
             "
           >
-            <tr>
-              <th>ID</th>
-              <th>Nome</th>
-              <th>Tipo</th>
-              <th>Casa</th>
-              <th>Status</th>
-              <th>Ações</th>
-            </tr>
-            <tr>
-              <td>S001</td>
-              <td>Sensor Temperatura 1</td>
-              <td>Temperatura</td>
-              <td>Auditório</td>
-              <td>
-                <span style="color: var(--success); font-weight: bold"
-                  >● Ativo</span
-                >
-              </td>
-              <td style="text-align: center">
-                <button
-                  class="edit-btn"
-                  style="
-                    background: none;
-                    border: none;
-                    color: var(--primary);
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                    padding: 0;
-                    margin-right: 0.5rem;
-                  "
-                >
-                  ✎
-                </button>
-                <button
-                  class="delete-btn"
-                  style="
-                    background: none;
-                    border: none;
-                    color: var(--error);
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                    padding: 0;
-                  "
-                >
-                  ✕
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td>A001</td>
-              <td>Ar Condicionado 1</td>
-              <td>Atuador</td>
-              <td>Auditório</td>
-              <td>
-                <span style="color: var(--success); font-weight: bold"
-                  >● Ativo</span
-                >
-              </td>
-              <td style="text-align: center">
-                <button
-                  class="edit-btn"
-                  style="
-                    background: none;
-                    border: none;
-                    color: var(--primary);
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                    padding: 0;
-                    margin-right: 0.5rem;
-                  "
-                >
-                  ✎
-                </button>
-                <button
-                  class="delete-btn"
-                  style="
-                    background: none;
-                    border: none;
-                    color: var(--error);
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                    padding: 0;
-                  "
-                >
-                  ✕
-                </button>
-              </td>
-            </tr>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Tipo</th>
+                <th>Casa</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="sensors-actuators-table-body">
+              <!-- Rows will be populated by JavaScript -->
+            </tbody>
           </table>
         </div>
       </div>
@@ -458,86 +332,18 @@
               border-collapse: collapse;
             "
           >
-            <tr>
-              <th>ID</th>
-              <th>Nome</th>
-              <th>Descrição</th>
-              <th>Valor Min</th>
-              <th>Valor Max</th>
-              <th>Ações</th>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td>Temperatura Ideal</td>
-              <td>Temperatura recomendada para conforto</td>
-              <td>18°C</td>
-              <td>24°C</td>
-              <td style="text-align: center">
-                <button
-                  class="edit-btn"
-                  style="
-                    background: none;
-                    border: none;
-                    color: var(--primary);
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                    padding: 0;
-                    margin-right: 0.5rem;
-                  "
-                >
-                  ✎
-                </button>
-                <button
-                  class="delete-btn"
-                  style="
-                    background: none;
-                    border: none;
-                    color: var(--error);
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                    padding: 0;
-                  "
-                >
-                  ✕
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>Humidade Ideal</td>
-              <td>Umidade recomendada para ambiente</td>
-              <td>40%</td>
-              <td>60%</td>
-              <td style="text-align: center">
-                <button
-                  class="edit-btn"
-                  style="
-                    background: none;
-                    border: none;
-                    color: var(--primary);
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                    padding: 0;
-                    margin-right: 0.5rem;
-                  "
-                >
-                  ✎
-                </button>
-                <button
-                  class="delete-btn"
-                  style="
-                    background: none;
-                    border: none;
-                    color: var(--error);
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                    padding: 0;
-                  "
-                >
-                  ✕
-                </button>
-              </td>
-            </tr>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Descrição</th>
+                <th>Valor</th>
+                <th>ID Atuador</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="parameters-table-body">
+            </tbody>
           </table>
         </div>
       </div>
@@ -555,83 +361,87 @@
               border-collapse: collapse;
             "
           >
-            <tr>
-              <th>ID</th>
-              <th>Nome</th>
-              <th>Descrição</th>
-              <th>Categoria</th>
-              <th>Ações</th>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td>Temperatura</td>
-              <td>Sensor de temperatura ambiente</td>
-              <td>Sensor</td>
-              <td style="text-align: center">
-                <button
-                  class="edit-btn"
-                  style="
-                    background: none;
-                    border: none;
-                    color: var(--primary);
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                    padding: 0;
-                    margin-right: 0.5rem;
-                  "
-                >
-                  ✎
-                </button>
-                <button
-                  class="delete-btn"
-                  style="
-                    background: none;
-                    border: none;
-                    color: var(--error);
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                    padding: 0;
-                  "
-                >
-                  ✕
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>Umidade</td>
-              <td>Sensor de umidade do ar</td>
-              <td>Sensor</td>
-              <td style="text-align: center">
-                <button
-                  class="edit-btn"
-                  style="
-                    background: none;
-                    border: none;
-                    color: var(--primary);
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                    padding: 0;
-                    margin-right: 0.5rem;
-                  "
-                >
-                  ✎
-                </button>
-                <button
-                  class="delete-btn"
-                  style="
-                    background: none;
-                    border: none;
-                    color: var(--error);
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                    padding: 0;
-                  "
-                >
-                  ✕
-                </button>
-              </td>
-            </tr>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Descrição</th>
+                <th>Categoria</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="types-table-body">
+              <tr>
+                <td>1</td>
+                <td>Temperatura</td>
+                <td>Sensor de temperatura ambiente</td>
+                <td>Sensor</td>
+                <td style="text-align: center">
+                  <button
+                    class="edit-btn"
+                    style="
+                      background: none;
+                      border: none;
+                      color: var(--primary);
+                      font-size: 1.2rem;
+                      cursor: pointer;
+                      padding: 0;
+                      margin-right: 0.5rem;
+                    "
+                  >
+                    ✎
+                  </button>
+                  <button
+                    class="delete-btn"
+                    style="
+                      background: none;
+                      border: none;
+                      color: var(--error);
+                      font-size: 1.2rem;
+                      cursor: pointer;
+                      padding: 0;
+                    "
+                  >
+                    ✕
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Umidade</td>
+                <td>Sensor de umidade do ar</td>
+                <td>Sensor</td>
+                <td style="text-align: center">
+                  <button
+                    class="edit-btn"
+                    style="
+                      background: none;
+                      border: none;
+                      color: var(--primary);
+                      font-size: 1.2rem;
+                      cursor: pointer;
+                      padding: 0;
+                      margin-right: 0.5rem;
+                    "
+                  >
+                    ✎
+                  </button>
+                  <button
+                    class="delete-btn"
+                    style="
+                      background: none;
+                      border: none;
+                      color: var(--error);
+                      font-size: 1.2rem;
+                      cursor: pointer;
+                      padding: 0;
+                    "
+                  >
+                    ✕
+                  </button>
+                </td>
+              </tr>
+            </tbody>
           </table>
         </div>
       </div>
@@ -863,10 +673,9 @@
               "
               >Departamento:</label
             >
-            <input
-              type="text"
+            <select
               id="user-department"
-              required
+              class="form-control"
               style="
                 width: 100%;
                 padding: 0.5rem;
@@ -875,7 +684,13 @@
                 background: var(--bg-main);
                 color: var(--text-main);
               "
-            />
+            >
+              <option value="">Select Department</option>
+              <option value="Administração">Administração</option>
+              <option value="Auditório">Auditório</option>
+              <option value="Laboratório A">Laboratório A</option>
+              <option value="Laboratório B">Laboratório B</option>
+            </select>
           </div>
           <div>
             <label
@@ -947,6 +762,7 @@
     <!-- Modal for adding/editing Home -->
     <div
       id="home-modal"
+      class="modal"
       style="
         display: none;
         position: fixed;
@@ -1106,6 +922,7 @@
           id="device-form"
           style="display: flex; flex-direction: column; gap: 1rem"
         >
+          <input type="hidden" id="device-mode" value="sensor" />
           <div>
             <label
               style="
@@ -1138,8 +955,7 @@
               "
               >Tipo:</label
             >
-            <input
-              type="text"
+            <select
               id="device-type"
               required
               style="
@@ -1150,7 +966,9 @@
                 background: var(--bg-main);
                 color: var(--text-main);
               "
-            />
+            >
+              <option value="">Selecionar tipo...</option>
+            </select>
           </div>
           <div>
             <label
@@ -1283,7 +1101,7 @@
                 margin-bottom: 0.5rem;
                 color: var(--text-main);
               "
-              >Valor Mínimo:</label
+              >Valor:</label
             >
             <input
               type="text"
@@ -1306,11 +1124,10 @@
                 margin-bottom: 0.5rem;
                 color: var(--text-main);
               "
-              >Valor Máximo:</label
+              >Atuador:</label
             >
-            <input
-              type="text"
-              id="parameter-maxValue"
+            <select
+              id="parameter-atuador"
               required
               style="
                 width: 100%;
@@ -1320,7 +1137,9 @@
                 background: var(--bg-main);
                 color: var(--text-main);
               "
-            />
+            >
+              <option value="">Selecionar atuador...</option>
+            </select>
           </div>
           <div style="display: flex; gap: 1rem; justify-content: flex-end">
             <button

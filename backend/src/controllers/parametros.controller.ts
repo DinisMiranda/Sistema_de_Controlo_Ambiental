@@ -40,3 +40,21 @@ export async function patchParametro(req: Request, res: Response) {
   });
   res.json(row);
 }
+
+export async function deleteParametro(req: Request, res: Response) {
+  const id = Number(req.params.id);
+
+  if (Number.isNaN(id)) {
+    return res.status(400).json({ error: "ID inválido" });
+  }
+
+  const row = await models.ParametroAutomatico.findByPk(id);
+
+  if (!row) {
+    return res.status(404).json({ error: "Parâmetro não encontrado" });
+  }
+
+  await row.destroy();
+
+  res.status(204).send();
+}
