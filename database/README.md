@@ -23,12 +23,12 @@ Schema: **sistema_controlo_ambiental2** (MySQL 8+).
 
 ## How to apply
 
-### With Docker (from project root, i.e. Sistema_de_Controlo_Ambiental)
+### With Docker (from project root)
 
 ```bash
 docker compose up -d db
-# When MySQL is ready:
-mysql -h 127.0.0.1 -P 3306 -u root -psca_root < database/schema.sql
+# When MySQL is ready (default host port 3307):
+docker exec -i sca-mysql mysql -u root -psca_root sistema_controlo_ambiental2 < database/schema.sql
 ```
 
 ### Local MySQL
@@ -38,3 +38,41 @@ mysql -u root -p < database/schema.sql
 ```
 
 Or run `schema.sql` in MySQL Workbench.
+
+## Seed data (CSV → MySQL)
+
+Generate CSVs (if needed):
+
+```bash
+cd database/scripts
+./generate_seed_csvs.sh
+```
+
+Import into the database (truncates and reloads all seed tables):
+
+```bash
+./database/import/import_csv.sh
+```
+
+Environment overrides (optional):
+
+| Variable | Default |
+| -------- | ------- |
+| `DB_HOST` | `127.0.0.1` |
+| `DB_PORT` | `3307` |
+| `DB_USER` | `root` |
+| `DB_PASSWORD` | `sca_root` |
+| `DB_NAME` | `sistema_controlo_ambiental2` |
+| `USE_DOCKER` | `1` (uses `docker exec` into `sca-mysql`) |
+| `MYSQL_CONTAINER` | `sca-mysql` |
+
+Import a single table:
+
+```bash
+./database/import/import_csv.sh tipos
+./database/import/import_csv.sh sensores leituras_sensor
+```
+
+**Order matters** for foreign keys. Use `all` (default) for a full reload.
+
+**Note:** Import assigns explicit ids `1..N` for casas, utilizadores, sensores, atuadores and leituras so CSV foreign keys stay valid. After import, disable `SYNC_MODELS=true` in backend dev or avoid `sequelize.sync({ alter: true })` on seeded tables.
