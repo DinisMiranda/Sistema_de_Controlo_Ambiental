@@ -45,11 +45,10 @@ app.use(errorHandler);
 async function start() {
   try {
     await sequelize.authenticate();
-
-    await sequelize.sync();
-
-    console.log("Database synced");
-
+    if (process.env.SYNC_MODELS === "true") {
+      await sequelize.sync();
+      console.log("Database synced");
+    }
   } catch (error) {
     console.error(error);
   }

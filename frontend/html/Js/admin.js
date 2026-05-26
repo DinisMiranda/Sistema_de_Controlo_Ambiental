@@ -126,7 +126,6 @@ function populateUsersTable(users) {
     row.innerHTML = `
       <td>${u.nome}</td>
       <td>${u.email}</td>
-      <td>${u.department || "—"}</td>
       <td style="color: ${u.admin ? "var(--accent-orange)" : "var(--text-secondary)"}">
         ${u.admin ? "Admin" : "User"}
       </td>
@@ -196,14 +195,14 @@ let editingHomeId = null;
 
 async function loadSalas() {
   try {
-    const response = await fetchWithAuth("/api/salas");
-    if (!response.ok) throw new Error("Erro ao carregar salas");
+    const response = await fetchWithAuth("/api/casas");
+    if (!response.ok) throw new Error("Erro ao carregar casas");
     const salas = await response.json();
-    salasCache = salas.map((s, i) => ({
-      id:       s.id || i + 1,
-      name:     s.name,
+    salasCache = salas.map((s) => ({
+      id: s.id,
+      name: s.name,
       location: s.location || "—",
-      type:     s.badge || "—",
+      type: s.type || "—",
     }));
     renderSalasTable();
   } catch (err) {
@@ -229,10 +228,16 @@ function addSalaRow(sala) {
     </td>
   `;
   row.querySelector(".edit-btn").addEventListener("click", () => openHomeModal(sala.id));
-  row.querySelector(".delete-btn").addEventListener("click", () => {
+  row.querySelector(".delete-btn").addEventListener("click", async () => {
     if (!confirm("Tem a certeza que quer apagar esta sala?")) return;
-    salasCache = salasCache.filter((s) => s.id !== sala.id);
-    renderSalasTable();
+    try {
+      const response = await fetchWithAuth(`/api/casas/${sala.id}`, { method: "DELETE" });
+      if (!response.ok) throw new Error("Erro ao apagar casa");
+      await loadSalas();
+    } catch (err) {
+      console.error(err);
+      alert("Não foi possível apagar a casa.");
+    }
   });
 }
 
@@ -255,25 +260,41 @@ function openHomeModal(homeId = null) {
 
 document.getElementById("add-home")?.addEventListener("click", () => openHomeModal());
 
-homeForm.addEventListener("submit", (e) => {
+homeForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const name     = document.getElementById("home-name").value.trim();
+  const name = document.getElementById("home-name").value.trim();
   const location = document.getElementById("home-location").value.trim();
-  const type     = document.getElementById("home-type").value.trim();
+  const type = document.getElementById("home-type").value.trim();
 
-  if (!name || !location || !type) { alert("Por favor, preencha todos os campos."); return; }
-
-  if (editingHomeId) {
-    const sala = salasCache.find((s) => s.id === editingHomeId);
-    if (sala) { sala.name = name; sala.location = location; sala.type = type; }
-  } else {
-    const newId = salasCache.length ? Math.max(...salasCache.map((s) => s.id)) + 1 : 1;
-    salasCache.push({ id: newId, name, location, type });
+  if (!name || !location || !type) {
+    alert("Por favor, preencha todos os campos.");
+    return;
   }
 
-  renderSalasTable();
-  homeModal.style.display = "none";
-  homeForm.reset();
+  const body = { nome: name, morada: location, codigo_postal: type };
+
+  try {
+    const response = editingHomeId
+      ? await fetchWithAuth(`/api/casas/${editingHomeId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        })
+      : await fetchWithAuth("/api/casas", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+
+    if (!response.ok) throw new Error("Erro ao guardar casa");
+    await loadSalas();
+    homeModal.style.display = "none";
+    homeForm.reset();
+    editingHomeId = null;
+  } catch (err) {
+    console.error(err);
+    alert("Não foi possível guardar a casa.");
+  }
 });
 
 document.getElementById("home-cancel-btn")?.addEventListener("click", () => {

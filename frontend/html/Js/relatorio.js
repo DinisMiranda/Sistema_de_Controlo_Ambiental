@@ -40,11 +40,14 @@ async function loadReports() {
 
     // converte sensores em relatórios visuais
     reportsData = data.map((item) => {
-      const sensorType = item.type || item.tipo || "temperatura";
-      const sensorValue = item.value || item.valor || 0;
+      const sensorType = item.type || item.tipo || "consumo";
+      const sensorValue =
+        item.consumo ?? item.value ?? item.valor ?? 0;
 
       return {
-        date: formatDate(item.updatedAt || item.timestamp || new Date()),
+        date: formatDate(
+          item.periodo_fim || item.updatedAt || item.timestamp || new Date(),
+        ),
         room: item.room || item.department || item.nome || "Departamento",
         type: normalizeType(sensorType),
         value: formatSensorValue(sensorType, sensorValue),

@@ -101,11 +101,13 @@ Internamente, `requireAuth()` faz um `GET /api/auth/me` para validar o token jun
 
 ### `dashboard.js`
 - `GET /api/sensores` — lista sensores para mostrar no dashboard
-- `GET /api/atuadores` — lista atuadores ativos
-- `GET /api/consumption` — resumo de consumo (admin)
+- `GET /api/sensores/:id/latest` — última leitura por sensor
+- `GET /api/sensores?sala=` — sensores filtrados por sala
 
 ### `departamento.js`
-- `GET /api/sensores` — lista sensores/departamentos disponíveis
+- `GET /api/salas` — salas derivadas das localizações dos sensores
+- `GET /api/sensores` — lista sensores
+- `GET /api/sensores/:id/latest` e `/readings` — leituras
 
 ### `detalhe_departamento.js`
 - `GET /api/sensores/:id` — detalhe de um sensor
@@ -115,17 +117,16 @@ Internamente, `requireAuth()` faz um `GET /api/auth/me` para validar o token jun
 - `POST /api/actuators/:id/actions` — registar nova ação
 
 ### `relatorio.js`
-- `GET /api/sensors/:id/consumption` — consumo por sensor
-- `GET /api/consumption` — consumo global (admin)
+- `GET /api/reports` — registos de consumo da BD
+- `GET /api/consumo/sensors/:id/consumption` ou `GET /api/consumption` (admin)
 
 ### `sistema.js`
-- `GET /api/sensores` — visão geral de sensores
-- `GET /api/atuadores` — visão geral de atuadores
-- `GET /api/tipos` — tipos disponíveis no sistema
+- `GET /api/tipos`, `/api/sensores`, `/api/atuadores` — módulos e contagens
+- `GET /health/db` — estado da ligação à BD
 
 ### `admin.js`
-- CRUD completo de sensores, atuadores e tipos via endpoints `/api/sensores`, `/api/atuadores`, `/api/tipos` (requer token de admin)
-- `GET/POST/PATCH/DELETE` conforme a operação
+- CRUD de sensores, atuadores, tipos (`/api/sensores`, `/api/atuadores`, `/api/tipos`)
+- CRUD de casas (`/api/casas`); `/api/salas` é só leitura para a UI de departamentos
 
 ---
 

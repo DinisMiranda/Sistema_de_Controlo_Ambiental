@@ -1,99 +1,17 @@
-const modulesData = [
-  {
-    name: "Temperatura",
-    description: "Monitorização e controlo da climatização ambiente.",
-    status: "operational",
-    statusLabel: "Operacional",
-    enabled: true,
-  },
-  {
-    name: "Humidade",
-    description: "Leitura e regulação dos níveis de humidade.",
-    status: "operational",
-    statusLabel: "Operacional",
-    enabled: true,
-  },
-  {
-    name: "Iluminação",
-    description: "Gestão da intensidade e zonas de iluminação.",
-    status: "operational",
-    statusLabel: "Operacional",
-    enabled: true,
-  },
-  {
-    name: "Ventilação",
-    description: "Controlo do fluxo de ar e renovação do ambiente.",
-    status: "maintenance",
-    statusLabel: "Manutenção",
-    enabled: true,
-  },
-  {
-    name: "Qualidade do ar",
-    description: "Avaliação de CO₂ e indicadores ambientais internos.",
-    status: "operational",
-    statusLabel: "Operacional",
-    enabled: true,
-  },
-];
-
-const healthData = [
-  {
-    name: "API REST",
-    status: "online",
-    statusLabel: "Online",
-    description: "Responde dentro dos parâmetros esperados.",
-  },
-  {
-    name: "Base de dados",
-    status: "online",
-    statusLabel: "Online",
-    description: "Ligação ativa e sem falhas recentes.",
-  },
-  {
-    name: "Broker IoT",
-    status: "warning",
-    statusLabel: "Atenção",
-    description: "Latência ligeiramente acima do normal.",
-  },
-  {
-    name: "Sincronização de dispositivos",
-    status: "online",
-    statusLabel: "Online",
-    description: "Última sincronização concluída com sucesso.",
-  },
-];
-
-const eventsData = [
-  {
-    title: "Parâmetros de temperatura atualizados",
-    description: "O intervalo ideal foi ajustado para 20°C - 24°C.",
-    time: "há 5 minutos",
-  },
-  {
-    title: "Diagnóstico automático executado",
-    description: "Todos os serviços principais responderam corretamente.",
-    time: "há 18 minutos",
-  },
-  {
-    title: "Módulo de ventilação em manutenção",
-    description: "Foi sinalizada revisão preventiva do sistema.",
-    time: "há 1 hora",
-  },
-];
+let modulesData = [];
+let healthData = [];
+let eventsData = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
   const user = await requireAuth();
   if (!user) return;
 
-  // checkAdminAccess();
   setupLogout();
-  renderModules();
-  renderHealth();
-  renderEvents();
   setupRanges();
   setupActions();
   updateHeaderMeta();
   loadUserInfo();
+  await loadSystemData();
 });
 
 // ========================================
@@ -115,6 +33,91 @@ document.addEventListener("DOMContentLoaded", () => {
     adminLink.style.display = "none";
   }
 });
+
+async function loadSystemData() {
+  const apiBase = window.CONFIG?.API_BASE || "http://localhost:3001";
+
+  try {
+    const [tiposRes, sensoresRes, atuadoresRes, healthRes] = await Promise.all([
+      fetchWithAuth("/api/tipos"),
+      fetchWithAuth("/api/sensores"),
+      fetchWithAuth("/api/atuadores"),
+      fetch(`${apiBase}/health/db`),
+    ]);
+
+    if (tiposRes.ok) {
+      const tipos = await tiposRes.json();
+      modulesData = tipos.map((tipo) => ({
+        name: tipo.tipo || tipo.Tipos_tipo || tipo.nome || "Tipo",
+        description: `Classe: ${tipo.classe || tipo.Tipos_classe || "—"}`,
+        status: "operational",
+        statusLabel: "Operacional",
+        enabled: true,
+      }));
+    }
+
+    const sensorCount = sensoresRes.ok
+      ? (await sensoresRes.json()).length
+      : 0;
+    const atuadorCount = atuadoresRes.ok
+      ? (await atuadoresRes.json()).length
+      : 0;
+    const dbOnline = healthRes.ok;
+
+    healthData = [
+      {
+        name: "API REST",
+        status: "online",
+        statusLabel: "Online",
+        description: "Backend a responder.",
+      },
+      {
+        name: "Base de dados",
+        status: dbOnline ? "online" : "warning",
+        statusLabel: dbOnline ? "Online" : "Atenção",
+        description: dbOnline
+          ? "Ligação MySQL ativa."
+          : "Não foi possível validar a ligação.",
+      },
+      {
+        name: "Sensores",
+        status: sensorCount > 0 ? "online" : "warning",
+        statusLabel: sensorCount > 0 ? "Online" : "Sem dados",
+        description: `${sensorCount} sensor(es) registado(s).`,
+      },
+      {
+        name: "Atuadores",
+        status: atuadorCount > 0 ? "online" : "warning",
+        statusLabel: atuadorCount > 0 ? "Online" : "Sem dados",
+        description: `${atuadorCount} atuador(es) registado(s).`,
+      },
+    ];
+
+    eventsData = [
+      {
+        title: "Dados carregados da API",
+        description: `Sincronização com ${sensorCount} sensores e ${atuadorCount} atuadores.`,
+        time: new Date().toLocaleString("pt-PT"),
+      },
+    ];
+  } catch (error) {
+    console.error("Erro ao carregar sistema:", error);
+    modulesData = [];
+    healthData = [
+      {
+        name: "API REST",
+        status: "warning",
+        statusLabel: "Indisponível",
+        description: "Não foi possível contactar o backend.",
+      },
+    ];
+    eventsData = [];
+  }
+
+  renderModules();
+  renderHealth();
+  renderEvents();
+}
 
 function renderModules() {
   const container = document.getElementById("modules-list");
@@ -292,20 +295,29 @@ function setupActions() {
   }
 
   if (btnTest) {
-    btnTest.addEventListener("click", () => {
-      alert("Ligação testada com sucesso.");
+    btnTest.addEventListener("click", async () => {
+      const apiBase = window.CONFIG?.API_BASE || "http://localhost:3001";
+      try {
+        const res = await fetch(`${apiBase}/health/db`);
+        alert(res.ok ? "Ligação OK (API + BD)." : "API respondeu mas a BD falhou.");
+      } catch {
+        alert("Não foi possível contactar o backend.");
+      }
     });
   }
 
   if (btnSyncNow) {
-    btnSyncNow.addEventListener("click", () => {
-      alert("Sincronização iniciada.");
+    btnSyncNow.addEventListener("click", async () => {
+      await loadSystemData();
+      updateHeaderMeta();
+      alert("Dados atualizados a partir da API.");
     });
   }
 
   if (btnDiagnostics) {
-    btnDiagnostics.addEventListener("click", () => {
-      alert("Diagnóstico executado.");
+    btnDiagnostics.addEventListener("click", async () => {
+      await loadSystemData();
+      alert("Diagnóstico concluído. Ver estado técnico na página.");
     });
   }
 

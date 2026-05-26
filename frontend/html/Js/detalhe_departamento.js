@@ -44,13 +44,16 @@ function getSensorByType(room, typeRegExp) {
   return room.sensors.find((sensor) => typeRegExp.test(sensor.tipo_sensor));
 }
 
+function sensorIdOf(sensor) {
+  return sensor?.id_sensor ?? sensor?.id;
+}
+
 async function fetchLatestReading(sensorId) {
   if (!sensorId) return null;
   try {
-    const response = await fetchWithAuth(`/api/sensores/${sensorId}/readings`);
+    const response = await fetchWithAuth(`/api/sensores/${sensorId}/latest`);
     if (!response.ok) return null;
-    const readings = await response.json();
-    return Array.isArray(readings) && readings.length > 0 ? readings[0] : null;
+    return response.json();
   } catch (error) {
     console.error("Erro ao carregar leituras do sensor:", error);
     return null;
@@ -172,10 +175,10 @@ async function loadRoomActualData(room) {
 
   const [temperatureReading, humidityReading, lightReading, co2Reading] =
     await Promise.all([
-      fetchLatestReading(temperatureSensor?.id_sensor),
-      fetchLatestReading(humiditySensor?.id_sensor),
-      fetchLatestReading(lightSensor?.id_sensor),
-      fetchLatestReading(co2Sensor?.id_sensor),
+      fetchLatestReading(sensorIdOf(temperatureSensor)),
+      fetchLatestReading(sensorIdOf(humiditySensor)),
+      fetchLatestReading(sensorIdOf(lightSensor)),
+      fetchLatestReading(sensorIdOf(co2Sensor)),
     ]);
 
   const temperature = parseReadingValue(temperatureReading);
@@ -594,7 +597,11 @@ async function initializeRoomDetails() {
   // checkAdminAccess();
 
   const urlParams = new URLSearchParams(window.location.search);
-  const roomId = urlParams.get("room") || "sala-101";
+  const roomId = urlParams.get("room");
+  if (!roomId) {
+    console.error("Missing room query parameter");
+    return;
+  }
 
   const rooms = await fetchSensorRooms();
   currentRoom = rooms[roomId];
