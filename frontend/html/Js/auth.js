@@ -1,0 +1,193 @@
+const API_BASE = window.CONFIG?.API_BASE || "http://localhost:3001";
+
+function normalizeUser(user = {}) {
+  return {
+    ...user,
+    name: user.name || user.nome || user.Nome || "",
+    role: user.role || (user.admin ? "Admin" : "User"),
+    admin: Boolean(user.admin),
+  };
+}
+
+function setSession(user, token) {
+  const normalizedUser = normalizeUser(user);
+  localStorage.setItem("user", JSON.stringify(normalizedUser));
+  localStorage.setItem("token", token);
+}
+
+function clearSession() {
+  localStorage.removeItem("user");
+  localStorage.removeItem("token");
+}
+
+function getToken() {
+  return localStorage.getItem("token");
+}
+
+function getCurrentUser() {
+  const raw = localStorage.getItem("user");
+  if (!raw) return null;
+
+  try {
+    return JSON.parse(raw);
+  } catch {
+    clearSession();
+    return null;
+  }
+}
+
+function setupLogout() {
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  if (!logoutBtn) return;
+
+  logoutBtn.addEventListener("click", () => {
+    clearSession();
+    window.location.href = "../../index.html";
+  });
+}
+
+async function checkAuth({ redirect = false } = {}) {
+  const token = getToken();
+
+  if (!token) {
+    return null;
+  }
+
+  try {
+    const response = await fetchWithAuth("/api/auth/me");
+
+    if (!response.ok) {
+      throw new Error("Sessão inválida");
+    }
+
+    const data = await response.json();
+
+    if (!data?.user) {
+      throw new Error("Utilizador inválido");
+    }
+
+    setSession(data.user, token);
+
+    return getCurrentUser();
+  } catch (error) {
+    console.error("Auth check failed:", error);
+    clearSession();
+
+    if (redirect) {
+      window.location.href = "login.html";
+    }
+
+    return null;
+  }
+}
+
+async function requireAuth() {
+  return checkAuth({ redirect: true });
+}
+
+async function redirectIfAuthenticated() {
+  const user = await checkAuth();
+  if (user) {
+    window.location.href = "dashboard.html";
+  }
+}
+
+async function loginRequest(email, password) {
+  try {
+    const response = await fetch(`${API_BASE}/api/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    let data = {};
+
+    try {
+      data = await response.json();
+    } catch {
+      throw new Error("Resposta inválida do servidor");
+    }
+
+    if (!response.ok) {
+      throw new Error(data.error || data.message || "Erro no login");
+    }
+
+    if (!data.token || !data.user) {
+      throw new Error("Dados de autenticação inválidos");
+    }
+
+    return data;
+  } catch (error) {
+    if (error instanceof TypeError) {
+      throw new Error("Não foi possível ligar ao servidor");
+    }
+
+    throw error;
+  }
+}
+
+async function fetchWithAuth(path, options = {}) {
+  const token = getToken();
+  const headers = {
+    ...(options.headers || {}),
+  };
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  if (options.body && !headers["Content-Type"]) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  try {
+    const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+    const response = await fetch(`${API_BASE}${normalizedPath}`, {
+      ...options,
+      headers,
+    });
+
+    if (response.status === 401) {
+      clearSession();
+    }
+
+    return response;
+  } catch {
+    throw new Error("Erro de ligação ao servidor");
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("login-form");
+
+  if (!form) return;
+
+  const token = getToken();
+  if (token && window.location.pathname.includes("login.html")) {
+    window.location.href = "dashboard.html";
+    return;
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    try {
+      const data = await loginRequest(email, password);
+
+      setSession(data.user, data.token);
+
+      window.location.href = "dashboard.html";
+    } catch (err) {
+      const errorBox = document.getElementById("login-error");
+
+      errorBox.textContent = err.message;
+      errorBox.classList.remove("hidden");
+    }
+  });
+});

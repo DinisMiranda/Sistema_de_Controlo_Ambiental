@@ -1,35 +1,70 @@
 import "dotenv/config";
-import express from "express";
-import cors from "cors";
-import { db } from "./lib/db.js";
-import { sensoresRouter } from "./routes/sensores.js";
-import { atuadoresRouter } from "./routes/atuadores.js";
+import { app } from "./app.js";
+import { createHash } from "crypto";
+import {
+  authenticateSequelize,
+  syncModels,
+  models,
+} from "./models/sequelize/index.js";
 
-const app = express();
+const { Utilizador } = models;
+
 const PORT = process.env.PORT ?? 3001;
 
-app.use(cors());
-app.use(express.json());
-
-// Health check
-app.get("/health", (_req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
-});
-
-// DB check (opcional; falha se a BD não estiver acessível)
-app.get("/health/db", async (_req, res) => {
+async function bootstrap() {
   try {
-    const [rows] = await db.query("SELECT 1");
-    res.json({ status: "ok", database: "connected" });
-  } catch (err) {
-    res.status(503).json({ status: "error", database: "disconnected" });
+    await authenticateSequelize();
+    console.log("Database connection established.");
+    if (process.env.SYNC_MODELS === "true") {
+      await syncModels();
+      console.log("Sequelize models synchronized.");
+    }
+
+    await seedUsers();
+
+    app.listen(PORT, () => {
+      console.log(`SCA API listening on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error("Unable to connect to the database:", error);
+    process.exit(1);
   }
-});
+}
 
-// API routes
-app.use("/api/sensores", sensoresRouter);
-app.use("/api/atuadores", atuadoresRouter);
+function hashPassword(password: string) {
+  return createHash("sha256").update(password).digest("hex");
+}
 
-app.listen(PORT, () => {
-  console.log(`SCA API listening on http://localhost:${PORT}`);
-});
+async function seedUsers() {
+  const count = await Utilizador.count();
+
+  if (count === 0) {
+    await Utilizador.bulkCreate([
+      {
+        nome: "Carlos Pereira",
+        email: "admin@edificio.com",
+        palavra_passe_hash: hashPassword("admin123"),
+        admin: true,
+        data_criacao: new Date(),
+      },
+      {
+        nome: "João Silva",
+        email: "joao@empresa.com",
+        palavra_passe_hash: hashPassword("joao123"),
+        admin: false,
+        data_criacao: new Date(),
+      },
+      {
+        nome: "Maria Sousa",
+        email: "maria@empresa.com",
+        palavra_passe_hash: hashPassword("maria123"),
+        admin: false,
+        data_criacao: new Date(),
+      },
+    ]);
+
+    console.log("Default users seeded.");
+  }
+}
+
+bootstrap();

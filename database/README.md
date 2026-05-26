@@ -8,16 +8,16 @@ Schema: **sistema_controlo_ambiental2** (MySQL 8+).
 
 ## Tables
 
-| Table                  | Description |
-|------------------------|-------------|
+| Table                  | Description                                                                                     |
+| ---------------------- | ----------------------------------------------------------------------------------------------- |
 | Tipos                  | Type catalogue (classe, tipo, descrição). Referenced by sensores, atuadores, and acoes_sistema. |
-| Utilizadores           | System users (nome, email, palavra_passe_hash, admin). |
-| sensores               | Sensors; FK to Tipos (Tipos_classe, Tipos_tipo). |
-| atuadores              | Actuators; FK to Tipos. |
-| acoes_sistema          | Actions on actuators; FK to atuadores and Tipos. |
-| leituras_sensor        | Sensor readings (valor, unidade, timestamp). |
-| parametros_automaticos  | Configuration parameters; FK to **atuadores**. |
-| registos_consumo        | Consumption per period; FK to **leituras_sensor**. |
+| Utilizadores           | System users (nome, email, palavra_passe_hash, admin).                                          |
+| sensores               | Sensors; FK to Tipos (Tipos_classe, Tipos_tipo).                                                |
+| atuadores              | Actuators; FK to Tipos.                                                                         |
+| acoes_sistema          | Actions on actuators; FK to atuadores and Tipos.                                                |
+| leituras_sensor        | Sensor readings (valor, unidade, timestamp).                                                    |
+| parametros_automaticos | Configuration parameters; FK to **atuadores**.                                                  |
+| registos_consumo       | Consumption per period; FK to **leituras_sensor**.                                              |
 
 **Note:** `sensores` / `atuadores` / `acoes_sistema` reference **Tipos** only via `Tipos_classe` and `Tipos_tipo`.
 

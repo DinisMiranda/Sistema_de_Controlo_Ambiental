@@ -1,0 +1,41 @@
+id_atuador,tipo_acao,valor_aplicado,motivo,timestamp_acao,Tipos_classe,Tipos_tipo
+16,OPEN,CUTOFF,,2026-03-12 02:31:33,Acao_sistema,Circuito_energia_corte
+8,VENT,HIGH,Teste de atuador após intervenção.,2026-02-21 11:58:10,Acao_sistema,Ventilacao_reforco_ou_arranque
+19,DIM_UP,75%,Reforço de ventilação por humidade elevada.,2026-03-27 11:25:14,Acao_sistema,Iluminacao_ligar_ou_aumentar
+3,FAN,ON,,2026-03-14 23:22:40,Acao_sistema,Ventilacao_reforco_ou_arranque
+17,OPEN,CUTOFF,,2026-02-23 10:36:31,Acao_sistema,Circuito_energia_corte
+18,DIM_UP,75%,Corte por proteção de circuito.,2026-04-14 22:14:02,Acao_sistema,Iluminacao_ligar_ou_aumentar
+8,FAN,ON,Aumento de iluminação por pouca luminosidade.,2026-02-17 20:43:22,Acao_sistema,Ventilacao_reforco_ou_arranque
+8,OFF,0%,Ajuste por consigna de climatização.,2026-03-27 05:17:19,Acao_sistema,Iluminacao_desligar_ou_reduzir
+18,AUTO,LUX<200,,2026-02-14 16:34:26,Acao_sistema,Controlo_automatico_por_limite
+13,AUTO,LUX<200,Restabelecimento após teste de segurança.,2026-05-07 10:18:47,Acao_sistema,Controlo_automatico_por_limite
+6,OPEN,CUTOFF,Correção após leitura anómala.,2026-05-03 03:53:42,Acao_sistema,Circuito_energia_corte
+7,VENT,HIGH,Redução de iluminação por luz natural suficiente.,2026-03-01 05:51:10,Acao_sistema,Ventilacao_reforco_ou_arranque
+17,ON,100%,,2026-03-14 11:25:35,Acao_sistema,Iluminacao_ligar_ou_aumentar
+1,VENT,HIGH,Pedido do utilizador administrador.,2026-03-03 21:29:17,Acao_sistema,Ventilacao_reforco_ou_arranque
+19,VENT,HIGH,Redução de iluminação por luz natural suficiente.,2026-03-21 20:52:30,Acao_sistema,Ventilacao_reforco_ou_arranque
+5,UP,90%,Manutenção programada concluída.,2026-03-29 00:41:55,Acao_sistema,Iluminacao_ligar_ou_aumentar
+12,UP,90%,,2026-04-06 15:18:09,Acao_sistema,Iluminacao_ligar_ou_aumentar
+2,SETPOINT,18.3,Pedido do utilizador administrador.,2026-03-26 03:52:35,Acao_sistema,Climatizacao_definir_consigna
+8,DOWN,25%,,2026-04-19 18:57:34,Acao_sistema,Iluminacao_desligar_ou_reduzir
+15,SETPOINT,20.8,,2026-03-19 20:54:18,Acao_sistema,Climatizacao_definir_consigna
+20,CLOSE,ON,Corte por proteção de circuito.,2026-03-14 16:14:48,Acao_sistema,Circuito_energia_restabelecer
+11,SETPOINT,23.4,Manutenção programada concluída.,2026-04-05 11:54:52,Acao_sistema,Climatizacao_definir_consigna
+13,AUTO,LUX<200,Pedido do utilizador administrador.,2026-04-19 01:45:18,Acao_sistema,Controlo_automatico_por_limite
+19,DIM_UP,75%,Redução de iluminação por luz natural suficiente.,2026-02-09 16:47:02,Acao_sistema,Iluminacao_ligar_ou_aumentar
+7,MIN,5%,Reforço de ventilação por humidade elevada.,2026-03-16 22:00:12,Acao_sistema,Iluminacao_desligar_ou_reduzir
+11,CLOSE,ON,Reforço de ventilação por humidade elevada.,2026-03-29 04:10:44,Acao_sistema,Circuito_energia_restabelecer
+4,OPEN,CUTOFF,Agendamento (horário de conforto).,2026-03-18 16:50:45,Acao_sistema,Circuito_energia_corte
+15,CLOSE,ON,Aumento de iluminação por pouca luminosidade.,2026-03-16 00:03:11,Acao_sistema,Circuito_energia_restabelecer
+8,SETPOINT,19.2,Restabelecimento após teste de segurança.,2026-02-18 22:14:10,Acao_sistema,Climatizacao_definir_consigna
+14,BOOST,15min,,2026-03-06 18:48:40,Acao_sistema,Ventilacao_reforco_ou_arranque
+19,AUTO,LUX<200,,2026-04-01 13:14:28,Acao_sistema,Controlo_automatico_por_limite
+10,CLOSE,ON,Modo noturno ativo.,2026-03-02 08:56:12,Acao_sistema,Circuito_energia_restabelecer
+13,SCHED,NIGHT,Manutenção programada concluída.,2026-02-16 01:05:50,Acao_sistema,Controlo_automatico_por_limite
+8,VENT,HIGH,Pedido após deteção de ausência.,2026-04-27 17:58:07,Acao_sistema,Ventilacao_reforco_ou_arranque
+14,OPEN,CUTOFF,Correção após leitura anómala.,2026-03-13 09:32:51,Acao_sistema,Circuito_energia_corte
+6,CLOSE,ON,Ajuste por consigna de climatização.,2026-04-30 07:55:22,Acao_sistema,Circuito_energia_restabelecer
+18,UP,90%,Modo noturno ativo.,2026-03-03 11:17:48,Acao_sistema,Iluminacao_ligar_ou_aumentar
+6,SETPOINT,23.3,Pedido após deteção de ausência.,2026-05-09 13:49:14,Acao_sistema,Climatizacao_definir_consigna
+2,OPEN,CUTOFF,Pedido do utilizador administrador.,2026-04-28 15:04:45,Acao_sistema,Circuito_energia_corte
+14,RULE,T>26,Teste de atuador após intervenção.,2026-04-06 02:25:28,Acao_sistema,Controlo_automatico_por_limite

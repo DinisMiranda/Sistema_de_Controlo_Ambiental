@@ -19,21 +19,20 @@ A monitoring and control system for environmental sensors, actuators, and consum
 ## Project structure
 
 | Path | Purpose |
-|------|--------|
-| `frontend/` | Web UI — React, Vite, TypeScript |
+| ---- | ------- |
+| `frontend/` | Web UI — HTML, CSS, JavaScript (`frontend/html/`) |
 | `backend/` | REST API — Node.js, Express, TypeScript |
-| `database/` | MySQL schema and migration scripts |
+| `database/` | MySQL schema (`schema.sql`) and seed CSV generators (`database/scripts/`) |
 | `docs/` | Design docs, use cases, and references |
-| `scripts/` | Fake data generators (see `scripts/README.md`) |
 | `docker-compose.yml` | Local MySQL 8 service for development |
 
 ---
 
 ## Prerequisites
 
-- **Node.js** 18 or later  
-- **MySQL** 8 (or use the provided Docker setup)  
-- **npm** or **pnpm**
+- **Node.js** 18 or later
+- **Docker Desktop** (recommended) or local **MySQL** 8
+- **Python 3** (optional, for seed CSV scripts)
 
 ---
 
@@ -41,30 +40,20 @@ A monitoring and control system for environmental sensors, actuators, and consum
 
 Run from the **project root** (`Sistema_de_Controlo_Ambiental/`).
 
-### 1. Database
-
-Start MySQL with Docker:
+### 1. Database (Docker)
 
 ```bash
 docker compose up -d db
+docker exec -i sca-mysql mysql -u root -psca_root sistema_controlo_ambiental2 < database/schema.sql
 ```
 
-Wait until the container is healthy, then load the schema:
-
-```bash
-mysql -h 127.0.0.1 -P 3306 -u root -psca_root < database/schema.sql
-```
-
-Database name: `sistema_controlo_ambiental2`.
-
-**Without Docker:** create the database in your MySQL server and run `database/schema.sql`.
+Default Docker credentials: `root` / `sca_root`, host port **3307**.
 
 ### 2. Backend
 
 ```bash
 cd backend
 cp .env.example .env
-# Edit .env with your DB credentials (see Configuration)
 npm install
 npm run dev
 ```
@@ -73,25 +62,26 @@ API: **http://localhost:3001**
 
 ### 3. Frontend
 
+Serve the static UI (do not open HTML files directly with `file://`):
+
 ```bash
 cd frontend
-cp .env.example .env
-# Optional: set VITE_API_URL if not using the dev proxy
-npm install
-npm run dev
+python3 -m http.server 5173
 ```
 
-UI: **http://localhost:5173**
+Open: **http://localhost:5173/html/login.html**
+
+Test login: `admin@edificio.com` / `admin123`
 
 ---
 
 ## Configuration
 
 | Component | Config file | Notes |
-|-----------|-------------|--------|
-| **Docker (DB)** | `docker-compose.env.example` → `.env` | Optional overrides; do not commit `.env`. |
-| **Backend** | `backend/.env.example` → `backend/.env` | Required. With default Docker: `DB_HOST=127.0.0.1`, `DB_USER=root`, `DB_PASSWORD=sca_root`, `DB_NAME=sistema_controlo_ambiental2`. |
-| **Frontend** | `frontend/.env.example` → `frontend/.env` | Optional in dev; Vite proxies `/api` to the backend. |
+| --------- | ----------- | ----- |
+| **Docker (DB)** | `docker-compose.env.example` → `.env` | Optional overrides at repo root |
+| **Backend** | `backend/.env.example` → `backend/.env` | With Docker: `DB_PORT=3307`, `DB_PASSWORD=sca_root` |
+| **Seed scripts** | `database/scripts/.env.example` → `database/scripts/.env` | CSV output paths and row counts |
 
 ---
 
@@ -100,29 +90,36 @@ UI: **http://localhost:5173**
 Schema: **sistema_controlo_ambiental2**
 
 | Entity | Description |
-|--------|-------------|
-| **Tipos** | Type catalogue (referenced by sensors, actuators, actions). |
-| **Utilizadores** | System users (including admin flag). |
-| **sensores** / **atuadores** | Sensors and actuators (FK to Tipos). |
-| **leituras_sensor** | Sensor readings over time. |
-| **acoes_sistema** | Actions performed on actuators. |
-| **parametros_automaticos** | Configuration parameters (linked to actions). |
-| **registos_consumo** | Consumption per period (FK to sensores). |
+| ------ | ----------- |
+| **Tipos** | Type catalogue (sensors, actuators, actions) |
+| **Utilizadores** | System users (admin flag) |
+| **casas** | Buildings / homes |
+| **sensores** / **atuadores** | Sensors and actuators |
+| **leituras_sensor** | Sensor readings |
+| **acoes_sistema** | Actuator actions |
+| **parametros_automaticos** | Automatic control parameters |
+| **registos_consumo** | Consumption records |
 
 ---
 
 ## Tech stack
 
 | Layer | Stack |
-|-------|--------|
-| Frontend | React, Vite, TypeScript |
-| Backend | Node.js, Express, TypeScript |
+| ----- | ----- |
+| Frontend | HTML, CSS, JavaScript |
+| Backend | Node.js, Express, TypeScript, Sequelize |
 | Database | MySQL 8 |
 
 ---
 
 ## Documentation
 
-Design documents, use cases, and data model references are in **`docs/`**.
+- **`docs/`** — design documents and integration notes
+- **`database/scripts/README.md`** — fake data CSV generators
 
-Fake data scripts (e.g. **`Utilizadores`** / **`Tipos`** CSV output) are documented in **`scripts/README.md`** and in the module docstrings under **`scripts/`**.
+To regenerate all seed CSVs:
+
+```bash
+cd database/scripts
+./generate_seed_csvs.sh
+```

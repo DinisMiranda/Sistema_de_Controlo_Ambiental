@@ -9,7 +9,7 @@ O frontend é composto por páginas HTML estáticas com JavaScript vanilla. A co
 ## Estrutura de Ficheiros
 
 ```
-SCA_front_end/
+frontend/
 └── html/
     ├── Js/
     │   ├── config.js               ← URL base da API
@@ -153,10 +153,10 @@ npm run dev
 
 ### 2. Abrir o frontend
 
-Abrir diretamente no browser qualquer ficheiro HTML da pasta `SCA_front_end/html/`:
+Servir a pasta `frontend/` com um servidor HTTP local (ex.: `python3 -m http.server 5173`) e abrir:
 
 ```
-SCA_front_end/html/login.html
+http://localhost:5173/html/login.html
 ```
 
 > ⚠️ O frontend usa `window.location.hostname === "localhost"` para detetar o ambiente. Garantir que o backend está a correr na porta **3001** antes de abrir o frontend.

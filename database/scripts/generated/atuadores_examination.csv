@@ -1,0 +1,21 @@
+nome,tipo_atuador,localizacao,estado,Tipos_classe,Tipos_tipo
+Atuador — Iluminacao_regulatoria_Luminosidade (Marquise — Travessa da Boavista),Iluminacao_regulatoria_Luminosidade,Marquise — Travessa da Boavista,inativo,Atuador,Iluminacao_regulatoria_Luminosidade
+Atuador — Iluminacao_regulatoria_Luminosidade (Hall 2),Iluminacao_regulatoria_Luminosidade,Hall 2,inativo,Atuador,Iluminacao_regulatoria_Luminosidade
+Atuador — Rele_circuito_Consumo_energetico_kWh (Corredor — Av Madalena Pacheco),Rele_circuito_Consumo_energetico_kWh,Corredor — Av Madalena Pacheco,manutenção,Atuador,Rele_circuito_Consumo_energetico_kWh
+Atuador — Climatizacao_Temperatura_ambiente (Sala — Av Íris Matias),Climatizacao_Temperatura_ambiente,Sala — Av Íris Matias,ativo,Atuador,Climatizacao_Temperatura_ambiente
+Atuador — Climatizacao_Temperatura_ambiente (Corredor),Climatizacao_Temperatura_ambiente,Corredor,inativo,Atuador,Climatizacao_Temperatura_ambiente
+Atuador — Ventilacao_Humidade_relativa (Marquise — Largo Valente),Ventilacao_Humidade_relativa,Marquise — Largo Valente,manutenção,Atuador,Ventilacao_Humidade_relativa
+Atuador — Rele_circuito_Consumo_energetico_kWh (Arrumos),Rele_circuito_Consumo_energetico_kWh,Arrumos,inativo,Atuador,Rele_circuito_Consumo_energetico_kWh
+Atuador — Rele_circuito_Consumo_energetico_kWh (Corredor),Rele_circuito_Consumo_energetico_kWh,Corredor,inativo,Atuador,Rele_circuito_Consumo_energetico_kWh
+Atuador — Rele_circuito_Consumo_energetico_kWh (Cave — Avenida de São Francisco),Rele_circuito_Consumo_energetico_kWh,Cave — Avenida de São Francisco,inativo,Atuador,Rele_circuito_Consumo_energetico_kWh
+Atuador — Iluminacao_regulatoria_Luminosidade (Corredor),Iluminacao_regulatoria_Luminosidade,Corredor,manutenção,Atuador,Iluminacao_regulatoria_Luminosidade
+Atuador — Iluminacao_regulatoria_Luminosidade (Corredor),Iluminacao_regulatoria_Luminosidade,Corredor,inativo,Atuador,Iluminacao_regulatoria_Luminosidade
+Atuador — Ventilacao_Humidade_relativa (Hall),Ventilacao_Humidade_relativa,Hall,manutenção,Atuador,Ventilacao_Humidade_relativa
+Atuador — Rele_circuito_Consumo_energetico_kWh (Hall — Travessa Nascimento),Rele_circuito_Consumo_energetico_kWh,Hall — Travessa Nascimento,manutenção,Atuador,Rele_circuito_Consumo_energetico_kWh
+Atuador — Rele_circuito_Consumo_energetico_kWh (Casa de banho — Travessa de Carneiro),Rele_circuito_Consumo_energetico_kWh,Casa de banho — Travessa de Carneiro,ativo,Atuador,Rele_circuito_Consumo_energetico_kWh
+Atuador — Climatizacao_Temperatura_ambiente (Cave),Climatizacao_Temperatura_ambiente,Cave,ativo,Atuador,Climatizacao_Temperatura_ambiente
+Atuador — Rele_circuito_Consumo_energetico_kWh (Casa de banho 4),Rele_circuito_Consumo_energetico_kWh,Casa de banho 4,manutenção,Atuador,Rele_circuito_Consumo_energetico_kWh
+Atuador — Rele_circuito_Consumo_energetico_kWh (Arrumos 2),Rele_circuito_Consumo_energetico_kWh,Arrumos 2,inativo,Atuador,Rele_circuito_Consumo_energetico_kWh
+Atuador — Rele_circuito_Consumo_energetico_kWh (Garagem),Rele_circuito_Consumo_energetico_kWh,Garagem,manutenção,Atuador,Rele_circuito_Consumo_energetico_kWh
+Atuador — Ventilacao_Humidade_relativa (Sala de estar — Praça Nascimento),Ventilacao_Humidade_relativa,Sala de estar — Praça Nascimento,ativo,Atuador,Ventilacao_Humidade_relativa
+Atuador — Climatizacao_Temperatura_ambiente (Sala),Climatizacao_Temperatura_ambiente,Sala,inativo,Atuador,Climatizacao_Temperatura_ambiente

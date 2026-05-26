@@ -1,0 +1,36 @@
+nome_parametro,valor_parametro,descricao,data_atualizacao,atuadores_id_atuador
+histerese_graus,19.7,Regra automática associada ao atuador.,2025-11-25 16:48:57,16
+consigna_temperatura_alvo,22.7,,2025-12-31 15:25:40,19
+modo_fora_horas,30,Limite de segurança configurável.,2026-05-08 15:37:36,18
+limite_consumo_diario_kwh,atuador_1:38.30_kwh,,2026-05-09 04:04:47,1
+histerese_graus,21.9,Regra automática associada ao atuador.,2025-12-14 22:58:03,12
+limiar_luminosidade_lux,256,,2026-02-26 23:37:31,10
+tempo_min_entre_acoes_s,60,Limite de segurança configurável.,2026-02-24 01:36:50,15
+consigna_temperatura_alvo,21.6,,2026-01-10 03:03:21,17
+consigna_temperatura_alvo,22.0,,2026-02-28 09:02:00,11
+histerese_graus,19.3,Limite de segurança configurável.,2025-12-06 22:33:29,6
+histerese_graus,23.2,,2025-12-04 08:06:27,4
+consigna_temperatura_alvo,22.0,Ajuste após calibração do sensor.,2026-05-09 21:03:40,5
+limite_consumo_diario_kwh,atuador_6:22.91_kwh,Limite de segurança configurável.,2026-01-10 02:50:27,6
+intervalo_amostragem_min,60,Limite de segurança configurável.,2026-03-21 19:55:54,11
+limiar_luminosidade_lux,699,Limite de segurança configurável.,2026-02-26 06:07:28,12
+limite_consumo_diario_kwh,atuador_7:11.26_kwh,Regra automática associada ao atuador.,2026-01-03 12:50:39,7
+histerese_graus,21.9,Valor por defeito do fabricante; revisto em manutenção.,2026-03-28 20:08:50,3
+consigna_temperatura_alvo,22.8,Regra automática associada ao atuador.,2026-03-30 15:20:29,16
+modo_fora_horas,30,Ajuste após calibração do sensor.,2026-03-08 04:19:25,5
+consigna_temperatura_alvo,18.2,Valor por defeito do fabricante; revisto em manutenção.,2026-04-29 01:31:22,1
+consigna_temperatura_alvo,20.1,Regra automática associada ao atuador.,2025-12-22 18:33:49,2
+intervalo_amostragem_min,60,Regra automática associada ao atuador.,2026-05-09 10:29:16,14
+limite_consumo_diario_kwh,atuador_18:10.69_kwh,,2025-12-17 12:00:27,18
+tempo_min_entre_acoes_s,15,Limite de segurança configurável.,2026-03-02 06:05:49,5
+histerese_graus,23.7,Ajuste após calibração do sensor.,2026-03-25 12:03:12,9
+limite_consumo_diario_kwh,atuador_12:8.12_kwh,Regra automática associada ao atuador.,2026-04-14 15:11:16,12
+consigna_temperatura_alvo,21.2,Parâmetro de conforto ou poupança energética.,2026-04-27 17:29:12,10
+consigna_temperatura_alvo,23.6,Ajuste após calibração do sensor.,2025-11-30 21:42:04,4
+intervalo_amostragem_min,15,,2026-03-07 13:16:15,1
+modo_fora_horas,30,Valor por defeito do fabricante; revisto em manutenção.,2025-12-11 04:28:27,19
+tempo_min_entre_acoes_s,60,Limite de segurança configurável.,2026-02-20 22:22:03,4
+limite_consumo_diario_kwh,atuador_9:7.17_kwh,Parâmetro de conforto ou poupança energética.,2025-12-14 20:11:19,9
+modo_fora_horas,10,Limite de segurança configurável.,2025-11-28 17:31:23,13
+modo_fora_horas,30,,2026-04-18 21:37:20,13
+limite_consumo_diario_kwh,atuador_5:19.99_kwh,Ajuste após calibração do sensor.,2025-12-21 02:50:01,5

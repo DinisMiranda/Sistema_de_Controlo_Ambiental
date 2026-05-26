@@ -40,9 +40,9 @@ coverage/
 
 .cursor/
 .cursor/rules/
-scripts/.venv/
-scripts/.env
-scripts/generated/
+database/scripts/.venv/
+database/scripts/.env
+database/scripts/generated/
 
 # Python
 __pycache__/
