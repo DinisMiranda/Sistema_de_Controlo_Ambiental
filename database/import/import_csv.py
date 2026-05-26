@@ -229,6 +229,34 @@ def import_sensores(cfg: dict[str, str]) -> None:
     run_sql(cfg, sql)
     print(f"sensores: {len(rows)} rows")
 
+def import_atuadores(cfg: dict[str, str]) -> None:
+    rows = read_csv("atuadores_examination.csv")
+    if not rows:
+        return
+    values = []
+    for index, row in enumerate(rows, start=1):
+        values.append(
+            "("
+            f"{index}, "
+            f"{sql_literal(row['nome'])}, "
+            f"{sql_literal(row['tipo_atuador'])}, "
+            f"{sql_literal(row['localizacao'])}, "
+            f"{sql_literal(row['estado'])}, "
+            f"{sql_literal(row['Tipos_classe'])}, "
+            f"{sql_literal(row['Tipos_tipo'])}"
+            ")"
+        )
+    sql = (
+        "INSERT INTO `atuadores` "
+        "(`id_atuador`, `nome`, `tipo_atuador`, `localizacao`, `estado`, "
+        "`Tipos_classe`, `Tipos_tipo`) VALUES\n"
+        + ",\n".join(values)
+        + ";\n"
+        f"ALTER TABLE `atuadores` AUTO_INCREMENT = {len(rows) + 1};"
+    )
+    run_sql(cfg, sql)
+    print(f"atuadores: {len(rows)} rows")
+
 
 IMPORTERS = {
     "tipos": import_tipos,
@@ -236,6 +264,7 @@ IMPORTERS = {
     "utilizadores": import_utilizadores,
     "casa_administradores": import_casa_administradores,
     "sensores": import_sensores,
+    "atuadores": import_atuadores,
 }
 
 
