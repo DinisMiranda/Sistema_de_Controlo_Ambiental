@@ -74,3 +74,59 @@ export async function getCasaById(req: Request, res: Response) {
   res.json(mapCasaForAdmin(casa));
 }
 
+export async function createCasa(req: Request, res: Response) {
+  const { nome, morada, codigo_postal } = req.body;
+  if (!nome || !morada || !codigo_postal) {
+    return res.status(400).json({ error: "nome, morada e codigo_postal são obrigatórios" });
+  }
+  const created = await models.Casa.create({
+    nome,
+    morada,
+    codigo_postal,
+    data_criacao: new Date(),
+  });
+  res.status(201).json(mapCasaForAdmin(created));
+}
+
+export async function updateCasa(req: Request, res: Response) {
+  const id = Number(req.params.id);
+  if (Number.isNaN(id)) {
+    return res.status(400).json({ error: "ID inválido" });
+  }
+  const casa = await models.Casa.findByPk(id);
+  if (!casa) {
+    return res.status(404).json({ error: "Casa não encontrada" });
+  }
+  const { name, location, type, nome, morada, codigo_postal } = req.body;
+  await casa.update({
+    nome: nome ?? name ?? casa.get("nome"),
+    morada: morada ?? location ?? casa.get("morada"),
+    codigo_postal: codigo_postal ?? type ?? casa.get("codigo_postal"),
+  });
+  res.json(mapCasaForAdmin(casa));
+}
+
+export async function deleteCasa(req: Request, res: Response) {
+  const id = Number(req.params.id);
+  if (Number.isNaN(id)) {
+    return res.status(400).json({ error: "ID inválido" });
+  }
+  const deleted = await models.Casa.destroy({ where: { id_casa: id } });
+  if (!deleted) {
+    return res.status(404).json({ error: "Casa não encontrada" });
+  }
+  res.status(204).send();
+}
+
+export async function listDepartments(_req: Request, res: Response) {
+  const casas = await models.Casa.findAll({
+    attributes: ["id_casa", "nome"],
+    order: [["nome", "ASC"]],
+  });
+  res.json(
+    casas.map((c) => ({
+      id: c.get("id_casa"),
+      name: c.get("nome"),
+    })),
+  );
+}
