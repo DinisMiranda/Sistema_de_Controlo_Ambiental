@@ -1,459 +1,277 @@
-let roomsData = {};
+const SENSOR_ICONS = {
+  temperatura: { cls: "temp", icon: "ti-temperature" },
+  humidade: { cls: "hum", icon: "ti-droplet" },
+  luminosidade: { cls: "pres", icon: "ti-bulb" },
+  consumo: { cls: "co2", icon: "ti-bolt" },
+};
 
-function formatRoomKey(location) {
-  return String(location)
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9-]/g, "");
-}
-
-async function fetchSensorRooms() {
-  try {
-    const response = await fetchWithAuth("/api/sensores");
-
-    if (!response.ok) {
-      console.error("Não foi possível carregar os sensores do backend.");
-      return {};
-    }
-
-    const data = await response.json();
-    console.log("Resposta da API de sensores:", data);
-    console.log(data);
-    console.log("TYPE:", typeof data);
-    console.log("IS ARRAY:", Array.isArray(data));
-
-    const sensors = Array.isArray(data)
-      ? data
-      : Array.isArray(data.data)
-        ? data.data
-        : Array.isArray(data.sensores)
-          ? data.sensores
-          : [];
-    console.log("Sensores processados:", sensors);
-
-    const rooms = {};
-
-    sensors.forEach((sensor) => {
-      const location = sensor.localizacao || "Desconhecido";
-      const roomKey = formatRoomKey(location);
-
-      if (!rooms[roomKey]) {
-        rooms[roomKey] = {
-          id: roomKey,
-          name: location,
-          sensors: [],
-        };
-      }
-
-      rooms[roomKey].sensors.push(sensor);
-    });
-
-    return rooms;
-  } catch (error) {
-    console.error("Erro ao buscar dados de sensores:", error);
-    return {};
+function sensorIcon(tipo) {
+  const t = String(tipo || "").toLowerCase();
+  for (const key of Object.keys(SENSOR_ICONS)) {
+    if (t.includes(key)) return SENSOR_ICONS[key];
   }
-}
-
-function getSensorByType(room, typeRegExp) {
-  if (!room || !Array.isArray(room.sensors)) return null;
-
-  return room.sensors.find((sensor) => {
-    const type =
-      sensor.tipo_sensor || sensor.tipo || sensor.tipo_sensores || "";
-
-    return typeRegExp.test(type);
-  });
+  return { cls: "pres", icon: "ti-cpu" };
 }
 
 function sensorIdOf(sensor) {
   return sensor?.id_sensor ?? sensor?.id;
 }
 
-async function fetchLatestReading(sensorId) {
+function isActiveSensor(sensor) {
+  const estado = String(sensor.estado || "").toLowerCase();
+  return estado !== "offline" && estado !== "inativo";
+}
+
+async function fetchLatest(sensorId) {
   if (!sensorId) return null;
   try {
-    const response = await fetchWithAuth(`/api/sensores/${sensorId}/latest`);
-    if (!response.ok) return null;
-    return response.json();
-  } catch (error) {
-    console.error("Erro ao carregar leituras do sensor:", error);
+    const res = await fetchWithAuth(`/api/sensores/${sensorId}/latest`);
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
     return null;
   }
 }
 
-function parseReadingValue(reading) {
-  if (!reading || reading.valor === undefined || reading.valor === null) {
-    return null;
-  }
-
-  const value = Number(reading.valor);
-  return Number.isFinite(value) ? value : reading.valor;
-}
-
-function determineRoomStatus(temperature, humidity, co2) {
-  if (
-    (typeof temperature === "number" &&
-      (temperature < 18 || temperature > 26)) ||
-    (typeof humidity === "number" && (humidity < 35 || humidity > 65)) ||
-    (typeof co2 === "number" && co2 > 1000)
-  ) {
-    return "alert";
-  }
-
-  if (
-    (typeof temperature === "number" &&
-      (temperature < 20 || temperature > 24)) ||
-    (typeof humidity === "number" && (humidity < 40 || humidity > 60)) ||
-    (typeof co2 === "number" && co2 > 800)
-  ) {
-    return "attention";
-  }
-
-  return "comfortable";
-}
-
-function getStatusText(status) {
-  switch (status) {
-    case "alert":
-      return "Atenção — Revisão Necessária";
-    case "attention":
-      return "Atenção — Monitorar Condições";
-    default:
-      return "Ambiente Confortável";
+async function loadUserFromApi() {
+  try {
+    const res = await fetchWithAuth("/api/auth/me");
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data?.user) {
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          ...data.user,
+          name: data.user.nome || data.user.name,
+        }),
+      );
+    }
+  } catch {
+    /* ignore */
   }
 }
 
-function getAirQualityLabel(co2) {
-  if (typeof co2 !== "number") return "Desconhecida";
-  if (co2 <= 800) return "Boa";
-  if (co2 <= 1000) return "Moderada";
-  return "Péssima";
-}
+async function loadSensors() {
+  const list = document.getElementById("sensor-list");
+  try {
+    const res = await fetchWithAuth("/api/sensores");
+    if (!res.ok) throw new Error("sensores");
+    const sensors = await res.json();
+    const active = sensors.filter(isActiveSensor);
 
-async function initializeDashboard() {
-  roomsData = await fetchSensorRooms();
-  populateRoomSelector();
+    document.getElementById("kpi-sensors").textContent = active.length;
+    document.getElementById("online-count").textContent = `${active.length} online`;
+    document.getElementById("kpi-sensors-sub").textContent = `${sensors.length} sensores total`;
 
-  const roomKeys = Object.keys(roomsData);
-  if (roomKeys.length > 0) {
-    await updateRoomData(roomKeys[0]);
+    const withReadings = await Promise.all(
+      sensors.slice(0, 8).map(async (s) => ({
+        sensor: s,
+        latest: await fetchLatest(sensorIdOf(s)),
+      })),
+    );
+
+    const temps = withReadings
+      .filter(({ sensor, latest }) =>
+        /temperatura/i.test(sensor.tipo_sensor || "") && latest?.valor != null,
+      )
+      .map(({ latest }) => Number(latest.valor))
+      .filter(Number.isFinite);
+
+    if (temps.length) {
+      const avg = temps.reduce((a, b) => a + b, 0) / temps.length;
+      document.getElementById("kpi-temp").textContent = `${avg.toFixed(1)}°`;
+      document.getElementById("kpi-temp-sub").textContent = `${temps.length} leituras`;
+    } else {
+      document.getElementById("kpi-temp-sub").textContent = "sem dados";
+    }
+
+    list.innerHTML = "";
+    withReadings.slice(0, 5).forEach(({ sensor, latest }) => {
+      const { cls, icon } = sensorIcon(sensor.tipo_sensor);
+      const val =
+        latest?.valor != null
+          ? `${latest.valor}${latest.unidade || ""}`
+          : "—";
+      const estado = String(sensor.estado || "ok").toLowerCase();
+      const dotCls =
+        estado === "offline" || estado === "inativo"
+          ? "err"
+          : estado.includes("manuten")
+            ? "warn"
+            : "ok";
+      const valStyle =
+        dotCls === "err"
+          ? "color:var(--txt3)"
+          : dotCls === "warn"
+            ? "color:var(--red)"
+            : "";
+
+      list.insertAdjacentHTML(
+        "beforeend",
+        `<div class="srow">
+          <div class="sico ${cls}"><i class="ti ${icon}" aria-hidden="true"></i></div>
+          <div class="si">
+            <div class="sn">${sensor.nome || sensor.tipo_sensor || "Sensor"}</div>
+            <div class="sl">${(sensor.localizacao || "—").toLowerCase().replace(/\s+/g, "-")}</div>
+          </div>
+          <div class="sv" style="${valStyle}">${val}</div>
+          <div class="sdot ${dotCls}"></div>
+        </div>`,
+      );
+    });
+
+    document.getElementById("readings-ts").textContent = "atualizado agora";
+
+    const alertCount = sensors.filter((s) => {
+      const e = String(s.estado || "").toLowerCase();
+      return e.includes("manuten") || e === "inativo";
+    }).length;
+    document.getElementById("kpi-alerts").textContent = String(alertCount);
+    document.getElementById("kpi-alerts-sub").textContent = `${alertCount} sensores`;
+    document.getElementById("alerts-meta").textContent = `${alertCount} ativo${alertCount !== 1 ? "s" : ""}`;
+
+    renderAlertsFromSensors(sensors);
+  } catch {
+    list.innerHTML = '<div class="muted">Erro ao carregar sensores.</div>';
   }
 }
+
+function renderAlertsFromSensors(sensors) {
+  const list = document.getElementById("alert-list");
+  const flagged = sensors.filter((s) => {
+    const e = String(s.estado || "").toLowerCase();
+    return e.includes("manuten") || e === "inativo";
+  });
+
+  if (!flagged.length) {
+    list.innerHTML = `<div class="ai ok">
+      <i class="ti ti-check" aria-hidden="true"></i>
+      <div><div class="at">Todos os sensores operacionais</div><div class="ats">sem alertas</div></div>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = "";
+  flagged.slice(0, 4).forEach((s) => {
+    const cls = String(s.estado).toLowerCase().includes("manuten") ? "w" : "e";
+    const icon = cls === "w" ? "ti-alert-triangle" : "ti-alert-circle";
+    list.insertAdjacentHTML(
+      "beforeend",
+      `<div class="ai ${cls}">
+        <i class="ti ${icon}" aria-hidden="true"></i>
+        <div>
+          <div class="at">${s.nome || "Sensor"} — ${s.estado}</div>
+          <div class="ats">${s.localizacao || "—"} · #${sensorIdOf(s)}</div>
+        </div>
+      </div>`,
+    );
+  });
+}
+
+const DAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+
+async function loadConsumo() {
+  try {
+    let res = await fetchWithAuth("/api/reports");
+    if (!res.ok) res = await fetchWithAuth("/api/consumo/consumption");
+    if (!res.ok) return;
+
+    const data = await res.json();
+    if (!Array.isArray(data) || !data.length) return;
+
+    const byDay = new Map();
+    data.forEach((row) => {
+      const d = new Date(row.periodo_fim || row.updatedAt || Date.now());
+      const key = d.toLocaleDateString("pt-PT");
+      const val = Number(row.consumo ?? row.value ?? 0);
+      byDay.set(key, (byDay.get(key) || 0) + val);
+    });
+
+    const entries = [...byDay.entries()].slice(-7);
+    const nums = entries.map(([, v]) => v);
+    const labels = entries.map(([k], i) => {
+      const d = new Date(k.split("/").reverse().join("-"));
+      return Number.isNaN(d.getTime()) ? DAYS[i % 7] : DAYS[d.getDay()];
+    });
+
+    const max = Math.max(...nums, 1);
+    const total = nums.reduce((a, b) => a + b, 0);
+    const peakIdx = nums.indexOf(Math.max(...nums));
+
+    document.getElementById("chart-total").textContent =
+      `${Math.round(total).toLocaleString("pt-PT")} kWh`;
+    document.getElementById("chart-peak").textContent =
+      `${labels[peakIdx] || "—"} · ${Math.round(nums[peakIdx] || 0)} kWh`;
+    document.getElementById("kpi-consumo").textContent = Math.round(
+      nums[nums.length - 1] || 0,
+    ).toLocaleString("pt-PT");
+    document.getElementById("kpi-consumo-sub").textContent = "kWh (último dia)";
+
+    const chart = document.getElementById("chart");
+    chart.innerHTML = "";
+    nums.forEach((v, i) => {
+      const pct = Math.round((v / max) * 100);
+      const isLast = i === nums.length - 1;
+      const isPeak = i === peakIdx;
+      const bg = isLast ? "#ff6b00" : isPeak ? "#cc4400" : "#2a1400";
+      const labelColor = isLast ? "#ff6b00" : "#4a4540";
+      chart.insertAdjacentHTML(
+        "beforeend",
+        `<div class="bw">
+          <div class="bv">${Math.round(v)}</div>
+          <div class="b" style="height:${pct}%;background:${bg};"></div>
+          <div class="bl" style="color:${labelColor}">${labels[i]}</div>
+        </div>`,
+      );
+    });
+  } catch {
+    document.getElementById("kpi-consumo-sub").textContent = "sem dados";
+  }
+}
+
+async function loadRooms() {
+  const grid = document.getElementById("room-grid");
+  try {
+    const res = await fetchWithAuth("/api/salas");
+    if (!res.ok) throw new Error("salas");
+    const salas = await res.json();
+    document.getElementById("rooms-meta").textContent =
+      `${salas.length} sala${salas.length !== 1 ? "s" : ""}`;
+
+    grid.innerHTML = "";
+    salas.slice(0, 6).forEach((sala, i) => {
+      const name = sala.name || sala.nome || `Sala ${i + 1}`;
+      const href = `detalhe_departamento.html?room=${encodeURIComponent(sala.id)}`;
+      grid.insertAdjacentHTML(
+        "beforeend",
+        `<a class="rc ${i === 0 ? "act" : ""}" href="${href}">
+          <div class="rn">${name}</div>
+          <div class="rm"><span class="rmv">${sala.badge || "Ativo"}</span></div>
+          <div class="rbar"><div class="rfill" style="width:${50 + i * 8}%;background:${i === 0 ? "var(--ora)" : "var(--txt3)"}"></div></div>
+        </a>`,
+      );
+    });
+  } catch {
+    grid.innerHTML = '<div class="muted" style="grid-column:1/-1">Erro ao carregar salas.</div>';
+  }
+}
+
+async function loadAll() {
+  await loadUserFromApi();
+  await Promise.allSettled([loadSensors(), loadConsumo(), loadRooms()]);
+}
+
 
 document.addEventListener("DOMContentLoaded", async () => {
   const user = await requireAuth();
   if (!user) return;
 
-  initializeHeader();
-  initializeUserAvatar();
-  loadUserInfo();
-  setupLogout();
-  initializeControlMode();
+  setupShell("dashboard");
+  startTimestampClock();
 
-  const adminLink = document.querySelector(".admin-link");
+  document.getElementById("btn-refresh")?.addEventListener("click", loadAll);
 
-  if (adminLink) {
-    const isAdmin =
-      user && String(user.role || "").toLowerCase() === "admin";
-
-    if (!isAdmin) {
-      adminLink.style.display = "none";
-    }
-  }
-
-  await initializeDashboard();
+  await loadAll();
+  setInterval(loadSensors, 30000);
 });
-function initializeHeader() {
-  console.log("Header inicializado");
-}
-
-function populateRoomSelector() {
-  const roomSelect = document.getElementById("room-select");
-
-  if (!roomSelect) {
-    console.error("Seletor de sala não encontrado");
-    return;
-  }
-
-  roomSelect.innerHTML = "";
-
-  if (Object.keys(roomsData).length === 0) {
-    roomSelect.innerHTML = '<option value="">Nenhuma sala encontrada</option>';
-    return;
-  }
-
-  Object.values(roomsData).forEach((room) => {
-    const option = document.createElement("option");
-    option.value = room.id;
-    option.textContent = room.name;
-    roomSelect.appendChild(option);
-  });
-
-  roomSelect.onchange = function (e) {
-    updateRoomData(e.target.value);
-  };
-}
-
-async function loadRoomsData(roomID) {
-  try {
-    const response = await fetchWithAuth(`/api/sensores?sala=${roomID}`);
-    const data = await response.json();
-
-    updateDashboard(data);
-  } catch (error) {
-    console.error("Erro ao carregar dados das salas:", error);
-    return [];
-  }
-}
-
-function updateDashboard(data) {
-  document.getElementById("temperature").textContent = data.temperatura + "°C";
-
-  document.getElementById("humidity").textContent = data.humidade + "%";
-
-  document.getElementById("light").textContent = data.iluminacao + "%";
-}
-
-async function updateRoomData(roomId) {
-  const room = roomsData[roomId];
-  if (!room) {
-    console.error("Dados da sala não encontrados:", roomId);
-    return;
-  }
-
-  const temperatureSensor = getSensorByType(room, /temperatura/i);
-  const humiditySensor = getSensorByType(room, /humidade|umidade/i);
-  const lightSensor = getSensorByType(
-    room,
-    /luminosidade|iluminacao|iluminação|lux/i,
-  );
-  const co2Sensor = getSensorByType(room, /co2/i);
-
-  const [temperatureReading, humidityReading, lightReading, co2Reading] =
-    await Promise.all([
-      fetchLatestReading(sensorIdOf(temperatureSensor)),
-      fetchLatestReading(sensorIdOf(humiditySensor)),
-      fetchLatestReading(sensorIdOf(lightSensor)),
-      fetchLatestReading(sensorIdOf(co2Sensor)),
-    ]);
-
-  const temperature = parseReadingValue(temperatureReading);
-  const humidity = parseReadingValue(humidityReading);
-  const lightValue = parseReadingValue(lightReading);
-  const co2 = parseReadingValue(co2Reading);
-
-  const airQuality = getAirQualityLabel(co2);
-  const status = determineRoomStatus(temperature, humidity, co2);
-  const statusText = getStatusText(status);
-  const statusIcon =
-    status === "comfortable"
-      ? "check"
-      : status === "attention"
-        ? "warning"
-        : "alert";
-
-  const roomTitle = document.getElementById("current-room-title");
-  if (roomTitle) {
-    roomTitle.textContent = `Condições Atuais - ${room.name}`;
-  }
-
-  const tempValue = document.getElementById("temperature-value");
-  if (tempValue) {
-    const target = typeof temperature === "number" ? temperature : 0;
-    if (typeof temperature === "number") {
-      animateValue(
-        tempValue,
-        parseFloat(tempValue.textContent) || 0,
-        temperature,
-        500,
-      );
-    } else {
-      tempValue.textContent = "N/A";
-    }
-  }
-
-  const humidityValue = document.getElementById("humidity-value");
-
-  if (humidityValue) {
-    if (typeof humidity === "number") {
-      animateValue(
-        humidityValue,
-        parseFloat(humidityValue.textContent) || 0,
-        humidity,
-        500,
-      );
-    } else {
-      humidityValue.textContent = "N/A";
-    }
-  }
-
-  const airQualityValue = document.getElementById("air-quality-value");
-  if (airQualityValue) {
-    airQualityValue.textContent = airQuality;
-  }
-
-  const lightPercentage = document.getElementById("light-percentage");
-  if (lightPercentage) {
-    lightPercentage.textContent =
-      typeof lightValue === "number" ? `${Math.round(lightValue)}` : "N/A";
-  }
-
-  const lightInfo = document.querySelector(".light-info");
-  if (lightInfo) {
-    lightInfo.textContent =
-      typeof lightValue === "number"
-        ? `Luminosidade atual: ${Math.round(lightValue)} ${lightReading?.unidade || ""}`
-        : "Luminosidade indisponível";
-  }
-
-  updateComfortStatus(status, statusText, statusIcon);
-
-  console.log("✅ Sala atualizada:", room.name);
-}
-
-function updateComfortStatus(status, text, icon) {
-  const statusIndicator = document.querySelector(".status-indicator");
-
-  if (!statusIndicator) return;
-
-  statusIndicator.classList.remove(
-    "status-comfortable",
-    "status-attention",
-    "status-alert",
-  );
-  statusIndicator.classList.add(`status-${status}`);
-
-  const statusText = statusIndicator.querySelector(".status-text");
-  if (statusText) {
-    statusText.textContent = text;
-  }
-
-  const statusIconElement = statusIndicator.querySelector(".status-icon");
-  if (statusIconElement) {
-    statusIconElement.innerHTML = getStatusIcon(icon);
-  }
-}
-
-function getStatusIcon(iconType) {
-  const icons = {
-    check: `
-      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-      <polyline points="22 4 12 14.01 9 11.01"></polyline>
-    `,
-    warning: `
-      <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
-      <line x1="12" y1="9" x2="12" y2="13"></line>
-      <line x1="12" y1="17" x2="12.01" y2="17"></line>
-    `,
-    alert: `
-      <circle cx="12" cy="12" r="10"></circle>
-      <line x1="12" y1="8" x2="12" y2="12"></line>
-      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-    `,
-  };
-
-  return icons[iconType] || icons.check;
-}
-
-function animateValue(element, start, end, duration) {
-  const range = end - start;
-  const increment = range / (duration / 16);
-  let current = start;
-
-  const timer = setInterval(() => {
-    current += increment;
-
-    if (
-      (increment > 0 && current >= end) ||
-      (increment < 0 && current <= end)
-    ) {
-      current = end;
-      clearInterval(timer);
-    }
-
-    const displayValue = Number.isFinite(end)
-      ? Number.isInteger(end)
-        ? Math.round(current)
-        : current.toFixed(1)
-      : end;
-    element.textContent = displayValue;
-  }, 16);
-}
-
-function getUserDisplayName(user) {
-  return user?.name || user?.nome || user?.email || "";
-}
-
-function initializeUserAvatar() {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const avatarInitials = document.getElementById("user-initials");
-  const displayName = getUserDisplayName(user);
-
-  if (user && displayName && avatarInitials) {
-    const names = displayName.split(" ");
-    const initials =
-      names.length >= 2
-        ? names[0][0] + names[names.length - 1][0]
-        : names[0][0] + (names[0][1] || "");
-
-    avatarInitials.textContent = initials.toUpperCase();
-  }
-}
-
-function loadUserInfo() {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const userInfoElement = document.getElementById("user-info");
-
-  if (user && userInfoElement) {
-    userInfoElement.textContent = `👤 ${getUserDisplayName(user) || "Utilizador"}`;
-  }
-}
-
-function setupLogout() {
-  const logoutBtn = document.getElementById("logout-btn");
-
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      window.location.href = "login.html";
-    });
-  }
-}
-
-function initializeControlMode() {
-  const toggleModeBtn = document.getElementById("toggle-mode");
-  const controlModeSpan = document.getElementById("control-mode");
-  const modeDescription = document.getElementById("mode-description");
-
-  if (!toggleModeBtn || !controlModeSpan || !modeDescription) return;
-
-  let currentMode = localStorage.getItem("controlMode") || "Automático";
-
-  function updateModeUI(mode) {
-    controlModeSpan.textContent = mode;
-    controlModeSpan.classList.remove("automatic", "manual");
-
-    if (mode === "Automático") {
-      controlModeSpan.classList.add("automatic");
-      modeDescription.textContent =
-        "O sistema ajusta automaticamente as condições ambientais.";
-      toggleModeBtn.textContent = "Alterar para Manual";
-    } else {
-      controlModeSpan.classList.add("manual");
-      modeDescription.textContent =
-        "O utilizador passa a controlar manualmente as definições do sistema.";
-      toggleModeBtn.textContent = "Alterar para Automático";
-    }
-  }
-
-  updateModeUI(currentMode);
-
-  toggleModeBtn.addEventListener("click", function () {
-    currentMode = currentMode === "Automático" ? "Manual" : "Automático";
-    localStorage.setItem("controlMode", currentMode);
-    updateModeUI(currentMode);
-  });
-}

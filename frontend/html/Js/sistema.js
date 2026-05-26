@@ -6,32 +6,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   const user = await requireAuth();
   if (!user) return;
 
-  setupLogout();
+  setupShell("sistema");
+  startTimestampClock();
   setupRanges();
   setupActions();
   updateHeaderMeta();
-  loadUserInfo();
   await loadSystemData();
-});
-
-// ========================================
-// CONTROLO DE ACESSO ADMIN
-// ========================================
-
-document.addEventListener("DOMContentLoaded", () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-
-  const adminLink = document.querySelector(".admin-link");
-
-  if (!adminLink) return;
-
-  const isAdmin =
-    user &&
-    String(user.role || "").toLowerCase() === "admin";
-
-  if (!isAdmin) {
-    adminLink.style.display = "none";
-  }
 });
 
 async function loadSystemData() {

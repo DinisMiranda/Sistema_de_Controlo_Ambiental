@@ -210,29 +210,10 @@ document.addEventListener("DOMContentLoaded", async function () {
   const user = await requireAuth();
   if (!user) return;
 
-  console.log("🏢 Página de Departamentos inicializando...");
-
-  // checkAdminAccess();
-  setupLogout();
+  setupShell("salas");
+  startTimestampClock();
   await initializeDepartments();
   setupFilters();
-  loadUserInfo();
-
-  console.log("✅ Departamentos carregados com sucesso!");
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-
-  const adminLink = document.querySelector(".admin-link");
-
-  if (!adminLink) return;
-
-  const isAdmin = user && String(user.role || "").toLowerCase() === "admin";
-
-  if (!isAdmin) {
-    adminLink.style.display = "none";
-  }
 });
 
 function renderDepartmentCards(filter = "all") {
@@ -504,30 +485,3 @@ function goToRoomControl(roomId) {
   window.location.href = `detalhe_departamento.html?room=${encodeURIComponent(roomId)}&scroll=control`;
 }
 
-function setupLogout() {
-  const logoutBtn = document.getElementById("logout-btn");
-
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      window.location.href = "login.html";
-    });
-  }
-}
-function loadUserInfo() {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const userInfoElement = document.getElementById("user-info");
-
-  if (user && userInfoElement) {
-    const displayName = user.name || user.nome || user.email || "Utilizador";
-    userInfoElement.textContent = `👤 ${displayName}`;
-  }
-}
-
-async function initializePage() {
-  const user = await requireAuth();
-  if (!user) return;
-
-  console.log("🚀 Inicializando página de departamentos...");
-}

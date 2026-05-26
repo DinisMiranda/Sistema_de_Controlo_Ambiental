@@ -19,6 +19,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
+  setupShell("admin");
+  startTimestampClock();
+
   try {
   await loadUsers().then(populateUsersTable);
 } catch (e) {

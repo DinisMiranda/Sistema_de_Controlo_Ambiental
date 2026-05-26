@@ -1,45 +1,62 @@
-<!doctype html>
-<html lang="pt-BR">
+<!DOCTYPE html>
+<html lang="pt">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Dashboard</title>
+    <title>SCA — Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+    <link rel="stylesheet" href="Css/sca-theme.css" />
     <link rel="stylesheet" href="Css/style.css" />
     <script src="Js/config.js"></script>
     <script src="Js/session.js" defer></script>
+    <script src="Js/layout.js" defer></script>
     <script src="Js/admin.js" defer></script>
   </head>
   <body>
-    <header
-      style="
-        padding: 1rem;
-        border-bottom: 1px solid var(--border);
-        background: linear-gradient(90deg, #f97316, #3b82f6, #eab308);
-        -webkit-background-clip: text;
-        color: transparent;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      "
-    >
-      <div>
-        <h1>Admin Dashboard</h1>
-        <small>Gestão completa do sistema</small>
-      </div>
-      <a
-        href="dashboard.html"
-        style="
-          padding: 0.75rem 1.5rem;
-          background: var(--primary);
-          color: white;
-          border-radius: 4px;
-          text-decoration: none;
-          font-weight: 600;
-          cursor: pointer;
-        "
-        >🏠 Return to Dashboard</a
-      >
-    </header>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="logo">
+          <div class="logo-box"><i class="ti ti-leaf" aria-hidden="true"></i></div>
+          <div>
+            <div class="logo-name">SCA</div>
+            <div class="logo-ver">v2.1.0</div>
+          </div>
+        </div>
+        <nav>
+          <div class="nav-sect">overview</div>
+          <a class="nav-item" data-nav="dashboard" href="dashboard.html"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+          <a class="nav-item" data-nav="salas" href="departamento.html"><i class="ti ti-building"></i>Salas</a>
+          <div class="nav-sect">controlo</div>
+          <a class="nav-item" data-nav="relatorios" href="relatorio.html"><i class="ti ti-file-analytics"></i>Relatórios</a>
+          <div class="nav-sect">sistema</div>
+          <a class="nav-item" data-nav="sistema" href="sistema.html"><i class="ti ti-shield-check"></i>Sistema</a>
+          <a class="nav-item admin-link active" data-nav="admin" href="admin.html"><i class="ti ti-users"></i>Admin</a>
+        </nav>
+        <div class="sidebar-foot">
+          <div class="user">
+            <div class="ava" id="user-initials">?</div>
+            <div>
+              <div class="uname" id="user-name">—</div>
+              <div class="urole" id="user-role">—</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div class="main">
+        <header class="topbar">
+          <div>
+            <div class="page-ttl">Admin</div>
+            <div class="page-ts" id="timestamp">—</div>
+          </div>
+          <div class="tb-right">
+            <a class="tb-btn" href="dashboard.html" title="Dashboard" aria-label="Dashboard"><i class="ti ti-layout-dashboard"></i></a>
+            <button class="tb-btn" type="button" title="Sair" aria-label="Sair" id="logout-btn"><i class="ti ti-logout"></i></button>
+          </div>
+        </header>
+        <div class="body">
     <main class="content">
       <!-- Tab Navigation -->
       <div
@@ -1282,6 +1299,9 @@
             </button>
           </div>
         </form>
+      </div>
+    </div>
+        </div>
       </div>
     </div>
   </body>

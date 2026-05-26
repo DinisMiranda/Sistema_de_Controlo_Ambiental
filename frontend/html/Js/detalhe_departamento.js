@@ -236,6 +236,7 @@ function loadUserInfo() {
 function updateRoomHeader() {
   const breadcrumbRoom = document.getElementById("breadcrumb-room");
   const roomTitle = document.getElementById("room-title");
+  const pageRoomTitle = document.getElementById("page-room-title");
   const roomBadge = document.getElementById("room-badge");
   const statusBadge = document.getElementById("room-status-badge");
   const roomStatusText = document.getElementById("room-status-text");
@@ -243,6 +244,7 @@ function updateRoomHeader() {
 
   if (breadcrumbRoom) breadcrumbRoom.textContent = currentRoom.name;
   if (roomTitle) roomTitle.textContent = `📍 ${currentRoom.name}`;
+  if (pageRoomTitle) pageRoomTitle.textContent = currentRoom.name;
   if (roomBadge) roomBadge.textContent = currentRoom.badge || "Ativo";
 
   if (statusBadge) {
@@ -550,51 +552,12 @@ function createLineChart(container, data, color, minValue, maxValue) {
   container.appendChild(svg);
 }
 
-function loadUserInfo() {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const userInfoElement = document.getElementById("user-info");
-
-  if (user && userInfoElement) {
-    userInfoElement.textContent = `👤 ${user.name}`;
-  }
-}
-
-function setupLogout() {
-  const logoutBtn = document.getElementById("logout-btn");
-
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      window.location.href = "login.html";
-    });
-  }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-
-  const adminLink = document.querySelector(".admin-link");
-
-  if (!adminLink) return;
-
-  const isAdmin =
-    user &&
-    String(user.role || "").toLowerCase() === "admin";
-
-  if (!isAdmin) {
-    adminLink.style.display = "none";
-  }
-});
-
 async function initializeRoomDetails() {
   const user = await requireAuth();
   if (!user) return;
 
-  loadUserInfo();
-  setupLogout();
-  loadUserInfo();
-  // checkAdminAccess();
+  setupShell("salas");
+  startTimestampClock();
 
   const urlParams = new URLSearchParams(window.location.search);
   const roomId = urlParams.get("room");

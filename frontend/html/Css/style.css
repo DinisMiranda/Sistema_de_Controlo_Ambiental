@@ -99,13 +99,13 @@ a:hover {
   text-decoration: underline;
 }
 
-/* ===== Sidebar Dashboard ===== */
+/* ===== Layout legado (.dashboard) — não aplicar ao .shell do tema SCA ===== */
 .dashboard {
   display: flex;
   height: 100vh;
 }
 
-.sidebar {
+.dashboard .sidebar {
   width: 280px;
   background-color: var(--bg-card);
   border-right: 10px solid var(--border);
@@ -114,7 +114,7 @@ a:hover {
   justify-content: space-between;
 }
 
-.nav-item {
+.dashboard .nav-item {
   padding: 1rem 1.5rem;
   display: flex;
   align-items: center;
@@ -124,18 +124,18 @@ a:hover {
   transition: background 0.2s;
 }
 
-.nav-item.active {
+.dashboard .nav-item.active {
   border-left: 4px solid var(--accent-orange);
   background: rgba(249, 115, 22, 0.1);
   color: var(--text-main);
 }
 
-.nav-item:hover {
+.dashboard .nav-item:hover {
   background-color: var(--border);
   color: var(--text-main);
 }
 
-.content {
+.dashboard .content {
   flex: 1;
   padding: 2rem;
   background-color: var(--bg-main);
@@ -171,7 +171,7 @@ a:hover {
   .login-page {
     flex-direction: column;
   }
-  .sidebar {
+  .dashboard .sidebar {
     display: none;
   }
 }

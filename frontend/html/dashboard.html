@@ -1,147 +1,140 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sistema de Controlo Ambiental</title>
-    <link rel="stylesheet" href="Css/style.css" />
-    <script src="Js/config.js"></script>
-    <script src="Js/session.js" defer></script>
-    <script src="Js/dashboard.js" defer></script>
-  </head>
-  <body>
-    <div class="dashboard">
-      <aside class="sidebar">
-        <div class="sidebar-top">
-          <h2>Sistema de Controlo Ambiental</h2>
-          <a href="#" class="nav-item active">🏠 Home</a>
-          <a href="departamento.html" class="nav-item">📈 Departamentos</a>
-          <a href="relatorio.html" class="nav-item">📄 Relatórios</a>
-          <a href="sistema.html" class="nav-item">⚙️ Sistema</a>
-          <a href="admin.html" class="nav-item admin-link">🛡️ Admin</a>
-        </div>
-        <div class="sidebar-bottom">
-          <p id="user-info"></p>
-          <button id="logout-btn" class="btn-primary">Sair</button>
-        </div>
-      </aside>
-
-      <main class="content">
-  <!-- NOVO: Header Superior -->
-  <header class="dashboard-header">
-    <div class="header-left">
-      <div class="header-logo"></div>
-      <div class="header-titles">
-        <h1 class="header-title">Dashboard de Controlo</h1>
-        <p class="header-subtitle">Monitoramento em tempo real</p>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SCA — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="Css/sca-theme.css" />
+  <link rel="stylesheet" href="Css/style.css" />
+  <script src="Js/config.js"></script>
+  <script src="Js/session.js" defer></script>
+  <script src="Js/layout.js" defer></script>
+  <script src="Js/dashboard.js" defer></script>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-box"><i class="ti ti-leaf" aria-hidden="true"></i></div>
+      <div>
+        <div class="logo-name">SCA</div>
+        <div class="logo-ver">v2.1.0</div>
       </div>
     </div>
-    
-    <div class="header-right">
-      <div class="room-selector">
-        <label for="room-select" class="visually-hidden">Selecionar Sala</label>
-        <select id="room-select" class="room-select">
-          <option value="sala-101">Sala 101</option>
-          <option value="sala-102">Sala 102</option>
-          <option value="sala-201">Sala 201</option>
-          <option value="auditorio">Auditório Principal</option>
-          <option value="laboratorio">Laboratório A</option>
-        </select>
+    <nav>
+      <div class="nav-sect">overview</div>
+      <a class="nav-item active" data-nav="dashboard" href="dashboard.html"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+      <a class="nav-item" data-nav="salas" href="departamento.html"><i class="ti ti-building"></i>Salas</a>
+      <div class="nav-sect">controlo</div>
+      <a class="nav-item" data-nav="relatorios" href="relatorio.html"><i class="ti ti-file-analytics"></i>Relatórios</a>
+      <div class="nav-sect">sistema</div>
+      <a class="nav-item" data-nav="sistema" href="sistema.html"><i class="ti ti-shield-check"></i>Sistema</a>
+      <a class="nav-item admin-link" data-nav="admin" href="admin.html"><i class="ti ti-users"></i>Admin</a>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="user">
+        <div class="ava" id="user-initials">?</div>
+        <div>
+          <div class="uname" id="user-name">—</div>
+          <div class="urole" id="user-role">—</div>
+        </div>
       </div>
     </div>
-  </header>
+  </aside>
 
-  <!-- Card: Condições Atuais -->
-<div class="card conditions-card">
-  <div class="card-header">
-    <h2 id="current-room-title">Condições Atuais - Sala 101</h2>
-  </div>
-  
-  <div class="metrics-grid">
-<!-- Métrica: Temperatura -->
-<div class="metric-card temperature-card">
-  <div class="metric-icon">
-    <svg xmlns="[w3.org](http://www.w3.org/2000/svg)" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"></path>
-    </svg>
-  </div>
-  <div class="metric-value" id="temperature-value"></div>
-  <div class="metric-unit">°C</div>
-  <div class="metric-label">Temperatura</div>
+  <div class="main">
+    <header class="topbar">
+      <div>
+        <div class="page-ttl">Dashboard</div>
+        <div class="page-ts" id="timestamp">—</div>
+      </div>
+      <div class="tb-right">
+        <div class="pill-live"><span class="dot"></span><span id="online-count">— online</span></div>
+        <button class="tb-btn" type="button" title="Atualizar" aria-label="Atualizar" id="btn-refresh"><i class="ti ti-refresh"></i></button>
+        <button class="tb-btn" type="button" title="Sair" aria-label="Sair" id="logout-btn"><i class="ti ti-logout"></i></button>
+      </div>
+    </header>
 
-  <button class="btn-temperature" id="btn-temp">Ver Temperatura</button>
-</div>
+    <div class="body">
+      <div class="kpis">
+        <div class="kpi ora">
+          <div class="kpi-line"></div>
+          <div class="kpi-ico"><i class="ti ti-cpu" aria-hidden="true"></i></div>
+          <div class="kpi-lbl">sensores ativos</div>
+          <div class="kpi-num" id="kpi-sensors">—</div>
+          <div class="kpi-sub nu" id="kpi-sensors-sub">a carregar…</div>
+        </div>
+        <div class="kpi dim">
+          <div class="kpi-line"></div>
+          <div class="kpi-ico"><i class="ti ti-temperature" aria-hidden="true"></i></div>
+          <div class="kpi-lbl">temp. média</div>
+          <div class="kpi-num" id="kpi-temp">—</div>
+          <div class="kpi-sub nu" id="kpi-temp-sub">a carregar…</div>
+        </div>
+        <div class="kpi ora">
+          <div class="kpi-line"></div>
+          <div class="kpi-ico"><i class="ti ti-bolt" aria-hidden="true"></i></div>
+          <div class="kpi-lbl">consumo hoje</div>
+          <div class="kpi-num" id="kpi-consumo">—</div>
+          <div class="kpi-sub ora" id="kpi-consumo-sub">a carregar…</div>
+        </div>
+        <div class="kpi red">
+          <div class="kpi-line"></div>
+          <div class="kpi-ico"><i class="ti ti-alert-triangle" aria-hidden="true"></i></div>
+          <div class="kpi-lbl">alertas ativos</div>
+          <div class="kpi-num" id="kpi-alerts">—</div>
+          <div class="kpi-sub dn" id="kpi-alerts-sub">a carregar…</div>
+        </div>
+      </div>
 
-<!-- Métrica: Umidade -->
-<div class="metric-card humidity-card">
-  <div class="metric-icon">
-    <svg xmlns="[w3.org](http://www.w3.org/2000/svg)" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
-    </svg>
-  </div>
-  <div class="metric-value" id="humidity-value"></div>
-  <div class="metric-unit">%</div>
-  <div class="metric-label">Humidade</div>
+      <div class="mid">
+        <div class="panel">
+          <div class="ph">
+            <div class="ph-ttl">Leituras recentes</div>
+            <div class="ph-meta" id="readings-ts">—</div>
+          </div>
+          <div class="slist" id="sensor-list">
+            <div class="muted">A carregar sensores…</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="ph">
+            <div class="ph-ttl">Consumo semanal</div>
+            <div class="ph-meta">kWh / dia</div>
+          </div>
+          <div class="chart-wrap" id="chart" aria-label="Consumo semanal"></div>
+          <div class="chart-foot">
+            <span>total semana <strong id="chart-total">—</strong></span>
+            <span>pico <em id="chart-peak">—</em></span>
+          </div>
+        </div>
+      </div>
 
-  <button class="btn-humidity" id="btn-humidity">Ver Humidade</button>
-</div>
-
-<!-- Métrica: Iluminação -->
-<div class="metric-card light-card">
-  <div class="metric-icon">
-    <svg xmlns="[w3.org](http://www.w3.org/2000/svg)" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M12 18a6 6 0 0 0 6-6h3a9 9 0 1 1-18 0h3a6 6 0 0 0 6 6z"></path>
-      <line x1="12" y1="2" x2="12" y2="6"></line>
-      <line x1="4.22" y1="4.22" x2="6.34" y2="6.34"></line>
-      <line x1="2" y1="12" x2="6" y2="12"></line>
-      <line x1="17.66" y1="6.34" x2="19.78" y2="4.22"></line>
-      <line x1="18" y1="12" x2="22" y2="12"></line>
-    </svg>
-  </div>
-
-  <div class="metric-value" id="light-percentage"></div>
-  <div class="metric-unit">%</div>
-  <div class="metric-label">Iluminação</div>
-
-  <!-- Extra Info -->
-  <div class="light-info">
-    <strong>30</strong> de <strong>42</strong> luzes ligadas
-  </div>
-
-  <button class="btn-light" id="btn-light">Ver Iluminação</button>
-</div>
-
-
-
-  <!-- Status de Conforto -->
-  <div class="comfort-status" id="comfort-status">
-    <div class="status-indicator status-comfortable">
-      <svg class="status-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-        <polyline points="22 4 12 14.01 9 11.01"></polyline>
-      </svg>
-      <span class="status-text">Ambiente Confortável</span>
+      <div class="bot">
+        <div class="panel">
+          <div class="ph">
+            <div class="ph-ttl">Estado das salas</div>
+            <div class="ph-meta" id="rooms-meta">—</div>
+          </div>
+          <div class="rgrid" id="room-grid">
+            <div class="muted" style="grid-column:1/-1">A carregar salas…</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="ph">
+            <div class="ph-ttl">Alertas recentes</div>
+            <div class="ph-meta" id="alerts-meta">—</div>
+          </div>
+          <div class="alist" id="alert-list">
+            <div class="muted">A carregar alertas…</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
-
-  <!-- Card: Painel de Controlo -->
-  <div class="card control-panel-card">
-  <h2>Painel de Controle</h2>
-
-  <div class="mode-row">
-    <p class="mode-text">
-      Modo atual:
-      <span id="control-mode" class="mode-badge automatic">Automático</span>
-    </p>
-    <button id="toggle-mode" class="btn-primary">Alterar modo</button>
-  </div>
-
-  <p id="mode-description" class="mode-description">
-    O sistema ajusta automaticamente as condições ambientais.
-  </p>
-</div>
-</main>
-    </div>
-  </body>
+</body>
 </html>

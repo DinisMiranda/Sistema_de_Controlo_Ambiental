@@ -1,36 +1,62 @@
-<!doctype html>
-<html lang="pt-PT">
+<!DOCTYPE html>
+<html lang="pt">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sistema - Sistema de Controlo Ambiental</title>
-
+    <title>SCA — Sistema</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+    <link rel="stylesheet" href="Css/sca-theme.css" />
     <link rel="stylesheet" href="Css/style.css" />
     <link rel="stylesheet" href="Css/sistema.css" />
-
     <script src="Js/config.js"></script>
     <script src="Js/session.js" defer></script>
+    <script src="Js/layout.js" defer></script>
     <script src="Js/sistema.js" defer></script>
   </head>
   <body>
-    <div class="dashboard">
+    <div class="shell">
       <aside class="sidebar">
-        <div class="sidebar-top">
-          <h2>Sistema de Controlo Ambiental</h2>
-          <a href="dashboard.html" class="nav-item">🏠 Home</a>
-          <a href="departamento.html" class="nav-item">📈 Departamentos</a>
-          <a href="relatorio.html" class="nav-item">📄 Relatórios</a>
-          <a href="#" class="nav-item active">⚙️ Sistema</a>
-          <a href="admin.html" class="nav-item admin-link">🛡️ Admin</a>
+        <div class="logo">
+          <div class="logo-box"><i class="ti ti-leaf" aria-hidden="true"></i></div>
+          <div>
+            <div class="logo-name">SCA</div>
+            <div class="logo-ver">v2.1.0</div>
+          </div>
         </div>
-
-        <div class="sidebar-bottom">
-          <p id="user-info"></p>
-          <button id="logout-btn" class="btn-primary">Sair</button>
+        <nav>
+          <div class="nav-sect">overview</div>
+          <a class="nav-item" data-nav="dashboard" href="dashboard.html"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+          <a class="nav-item" data-nav="salas" href="departamento.html"><i class="ti ti-building"></i>Salas</a>
+          <div class="nav-sect">controlo</div>
+          <a class="nav-item" data-nav="relatorios" href="relatorio.html"><i class="ti ti-file-analytics"></i>Relatórios</a>
+          <div class="nav-sect">sistema</div>
+          <a class="nav-item active" data-nav="sistema" href="sistema.html"><i class="ti ti-shield-check"></i>Sistema</a>
+          <a class="nav-item admin-link" data-nav="admin" href="admin.html"><i class="ti ti-users"></i>Admin</a>
+        </nav>
+        <div class="sidebar-foot">
+          <div class="user">
+            <div class="ava" id="user-initials">?</div>
+            <div>
+              <div class="uname" id="user-name">—</div>
+              <div class="urole" id="user-role">—</div>
+            </div>
+          </div>
         </div>
       </aside>
 
-      <main class="content">
+      <div class="main">
+        <header class="topbar">
+          <div>
+            <div class="page-ttl">Sistema</div>
+            <div class="page-ts" id="timestamp">—</div>
+          </div>
+          <div class="tb-right">
+            <button class="tb-btn" type="button" title="Sair" aria-label="Sair" id="logout-btn"><i class="ti ti-logout"></i></button>
+          </div>
+        </header>
+        <div class="body content">
         <header class="system-header-card">
           <div class="system-header-content">
             <div class="system-header-text">
@@ -431,7 +457,8 @@
             </section>
           </aside>
         </section>
-      </main>
+        </div>
+      </div>
     </div>
   </body>
 </html>

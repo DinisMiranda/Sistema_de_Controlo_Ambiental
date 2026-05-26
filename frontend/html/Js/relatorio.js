@@ -4,11 +4,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const user = await requireAuth();
   if (!user) return;
 
-  // checkAdminAccess();
-  setupLogout();
+  setupShell("relatorios");
+  startTimestampClock();
   setupDefaultDates();
   setupEvents();
-  loadUserInfo();
 
   await loadReports();
 

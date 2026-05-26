@@ -78,7 +78,6 @@ def run_sql(cfg: dict[str, str], sql: str) -> None:
             "-i",
             cfg["container"],
             "mysql",
-            "--default-character-set=utf8mb4",
             f"-u{cfg['user']}",
             f"-p{cfg['password']}",
             cfg["database"],
@@ -86,7 +85,6 @@ def run_sql(cfg: dict[str, str], sql: str) -> None:
     else:
         cmd = [
             "mysql",
-            "--default-character-set=utf8mb4",
             f"-h{cfg['host']}",
             f"-P{cfg['port']}",
             f"-u{cfg['user']}",
@@ -94,7 +92,8 @@ def run_sql(cfg: dict[str, str], sql: str) -> None:
             cfg["database"],
         ]
 
-    subprocess.run(cmd, input=sql.encode("utf-8"), check=True)
+    payload = f"SET NAMES utf8mb4;\n{sql}"
+    subprocess.run(cmd, input=payload.encode("utf-8"), check=True)
 
 
 def read_csv(name: str) -> list[dict[str, str]]:
