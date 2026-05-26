@@ -336,6 +336,31 @@ def import_parametros_automaticos(cfg: dict[str, str]) -> None:
     run_sql(cfg, sql)
     print(f"parametros_automaticos: {len(rows)} rows")
 
+def import_registos_consumo(cfg: dict[str, str]) -> None:
+    rows = read_csv("registos_consumo_examination.csv")
+    if not rows:
+        return
+    values = []
+    for row in rows:
+        values.append(
+            "("
+            f"{row['consumo'].strip()}, "
+            f"{sql_literal(row['unidade'])}, "
+            f"{sql_literal(row['periodo_inicio'])}, "
+            f"{sql_literal(row['periodo_fim'])}, "
+            f"{row['leituras_sensor_id_leitura'].strip()}"
+            ")"
+        )
+    sql = (
+        "INSERT INTO `registos_consumo` "
+        "(`consumo`, `unidade`, `periodo_inicio`, `periodo_fim`, "
+        "`leituras_sensor_id_leitura`) VALUES\n"
+        + ",\n".join(values)
+        + ";"
+    )
+    run_sql(cfg, sql)
+    print(f"registos_consumo: {len(rows)} rows")
+
 
 IMPORTERS = {
     "tipos": import_tipos,
@@ -347,6 +372,64 @@ IMPORTERS = {
     "leituras_sensor": import_leituras_sensor,
     "acoes_sistema": import_acoes_sistema,
     "parametros_automaticos": import_parametros_automaticos,
+    "registos_consumo": import_registos_consumo,
+}
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Import generated CSVs into MySQL")
+    parser.add_argument(
+        "tables",
+        nargs="*",
+        choices=["all", *TABLES_IN_ORDER],
+        help="Tables to import (default: all)",
+    )
+    parser.add_argument(
+        "--no-truncate",
+        action="store_true",
+        help="Do not truncate tables before import (only with explicit table list)",
+    )
+    args = parser.parse_args()
+
+    selected = TABLES_IN_ORDER if not args.tables or "all" in args.tables else args.tables
+    for name in selected:
+        if name not in TABLES_IN_ORDER:
+            print(f"Unknown table: {name}", file=sys.stderr)
+            return 1
+
+    cfg = load_config()
+    if not GENERATED_DIR.is_dir():
+        print(f"Missing generated CSV folder: {GENERATED_DIR}", file=sys.stderr)
+        return 1
+
+    truncate = "all" in (args.tables or ["all"]) and not args.no_truncate
+    if truncate:
+        print("Truncating tables...")
+        truncate_all(cfg)
+
+    for name in selected:
+        print(f"Importing {name}...")
+        IMPORTERS[name](cfg)
+
+    print("Done.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+
+
+IMPORTERS = {
+    "tipos": import_tipos,
+    "casas": import_casas,
+    "utilizadores": import_utilizadores,
+    "casa_administradores": import_casa_administradores,
+    "sensores": import_sensores,
+    "atuadores": import_atuadores,
+    "leituras_sensor": import_leituras_sensor,
+    "acoes_sistema": import_acoes_sistema,
+    "parametros_automaticos": import_parametros_automaticos,
+    "registos_consumo": import_registos_consumo,
 }
 
 
