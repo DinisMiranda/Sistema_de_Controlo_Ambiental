@@ -199,12 +199,43 @@ def import_casa_administradores(cfg: dict[str, str]) -> None:
     run_sql(cfg, sql)
     print(f"Casa_Administradores: {len(rows)} rows")
 
+def import_sensores(cfg: dict[str, str]) -> None:
+    rows = read_csv("sensores_examination.csv")
+    if not rows:
+        return
+    values = []
+    for index, row in enumerate(rows, start=1):
+        data_instalacao = row.get("data_instalacao", "").strip()
+        values.append(
+            "("
+            f"{index}, "
+            f"{sql_literal(row['nome'])}, "
+            f"{sql_literal(row['tipo_sensor'])}, "
+            f"{sql_literal(row['localizacao'])}, "
+            f"{sql_literal(row['estado'])}, "
+            f"{sql_literal(data_instalacao) if data_instalacao else 'NULL'}, "
+            f"{sql_literal(row['Tipos_classe'])}, "
+            f"{sql_literal(row['Tipos_tipo'])}"
+            ")"
+        )
+    sql = (
+        "INSERT INTO `sensores` "
+        "(`id_sensor`, `nome`, `tipo_sensor`, `localizacao`, `estado`, "
+        "`data_instalacao`, `Tipos_classe`, `Tipos_tipo`) VALUES\n"
+        + ",\n".join(values)
+        + ";\n"
+        f"ALTER TABLE `sensores` AUTO_INCREMENT = {len(rows) + 1};"
+    )
+    run_sql(cfg, sql)
+    print(f"sensores: {len(rows)} rows")
+
 
 IMPORTERS = {
     "tipos": import_tipos,
     "casas": import_casas,
     "utilizadores": import_utilizadores,
     "casa_administradores": import_casa_administradores,
+    "sensores": import_sensores,
 }
 
 
