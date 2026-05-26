@@ -126,7 +126,6 @@ function populateUsersTable(users) {
     row.innerHTML = `
       <td>${u.nome}</td>
       <td>${u.email}</td>
-      <td>${u.department || "—"}</td>
       <td style="color: ${u.admin ? "var(--accent-orange)" : "var(--text-secondary)"}">
         ${u.admin ? "Admin" : "User"}
       </td>
