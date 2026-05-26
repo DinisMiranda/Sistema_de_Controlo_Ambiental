@@ -3,6 +3,7 @@ import {
   createSensor,
   deleteSensor,
   getAllSensores,
+  getLatestReading,
   getSensorById,
   patchSensor,
 } from "../controllers/sensores.controller.js";
@@ -13,6 +14,7 @@ import { validateRequiredBody } from "../middlewares/validate-body.middleware.js
 export const sensoresRouter = Router();
 
 sensoresRouter.get("/", getAllSensores);
+sensoresRouter.get("/:id/latest", getLatestReading);
 sensoresRouter.get("/:id/readings", getLeituras);
 sensoresRouter.get("/:id", getSensorById);
 sensoresRouter.post(
