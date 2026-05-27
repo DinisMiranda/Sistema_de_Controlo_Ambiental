@@ -1,321 +1,50 @@
-let reportsData = [];
+let allRows = [];
+let filtered = [];
+let sortCol = "data";
+let sortDir = "desc";
+let page = 1;
+const PAGE_SIZE = 15;
 
-document.addEventListener("DOMContentLoaded", async () => {
-  const user = await requireAuth();
-  if (!user) return;
-
-  setupShell("relatorios");
-  startTimestampClock();
-  setupDefaultDates();
-  setupEvents();
-
-  await loadReports();
-
-  const headerLastUpdate = document.getElementById("header-last-update");
-  if (headerLastUpdate) {
-    headerLastUpdate.textContent = new Date().toLocaleString("pt-PT");
-  }
-});
-
-// ========================================
-// BACKEND API
-// ========================================
-
-async function loadReports() {
+function fmtDate(str) {
+  if (!str) return "—";
   try {
-    // tenta primeiro endpoint inglês
-    let response = await fetchWithAuth("/api/reports");
-
-    // fallback automático para endpoints existentes
-    if (!response.ok) {
-      response = await fetchWithAuth("/api/sensores");
-    }
-
-    if (!response.ok) {
-      throw new Error("Nenhum endpoint disponível");
-    }
-
-    const data = await response.json();
-
-    // converte sensores em relatórios visuais
-    reportsData = data.map((item) => {
-      const sensorType = item.type || item.tipo || "consumo";
-      const sensorValue =
-        item.consumo ?? item.value ?? item.valor ?? 0;
-
-      return {
-        date: formatDate(
-          item.periodo_fim || item.updatedAt || item.timestamp || new Date(),
-        ),
-        room: item.room || item.department || item.nome || "Departamento",
-        type: normalizeType(sensorType),
-        value: formatSensorValue(sensorType, sensorValue),
-        status: generateStatus(sensorType, sensorValue),
-        note: generateNote(sensorType, sensorValue),
-      };
+    return new Date(str).toLocaleString("pt-PT", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
-
-    renderReports(reportsData);
-  } catch (error) {
-    console.error("Erro ao obter relatórios:", error);
-
-    renderReports([]);
-
-    const tbody = document.getElementById("reports-table-body");
-
-    if (tbody) {
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="6" style="text-align:center; padding:20px; color:red;">
-            Backend indisponível
-          </td>
-        </tr>
-      `;
-    }
+  } catch {
+    return String(str);
   }
 }
 
-function loadUserInfo() {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const userInfoElement = document.getElementById("user-info");
+function rowDate(row) {
+  return row.dataRaw || row.data || row.data_hora || row.created_at || row.periodo_fim;
+}
 
-  if (user && userInfoElement) {
-    userInfoElement.textContent = `👤 ${user.name}`;
+function statusBadgeHtml(estado) {
+  const label = formatStatusLabel(estado);
+  const e = String(estado || "").toLowerCase();
+  if (e.includes("normal") || e === "ok") return `<span class="badge badge-grn">${label}</span>`;
+  if (e.includes("alert") || e.includes("aviso") || e.includes("warn")) {
+    return `<span class="badge badge-ora">${label}</span>`;
   }
+  if (e.includes("erro") || e.includes("crit")) return `<span class="badge badge-red">${label}</span>`;
+  return `<span class="badge badge-grey">${label}</span>`;
 }
 
-function normalizeType(type) {
-  if (!type) return "desconhecido";
-
-  const map = {
-    temperature: "temperatura",
-    humidity: "humidade",
-    lighting: "iluminacao",
-    consumption: "consumo",
-    action: "acao",
-  };
-
-  return map[type] || type;
+function typeBadgeHtml(tipo) {
+  const label = formatTypeLabel(tipo);
+  const t = String(tipo || "").toLowerCase();
+  if (t.includes("temp")) return `<span class="badge badge-ora">${label}</span>`;
+  if (t.includes("hum")) return `<span class="badge badge-blue">${label}</span>`;
+  if (t.includes("consumo")) return `<span class="badge badge-yel">${label}</span>`;
+  return `<span class="badge badge-grey">${label}</span>`;
 }
 
-function formatValue(item) {
-  if (item.value !== undefined) {
-    return formatSensorValue(item.type, item.value);
-  }
-
-  return "--";
-}
-
-function formatSensorValue(type, value) {
-  if (type === "temperature" || type === "temperatura") {
-    return `${value} °C`;
-  }
-
-  if (type === "humidity" || type === "humidade") {
-    return `${value}%`;
-  }
-
-  if (type === "consumption" || type === "consumo") {
-    return `${value} kWh`;
-  }
-
-  return String(value);
-}
-
-function generateStatus(type, value) {
-  const numeric = Number(value);
-
-  if (type === "temperature" || type === "temperatura") {
-    if (numeric > 26) return "alert";
-    if (numeric > 24) return "warning";
-  }
-
-  if (type === "humidity" || type === "humidade") {
-    if (numeric > 70) return "alert";
-    if (numeric > 60) return "warning";
-  }
-
-  return "normal";
-}
-
-function generateNote(type, value) {
-  const status = generateStatus(type, value);
-
-  if (status === "alert") {
-    return "Valor crítico detetado";
-  }
-
-  if (status === "warning") {
-    return "Valor acima do recomendado";
-  }
-
-  return "Sistema estável";
-}
-
-function formatDate(dateString) {
-  if (!dateString) return "--";
-
-  const date = new Date(dateString);
-
-  return date.toLocaleString("pt-PT");
-}
-
-// ========================================
-// CONTROLO DE ACESSO ADMIN
-// ========================================
-
-document.addEventListener("DOMContentLoaded", () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-
-  const adminLink = document.querySelector(".admin-link");
-
-  if (!adminLink) return;
-
-  const isAdmin =
-    user &&
-    String(user.role || "").toLowerCase() === "admin";
-
-  if (!isAdmin) {
-    adminLink.style.display = "none";
-  }
-});
-
-function setupDefaultDates() {
-  const startDate = document.getElementById("start-date");
-  const endDate = document.getElementById("end-date");
-
-  const today = new Date();
-  const lastWeek = new Date();
-  lastWeek.setDate(today.getDate() - 7);
-
-  if (startDate) startDate.value = formatDateInput(lastWeek);
-  if (endDate) endDate.value = formatDateInput(today);
-}
-
-function setupEvents() {
-  const applyBtn = document.getElementById("apply-filters");
-  const clearBtn = document.getElementById("clear-filters");
-  const exportBtn = document.getElementById("btn-export");
-  const periodSelect = document.getElementById("filter-period");
-
-  if (applyBtn) applyBtn.addEventListener("click", applyFilters);
-  if (clearBtn) clearBtn.addEventListener("click", clearFilters);
-  if (exportBtn) exportBtn.addEventListener("click", exportCSV);
-  if (periodSelect) periodSelect.addEventListener("change", handlePeriodChange);
-}
-
-function handlePeriodChange() {
-  const period = document.getElementById("filter-period").value;
-  const startDate = document.getElementById("start-date");
-  const endDate = document.getElementById("end-date");
-
-  const today = new Date();
-  const start = new Date();
-
-  if (period === "today") {
-    start.setDate(today.getDate());
-  } else if (period === "7days") {
-    start.setDate(today.getDate() - 7);
-  } else if (period === "30days") {
-    start.setDate(today.getDate() - 30);
-  } else {
-    return;
-  }
-
-  startDate.value = formatDateInput(start);
-  endDate.value = formatDateInput(today);
-}
-
-function applyFilters() {
-  const room = document.getElementById("filter-room").value;
-  const type = document.getElementById("filter-type").value;
-  const startDate = document.getElementById("start-date").value;
-  const endDate = document.getElementById("end-date").value;
-
-  const filtered = reportsData.filter((item) => {
-    const itemDate = item.date.split(",")[0].split("/").reverse().join("-");
-
-    const matchesRoom = room === "all" || item.room === room;
-    const matchesType = type === "all" || item.type === type;
-    const matchesStart = !startDate || itemDate >= startDate;
-    const matchesEnd = !endDate || itemDate <= endDate;
-
-    return matchesRoom && matchesType && matchesStart && matchesEnd;
-  });
-
-  renderReports(filtered);
-}
-
-function clearFilters() {
-  document.getElementById("filter-room").value = "all";
-  document.getElementById("filter-type").value = "all";
-  document.getElementById("filter-period").value = "7days";
-
-  setupDefaultDates();
-  renderReports(reportsData);
-}
-
-function renderReports(data) {
-  const tbody = document.getElementById("reports-table-body");
-  const emptyState = document.getElementById("empty-state");
-  const resultsCount = document.getElementById("results-count");
-
-  tbody.innerHTML = "";
-
-  if (!data.length) {
-    emptyState.style.display = "block";
-    resultsCount.textContent = "0 resultados";
-    updateSummary([]);
-    return;
-  }
-
-  emptyState.style.display = "none";
-  resultsCount.textContent = `${data.length} resultado${data.length > 1 ? "s" : ""}`;
-
-  data.forEach((item) => {
-    const row = document.createElement("tr");
-
-    row.innerHTML = `
-      <td>${item.date}</td>
-      <td>${item.room}</td>
-      <td><span class="type-badge type-${item.type}">${formatType(item.type)}</span></td>
-      <td>${item.value}</td>
-      <td><span class="status-badge status-${item.status}">${formatStatus(item.status)}</span></td>
-      <td>${item.note}</td>
-    `;
-
-    tbody.appendChild(row);
-  });
-
-  updateSummary(data);
-}
-
-function updateSummary(data) {
-  const totalEl = document.getElementById("summary-total");
-  const consumptionEl = document.getElementById("summary-consumption");
-  const alertsEl = document.getElementById("summary-alerts");
-  const updateEl = document.getElementById("summary-update");
-
-  totalEl.textContent = data.length;
-
-  const totalConsumption = data
-    .filter((item) => item.type === "consumo")
-    .reduce((sum, item) => {
-      const numeric = parseFloat(item.value.replace("kWh", "").trim());
-      return sum + (isNaN(numeric) ? 0 : numeric);
-    }, 0);
-
-  consumptionEl.textContent = `${totalConsumption.toFixed(1)} kWh`;
-
-  const alerts = data.filter(
-    (item) => item.status === "alert" || item.status === "warning",
-  ).length;
-
-  alertsEl.textContent = alerts;
-  updateEl.textContent = data.length ? data[0].date : "--";
-}
-
-function formatType(type) {
+function formatTypeLabel(type) {
   const labels = {
     temperatura: "Temperatura",
     humidade: "Humidade",
@@ -323,72 +52,382 @@ function formatType(type) {
     consumo: "Consumo",
     acao: "Ação",
   };
-
-  return labels[type] || type;
+  return labels[type] || type || "—";
 }
 
-function formatStatus(status) {
-  const labels = {
-    normal: "Normal",
-    warning: "Atenção",
-    alert: "Alerta",
+function formatStatusLabel(status) {
+  const labels = { normal: "Normal", warning: "Atenção", alert: "Alerta" };
+  return labels[status] || status || "—";
+}
+
+function normalizeApiRow(item) {
+  const tipoRaw = item.type || item.tipo || "consumo";
+  const tipo = normalizeType(tipoRaw);
+  const valorNum = item.consumo ?? item.value ?? item.valor ?? 0;
+  const dataRaw = item.periodo_fim || item.periodo_inicio || item.updatedAt || item.timestamp || new Date();
+  const departamento = item.room || item.department || item.nome || item.localizacao || "—";
+  const estado = generateStatus(tipo, valorNum);
+
+  return {
+    dataRaw,
+    data: fmtDate(dataRaw),
+    departamento,
+    tipo,
+    valor: valorNum,
+    valorDisplay: formatSensorValue(tipo, valorNum),
+    unidade: item.unidade || (tipo === "consumo" ? "kWh" : ""),
+    estado,
+    observacao: generateNote(tipo, valorNum),
   };
-
-  return labels[status] || status;
 }
 
-function formatDateInput(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
+function normalizeType(type) {
+  if (!type) return "consumo";
+  const map = {
+    temperature: "temperatura",
+    humidity: "humidade",
+    lighting: "iluminacao",
+    consumption: "consumo",
+    action: "acao",
+    consumo: "consumo",
+  };
+  const key = String(type).toLowerCase();
+  return map[key] || key;
+}
 
-  return `${year}-${month}-${day}`;
+function formatSensorValue(type, value) {
+  const n = Number(value);
+  if (Number.isNaN(n)) return String(value);
+  if (type === "temperatura") return `${n} °C`;
+  if (type === "humidade") return `${n}%`;
+  if (type === "consumo") return `${n} kWh`;
+  return String(value);
+}
+
+function generateStatus(type, value) {
+  const numeric = Number(value);
+  if (type === "temperatura") {
+    if (numeric > 26) return "alert";
+    if (numeric > 24) return "warning";
+  }
+  if (type === "humidade") {
+    if (numeric > 70) return "alert";
+    if (numeric > 60) return "warning";
+  }
+  return "normal";
+}
+
+function generateNote(type, value) {
+  const status = generateStatus(type, value);
+  if (status === "alert") return "Valor crítico detetado";
+  if (status === "warning") return "Valor acima do recomendado";
+  return "Registo de consumo energético";
+}
+
+function updateSummary() {
+  const total = filtered.length;
+  document.getElementById("summary-total").textContent = String(total);
+
+  const alerts = filtered.filter((r) => {
+    const e = String(r.estado || "").toLowerCase();
+    return e.includes("alert") || e.includes("warning") || e.includes("aviso");
+  }).length;
+  document.getElementById("summary-alerts").textContent = String(alerts);
+
+  const kWh = filtered
+    .filter((r) => r.tipo === "consumo")
+    .reduce((acc, r) => acc + Number(r.valor || 0), 0);
+  document.getElementById("summary-consumption").textContent =
+    kWh > 0 ? `${Math.round(kWh).toLocaleString("pt-PT")} kWh` : "—";
+
+  const now = new Date().toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
+  document.getElementById("summary-update").textContent = now;
+  const headerUpdate = document.getElementById("header-last-update");
+  if (headerUpdate) headerUpdate.textContent = now;
+}
+
+function renderTable() {
+  const tbody = document.getElementById("reports-table-body");
+  const empty = document.getElementById("empty-state");
+  const pag = document.getElementById("pagination");
+  const tblWrap = document.querySelector(".table-panel .tbl-wrap");
+
+  const total = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  if (page > totalPages) page = totalPages;
+
+  const slice = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  document.getElementById("results-count").textContent =
+    `${total} resultado${total !== 1 ? "s" : ""}`;
+
+  if (!total) {
+    tbody.innerHTML = "";
+    empty.classList.add("visible");
+    if (tblWrap) tblWrap.style.display = "none";
+    pag.style.display = "none";
+    updateSummary();
+    return;
+  }
+
+  empty.classList.remove("visible");
+  if (tblWrap) tblWrap.style.display = "";
+  pag.style.display = "flex";
+
+  tbody.innerHTML = slice
+    .map(
+      (r) => `
+    <tr>
+      <td class="mono">${r.data}</td>
+      <td class="primary">${r.departamento}</td>
+      <td>${typeBadgeHtml(r.tipo)}</td>
+      <td class="val">${r.valorDisplay}</td>
+      <td>${statusBadgeHtml(r.estado)}</td>
+      <td>${r.observacao}</td>
+    </tr>`,
+    )
+    .join("");
+
+  renderPagination(total, totalPages);
+  updateSummary();
+}
+
+function renderPagination(total, totalPages) {
+  const info = document.getElementById("pag-info");
+  const ctrl = document.getElementById("pag-controls");
+  const from = (page - 1) * PAGE_SIZE + 1;
+  const to = Math.min(page * PAGE_SIZE, total);
+  info.textContent = `${from}–${to} de ${total}`;
+
+  let html = `<button type="button" class="pag-btn" id="pag-prev" ${page === 1 ? "disabled" : ""}><i class="ti ti-chevron-left"></i></button>`;
+  for (let i = 1; i <= totalPages; i++) {
+    if (totalPages > 7 && i > 2 && i < totalPages - 1 && Math.abs(i - page) > 1) {
+      if (i === 3 || i === totalPages - 2) html += `<button type="button" class="pag-btn" disabled>…</button>`;
+      continue;
+    }
+    html += `<button type="button" class="pag-btn ${i === page ? "active" : ""}" data-page="${i}">${i}</button>`;
+  }
+  html += `<button type="button" class="pag-btn" id="pag-next" ${page === totalPages ? "disabled" : ""}><i class="ti ti-chevron-right"></i></button>`;
+  ctrl.innerHTML = html;
+
+  ctrl.querySelectorAll("[data-page]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      page = Number(btn.dataset.page);
+      renderTable();
+    });
+  });
+  document.getElementById("pag-prev")?.addEventListener("click", () => {
+    if (page > 1) {
+      page--;
+      renderTable();
+    }
+  });
+  document.getElementById("pag-next")?.addEventListener("click", () => {
+    if (page < totalPages) {
+      page++;
+      renderTable();
+    }
+  });
+}
+
+function sortFiltered() {
+  filtered.sort((a, b) => {
+    let va;
+    let vb;
+    if (sortCol === "data") {
+      va = new Date(rowDate(a)).getTime();
+      vb = new Date(rowDate(b)).getTime();
+    } else if (sortCol === "valor") {
+      va = Number(a.valor);
+      vb = Number(b.valor);
+    } else {
+      va = String(a[sortCol] || "").toLowerCase();
+      vb = String(b[sortCol] || "").toLowerCase();
+    }
+    if (va < vb) return sortDir === "asc" ? -1 : 1;
+    if (va > vb) return sortDir === "asc" ? 1 : -1;
+    return 0;
+  });
+}
+
+function applyFilters() {
+  const room = document.getElementById("filter-room").value;
+  const type = document.getElementById("filter-type").value;
+  const period = document.getElementById("filter-period").value;
+  const start = document.getElementById("start-date").value;
+  const end = document.getElementById("end-date").value;
+
+  const now = new Date();
+  let dateFrom = null;
+  let dateTo = null;
+
+  if (period === "today") {
+    dateFrom = new Date();
+    dateFrom.setHours(0, 0, 0, 0);
+  } else if (period === "7days") {
+    dateFrom = new Date(Date.now() - 7 * 86400000);
+  } else if (period === "30days") {
+    dateFrom = new Date(Date.now() - 30 * 86400000);
+  } else if (period === "custom") {
+    if (start) dateFrom = new Date(start);
+    if (end) dateTo = new Date(`${end}T23:59:59`);
+  }
+
+  filtered = allRows.filter((r) => {
+    if (room !== "all") {
+      const loc = String(r.departamento || "").toLowerCase();
+      if (!loc.includes(room.toLowerCase())) return false;
+    }
+    if (type !== "all" && r.tipo !== type) return false;
+
+    if (dateFrom || dateTo) {
+      const d = new Date(rowDate(r));
+      if (dateFrom && d < dateFrom) return false;
+      if (dateTo && d > dateTo) return false;
+    }
+    return true;
+  });
+
+  sortCol = "data";
+  sortDir = "desc";
+  sortFiltered();
+  page = 1;
+  renderTable();
+}
+
+function clearFilters() {
+  document.getElementById("filter-room").value = "all";
+  document.getElementById("filter-type").value = "all";
+  document.getElementById("filter-period").value = "7days";
+  document.getElementById("start-date").value = "";
+  document.getElementById("end-date").value = "";
+  handlePeriodChange();
+  filtered = [...allRows];
+  sortFiltered();
+  page = 1;
+  renderTable();
+}
+
+function handlePeriodChange() {
+  const show = document.getElementById("filter-period").value === "custom";
+  document.getElementById("date-start-group")?.classList.toggle("active", show);
+  document.getElementById("date-end-group")?.classList.toggle("active", show);
 }
 
 function exportCSV() {
-  const rows = [
-    ["Data", "Departamento", "Tipo", "Valor", "Estado", "Observação"],
-    ...reportsData.map((item) => [
-      item.date,
-      item.room,
-      formatType(item.type),
-      item.value,
-      formatStatus(item.status),
-      item.note,
-    ]),
-  ];
+  if (!filtered.length) return;
 
-  const csvContent = rows.map((row) => row.join(";")).join("\n");
-  const blob = new Blob([csvContent], {
-    type: "text/csv;charset=utf-8;",
-  });
+  const header = ["Data", "Departamento", "Tipo", "Valor", "Estado", "Observação"].join(";");
+  const rows = filtered.map((r) =>
+    [r.data, r.departamento, formatTypeLabel(r.tipo), r.valorDisplay, formatStatusLabel(r.estado), r.observacao]
+      .map((v) => `"${String(v).replace(/"/g, '""')}"`)
+      .join(";"),
+  );
 
+  const csv = ["\uFEFF" + header, ...rows].join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
-
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "relatorios_sca.csv";
-
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `relatorio_sca_${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
 
-// ========================================
-// LOGOUT
-// ========================================
+async function loadRoomFilter() {
+  const select = document.getElementById("filter-room");
+  if (!select) return;
 
-function setupLogout() {
-  const logoutBtn = document.getElementById("logout-btn");
-
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      window.location.href = "login.html";
+  try {
+    const res = await fetchWithAuth("/api/salas");
+    if (!res.ok) return;
+    const salas = await res.json();
+    salas.forEach((s) => {
+      const name = s.name || s.nome;
+      if (!name) return;
+      const opt = document.createElement("option");
+      opt.value = name;
+      opt.textContent = name;
+      select.appendChild(opt);
     });
+  } catch {
+    /* ignore */
   }
 }
 
+async function loadReports() {
+  const tbody = document.getElementById("reports-table-body");
+  tbody.innerHTML = '<tr class="loading-row"><td colspan="6">A carregar dados…</td></tr>';
+
+  try {
+    let response = await fetchWithAuth("/api/reports");
+    if (!response.ok) {
+      response = await fetchWithAuth("/api/consumo/consumption");
+    }
+    if (!response.ok) throw new Error("API indisponível");
+
+    const data = await response.json();
+    allRows = (Array.isArray(data) ? data : []).map(normalizeApiRow);
+  } catch (err) {
+    console.error(err);
+    allRows = [];
+    tbody.innerHTML =
+      '<tr class="error-row"><td colspan="6">Erro ao carregar relatórios. Verifica se o backend está a correr.</td></tr>';
+    filtered = [];
+    updateSummary();
+    return;
+  }
+
+  filtered = [...allRows];
+  sortFiltered();
+  page = 1;
+  applyFilters();
+}
+
+function setupSorting() {
+  document.querySelectorAll("th[data-col]").forEach((th) => {
+    th.addEventListener("click", () => {
+      const col = th.dataset.col;
+      if (sortCol === col) sortDir = sortDir === "asc" ? "desc" : "asc";
+      else {
+        sortCol = col;
+        sortDir = "asc";
+      }
+
+      document.querySelectorAll("th[data-col]").forEach((t) => t.classList.remove("sorted"));
+      th.classList.add("sorted");
+      const icon = th.querySelector(".sort-icon");
+      if (icon) {
+        icon.className = `sort-icon ti ${sortDir === "asc" ? "ti-chevron-up" : "ti-chevron-down"}`;
+      }
+
+      sortFiltered();
+      page = 1;
+      renderTable();
+    });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const user = await requireAuth();
+  if (!user) return;
+
+  setupShell("relatorios");
+  startTimestampClock();
+  handlePeriodChange();
+
+  document.getElementById("apply-filters")?.addEventListener("click", applyFilters);
+  document.getElementById("clear-filters")?.addEventListener("click", clearFilters);
+  document.getElementById("filter-period")?.addEventListener("change", handlePeriodChange);
+  document.getElementById("btn-export")?.addEventListener("click", exportCSV);
+  document.getElementById("btn-export-hero")?.addEventListener("click", exportCSV);
+  document.getElementById("btn-refresh")?.addEventListener("click", loadReports);
+
+  setupSorting();
+  await loadRoomFilter();
+  await loadReports();
+
+  setInterval(loadReports, 60000);
+});

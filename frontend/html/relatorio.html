@@ -1,212 +1,198 @@
 <!DOCTYPE html>
 <html lang="pt">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SCA — Relatórios</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
-    <link rel="stylesheet" href="Css/sca-theme.css" />
-    <link rel="stylesheet" href="Css/style.css" />
-    <link rel="stylesheet" href="Css/relatorio.css" />
-    <script src="Js/config.js"></script>
-    <script src="Js/session.js" defer></script>
-    <script src="Js/layout.js" defer></script>
-    <script src="Js/relatorio.js" defer></script>
-  </head>
-  <body>
-    <div class="shell">
-      <aside class="sidebar">
-        <div class="logo">
-          <div class="logo-box"><i class="ti ti-leaf" aria-hidden="true"></i></div>
-          <div>
-            <div class="logo-name">SCA</div>
-            <div class="logo-ver">v2.1.0</div>
-          </div>
-        </div>
-        <nav>
-          <div class="nav-sect">overview</div>
-          <a class="nav-item" data-nav="dashboard" href="dashboard.html"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
-          <a class="nav-item" data-nav="salas" href="departamento.html"><i class="ti ti-building"></i>Salas</a>
-          <div class="nav-sect">controlo</div>
-          <a class="nav-item active" data-nav="relatorios" href="relatorio.html"><i class="ti ti-file-analytics"></i>Relatórios</a>
-          <div class="nav-sect">sistema</div>
-          <a class="nav-item" data-nav="sistema" href="sistema.html"><i class="ti ti-shield-check"></i>Sistema</a>
-          <a class="nav-item admin-link" data-nav="admin" href="admin.html"><i class="ti ti-users"></i>Admin</a>
-        </nav>
-        <div class="sidebar-foot">
-          <div class="user">
-            <div class="ava" id="user-initials">?</div>
-            <div>
-              <div class="uname" id="user-name">—</div>
-              <div class="urole" id="user-role">—</div>
-            </div>
-          </div>
-        </div>
-      </aside>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SCA — Relatórios</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="Css/sca-theme.css" />
+  <link rel="stylesheet" href="Css/relatorio.css" />
+  <script src="Js/config.js"></script>
+  <script src="Js/session.js" defer></script>
+  <script src="Js/layout.js" defer></script>
+  <script src="Js/relatorio.js" defer></script>
+</head>
+<body>
+<div class="shell">
 
-      <div class="main">
-        <header class="topbar">
-          <div>
-            <div class="page-ttl">Relatórios</div>
-            <div class="page-ts" id="timestamp">—</div>
-          </div>
-          <div class="tb-right">
-            <button class="tb-btn" type="button" title="Sair" aria-label="Sair" id="logout-btn"><i class="ti ti-logout"></i></button>
-          </div>
-        </header>
-        <div class="body content">
-        <header class="reports-header-card">
-          <div class="reports-header-content">
-            <div class="reports-header-text">
-              <div class="reports-badge">📄 Área de análise</div>
-              <h1 class="reports-title">Relatórios</h1>
-              <p class="reports-subtitle">
-                Consulta de históricos, consumos energéticos e ações registadas
-                no sistema.
-              </p>
-            </div>
-
-            <div class="reports-header-actions">
-              <button class="btn-secondary" id="btn-export" type="button">
-                <span>⬇</span>
-                <span>Exportar CSV</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="reports-header-meta">
-            <div class="meta-item">
-              <span class="meta-label">Módulo</span>
-              <strong class="meta-value">Monitorização</strong>
-            </div>
-
-            <div class="meta-item">
-              <span class="meta-label">Formato</span>
-              <strong class="meta-value">Tabela + resumo</strong>
-            </div>
-
-            <div class="meta-item">
-              <span class="meta-label">Atualização</span>
-              <strong class="meta-value" id="header-last-update"
-                >Tempo real</strong
-              >
-            </div>
-          </div>
-        </header>
-
-        <section class="filters-panel">
-          <div class="filter-group">
-            <label for="filter-room">Departamento</label>
-            <select id="filter-room">
-              <option value="all">Todos</option>
-              <option value="Sala 101">Sala 101</option>
-              <option value="Sala 102">Sala 102</option>
-              <option value="Sala 201">Sala 201</option>
-              <option value="Auditório Principal">Auditório Principal</option>
-              <option value="Laboratório A">Laboratório A</option>
-            </select>
-          </div>
-
-          <div class="filter-group">
-            <label for="filter-type">Tipo</label>
-            <select id="filter-type">
-              <option value="all">Todos</option>
-              <option value="temperatura">Temperatura</option>
-              <option value="humidade">Humidade</option>
-              <option value="iluminacao">Iluminação</option>
-              <option value="consumo">Consumo</option>
-              <option value="acao">Ação do sistema</option>
-            </select>
-          </div>
-
-          <div class="filter-group">
-            <label for="filter-period">Período</label>
-            <select id="filter-period">
-              <option value="today">Hoje</option>
-              <option value="7days" selected>Últimos 7 dias</option>
-              <option value="30days">Últimos 30 dias</option>
-              <option value="custom">Personalizado</option>
-            </select>
-          </div>
-
-          <div class="filter-group">
-            <label for="start-date">Data início</label>
-            <input type="date" id="start-date" />
-          </div>
-
-          <div class="filter-group">
-            <label for="end-date">Data fim</label>
-            <input type="date" id="end-date" />
-          </div>
-
-          <div class="filter-actions">
-            <button class="btn-primary" id="apply-filters" type="button">
-              Aplicar filtros
-            </button>
-            <button class="btn-outline" id="clear-filters" type="button">
-              Limpar
-            </button>
-          </div>
-        </section>
-
-        <section class="reports-summary">
-          <div class="summary-card">
-            <span class="summary-label">Registos encontrados</span>
-            <strong class="summary-value" id="summary-total">0</strong>
-          </div>
-
-          <div class="summary-card">
-            <span class="summary-label">Consumo total</span>
-            <strong class="summary-value" id="summary-consumption"
-              >0 kWh</strong
-            >
-          </div>
-
-          <div class="summary-card">
-            <span class="summary-label">Alertas</span>
-            <strong class="summary-value" id="summary-alerts">0</strong>
-          </div>
-
-          <div class="summary-card">
-            <span class="summary-label">Última atualização</span>
-            <strong class="summary-value" id="summary-update">--</strong>
-          </div>
-        </section>
-
-        <section class="reports-table-section">
-          <div class="section-top">
-            <h2 class="section-title">Histórico de relatórios</h2>
-            <span class="results-count" id="results-count">0 resultados</span>
-          </div>
-
-          <div class="table-wrapper">
-            <table class="reports-table">
-              <thead>
-                <tr>
-                  <th>Data</th>
-                  <th>Departamento</th>
-                  <th>Tipo</th>
-                  <th>Valor</th>
-                  <th>Estado</th>
-                  <th>Observação</th>
-                </tr>
-              </thead>
-              <tbody id="reports-table-body">
-                <!-- preenchido por JS -->
-              </tbody>
-            </table>
-          </div>
-
-          <div class="empty-state" id="empty-state" style="display: none">
-            <div class="empty-icon">📭</div>
-            <h3>Sem resultados</h3>
-            <p>Não existem relatórios para os filtros selecionados.</p>
-          </div>
-        </section>
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-box"><i class="ti ti-leaf" aria-hidden="true"></i></div>
+      <div>
+        <div class="logo-name">SCA</div>
+        <div class="logo-ver">v2.1.0</div>
+      </div>
+    </div>
+    <nav>
+      <div class="nav-sect">overview</div>
+      <a class="nav-item" data-nav="dashboard" href="dashboard.html"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+      <a class="nav-item" data-nav="salas" href="departamento.html"><i class="ti ti-building"></i>Salas</a>
+      <div class="nav-sect">controlo</div>
+      <a class="nav-item active" data-nav="relatorios" href="relatorio.html"><i class="ti ti-file-analytics"></i>Relatórios</a>
+      <div class="nav-sect">sistema</div>
+      <a class="nav-item" data-nav="sistema" href="sistema.html"><i class="ti ti-shield-check"></i>Sistema</a>
+      <a class="nav-item admin-link" data-nav="admin" href="admin.html"><i class="ti ti-users"></i>Admin</a>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="user">
+        <div class="ava" id="user-initials">?</div>
+        <div>
+          <div class="uname" id="user-name">—</div>
+          <div class="urole" id="user-role">—</div>
         </div>
       </div>
     </div>
-  </body>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div>
+        <div class="page-ttl">Relatórios</div>
+        <div class="page-ts" id="timestamp">—</div>
+      </div>
+      <div class="tb-right">
+        <button class="tb-btn" type="button" id="btn-export" title="Exportar CSV" aria-label="Exportar CSV"><i class="ti ti-download"></i></button>
+        <button class="tb-btn" type="button" title="Sair" aria-label="Sair" id="logout-btn"><i class="ti ti-logout"></i></button>
+      </div>
+    </header>
+
+    <div class="body relatorio-body">
+
+      <div class="hero">
+        <div class="hero-left">
+          <div class="hero-badge"><i class="ti ti-file-analytics"></i>Área de análise</div>
+          <div class="hero-title">Relatórios</div>
+          <div class="hero-sub">Consulta de históricos, consumos energéticos e ações registadas no sistema.</div>
+        </div>
+        <div class="hero-right">
+          <button class="btn btn-ghost" id="btn-export-hero" type="button"><i class="ti ti-download"></i>Exportar CSV</button>
+          <button class="btn btn-ora" id="btn-refresh" type="button"><i class="ti ti-refresh"></i>Atualizar</button>
+        </div>
+        <div class="hero-meta">
+          <div class="meta-item">
+            <span class="meta-label">Módulo</span>
+            <span class="meta-value">Monitorização</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Formato</span>
+            <span class="meta-value">Tabela + resumo</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Atualização</span>
+            <span class="meta-value" id="header-last-update">—</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi ora">
+          <div class="kpi-line"></div>
+          <div class="kpi-ico"><i class="ti ti-list-details"></i></div>
+          <div class="kpi-lbl">Registos encontrados</div>
+          <div class="kpi-num" id="summary-total">—</div>
+        </div>
+        <div class="kpi dim">
+          <div class="kpi-line"></div>
+          <div class="kpi-ico"><i class="ti ti-bolt"></i></div>
+          <div class="kpi-lbl">Consumo total</div>
+          <div class="kpi-num" id="summary-consumption">—</div>
+        </div>
+        <div class="kpi red">
+          <div class="kpi-line"></div>
+          <div class="kpi-ico"><i class="ti ti-alert-triangle"></i></div>
+          <div class="kpi-lbl">Alertas</div>
+          <div class="kpi-num" id="summary-alerts">—</div>
+        </div>
+        <div class="kpi grn">
+          <div class="kpi-line"></div>
+          <div class="kpi-ico"><i class="ti ti-clock"></i></div>
+          <div class="kpi-lbl">Última atualização</div>
+          <div class="kpi-num kpi-num-sm" id="summary-update">—</div>
+        </div>
+      </div>
+
+      <div class="filters">
+        <div class="filter-group">
+          <label for="filter-room">Departamento</label>
+          <select id="filter-room">
+            <option value="all">Todos</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="filter-type">Tipo</label>
+          <select id="filter-type">
+            <option value="all">Todos</option>
+            <option value="consumo">Consumo</option>
+            <option value="temperatura">Temperatura</option>
+            <option value="humidade">Humidade</option>
+            <option value="iluminacao">Iluminação</option>
+            <option value="acao">Ação do sistema</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="filter-period">Período</label>
+          <select id="filter-period">
+            <option value="today">Hoje</option>
+            <option value="7days" selected>Últimos 7 dias</option>
+            <option value="30days">Últimos 30 dias</option>
+            <option value="custom">Personalizado</option>
+          </select>
+        </div>
+        <div class="filter-group" id="date-start-group">
+          <label for="start-date">Data início</label>
+          <input type="date" id="start-date" />
+        </div>
+        <div class="filter-group" id="date-end-group">
+          <label for="end-date">Data fim</label>
+          <input type="date" id="end-date" />
+        </div>
+        <div class="filter-divider"></div>
+        <div class="filter-actions">
+          <button class="btn btn-ora" id="apply-filters" type="button"><i class="ti ti-filter"></i>Aplicar</button>
+          <button class="btn btn-ghost" id="clear-filters" type="button"><i class="ti ti-x"></i>Limpar</button>
+        </div>
+      </div>
+
+      <div class="table-panel">
+        <div class="table-panel-header">
+          <div class="table-panel-title">Histórico de relatórios</div>
+          <div class="results-count" id="results-count">— resultados</div>
+        </div>
+
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th data-col="data">Data <span class="sort-icon ti ti-chevrons-up-down"></span></th>
+                <th data-col="departamento">Departamento <span class="sort-icon ti ti-chevrons-up-down"></span></th>
+                <th data-col="tipo">Tipo <span class="sort-icon ti ti-chevrons-up-down"></span></th>
+                <th data-col="valor">Valor <span class="sort-icon ti ti-chevrons-up-down"></span></th>
+                <th data-col="estado">Estado <span class="sort-icon ti ti-chevrons-up-down"></span></th>
+                <th>Observação</th>
+              </tr>
+            </thead>
+            <tbody id="reports-table-body">
+              <tr class="loading-row"><td colspan="6">A carregar dados…</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="empty-state" id="empty-state">
+          <div class="empty-icon"><i class="ti ti-inbox"></i></div>
+          <h3>Sem resultados</h3>
+          <p>Não existem relatórios para os filtros selecionados.</p>
+        </div>
+
+        <div class="pagination" id="pagination">
+          <div class="pag-info" id="pag-info">—</div>
+          <div class="pag-controls" id="pag-controls"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</body>
 </html>
