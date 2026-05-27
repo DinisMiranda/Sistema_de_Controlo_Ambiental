@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
   <link rel="stylesheet" href="Css/sca-theme.css" />
-  <link rel="stylesheet" href="Css/relatorio.css" />
+  <link rel="stylesheet" href="Css/relatorio.css?v=3" />
   <script src="Js/config.js"></script>
   <script src="Js/session.js" defer></script>
   <script src="Js/layout.js" defer></script>
@@ -61,32 +61,34 @@
     <div class="body relatorio-body">
 
       <div class="hero">
-        <div class="hero-left">
-          <div class="hero-badge"><i class="ti ti-file-analytics"></i>Área de análise</div>
-          <div class="hero-title">Relatórios</div>
-          <div class="hero-sub">Consulta de históricos, consumos energéticos e ações registadas no sistema.</div>
-        </div>
-        <div class="hero-right">
-          <button class="btn btn-ghost" id="btn-export-hero" type="button"><i class="ti ti-download"></i>Exportar CSV</button>
-          <button class="btn btn-ora" id="btn-refresh" type="button"><i class="ti ti-refresh"></i>Atualizar</button>
+        <div class="hero-top">
+          <div class="hero-left">
+            <div class="hero-badge"><i class="ti ti-file-analytics"></i>Área de análise</div>
+            <div class="hero-title">Relatórios</div>
+            <div class="hero-sub">Consulta de históricos, consumos energéticos e ações registadas no sistema.</div>
+          </div>
+          <div class="hero-right">
+            <button class="btn btn-ghost" id="btn-export-hero" type="button"><i class="ti ti-download"></i>Exportar CSV</button>
+            <button class="btn btn-ora" id="btn-refresh" type="button"><i class="ti ti-refresh"></i>Atualizar</button>
+          </div>
         </div>
         <div class="hero-meta">
-          <div class="meta-item">
-            <span class="meta-label">Módulo</span>
-            <span class="meta-value">Monitorização</span>
+          <div class="rel-meta-item">
+            <span class="rel-meta-label">Módulo</span>
+            <span class="rel-meta-value">Monitorização</span>
           </div>
-          <div class="meta-item">
-            <span class="meta-label">Formato</span>
-            <span class="meta-value">Tabela + resumo</span>
+          <div class="rel-meta-item">
+            <span class="rel-meta-label">Formato</span>
+            <span class="rel-meta-value">Tabela + resumo</span>
           </div>
-          <div class="meta-item">
-            <span class="meta-label">Atualização</span>
-            <span class="meta-value" id="header-last-update">—</span>
+          <div class="rel-meta-item">
+            <span class="rel-meta-label">Atualização</span>
+            <span class="rel-meta-value" id="header-last-update">—</span>
           </div>
         </div>
       </div>
 
-      <div class="kpis">
+      <div class="kpis relatorio-kpis">
         <div class="kpi ora">
           <div class="kpi-line"></div>
           <div class="kpi-ico"><i class="ti ti-list-details"></i></div>
@@ -113,14 +115,14 @@
         </div>
       </div>
 
-      <div class="filters">
-        <div class="filter-group">
+      <div class="rel-filters">
+        <div class="rel-filter-group">
           <label for="filter-room">Departamento</label>
           <select id="filter-room">
             <option value="all">Todos</option>
           </select>
         </div>
-        <div class="filter-group">
+        <div class="rel-filter-group">
           <label for="filter-type">Tipo</label>
           <select id="filter-type">
             <option value="all">Todos</option>
@@ -131,7 +133,7 @@
             <option value="acao">Ação do sistema</option>
           </select>
         </div>
-        <div class="filter-group">
+        <div class="rel-filter-group">
           <label for="filter-period">Período</label>
           <select id="filter-period">
             <option value="today">Hoje</option>
@@ -140,16 +142,16 @@
             <option value="custom">Personalizado</option>
           </select>
         </div>
-        <div class="filter-group" id="date-start-group">
+        <div class="rel-filter-group" id="date-start-group">
           <label for="start-date">Data início</label>
           <input type="date" id="start-date" />
         </div>
-        <div class="filter-group" id="date-end-group">
+        <div class="rel-filter-group" id="date-end-group">
           <label for="end-date">Data fim</label>
           <input type="date" id="end-date" />
         </div>
-        <div class="filter-divider"></div>
-        <div class="filter-actions">
+        <div class="rel-filter-divider"></div>
+        <div class="rel-filter-actions">
           <button class="btn btn-ora" id="apply-filters" type="button"><i class="ti ti-filter"></i>Aplicar</button>
           <button class="btn btn-ghost" id="clear-filters" type="button"><i class="ti ti-x"></i>Limpar</button>
         </div>
