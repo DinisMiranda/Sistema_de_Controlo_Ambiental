@@ -1,8 +1,39 @@
 import { Router } from "express";
+import { createUtilizador } from "../controllers/auth.controller.js";
 import { requireAuth, requireAdmin } from "../middlewares/auth.middleware.js";
 import { models } from "../models/sequelize/index.js";
 
 export const usersRouter = Router();
+
+// Create user (admin only; can set admin flag)
+usersRouter.post("/", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { nome, email, password, admin } = req.body;
+    const user = await createUtilizador({
+      nome,
+      email,
+      password,
+      admin: admin === true || admin === 1 || admin === "1" || admin === "true",
+    });
+
+    res.status(201).json({
+      message: "Utilizador criado com sucesso",
+      user: {
+        id: user.get("id_administrador"),
+        nome: user.get("nome"),
+        email: user.get("email"),
+        admin: user.get("admin"),
+      },
+    });
+  } catch (err) {
+    const error = err as Error & { status?: number };
+    if (error.status) {
+      return res.status(error.status).json({ error: error.message });
+    }
+    console.error("CREATE USER ERROR:", err);
+    res.status(500).json({ error: "Erro interno do servidor" });
+  }
+});
 
 // List all users (admin only)
 usersRouter.get("/", requireAuth, requireAdmin, async (_req, res) => {

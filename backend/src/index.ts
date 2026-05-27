@@ -21,6 +21,7 @@ async function bootstrap() {
     }
 
     await seedUsers();
+    await ensureDefaultAdmin();
 
     app.listen(PORT, () => {
       console.log(`SCA API listening on http://localhost:${PORT}`);
@@ -65,6 +66,33 @@ async function seedUsers() {
 
     console.log("Default users seeded.");
   }
+}
+
+/** Garante pelo menos um admin (útil após import CSV sem contas admin). */
+async function ensureDefaultAdmin() {
+  const adminCount = await Utilizador.count({ where: { admin: true } });
+  if (adminCount > 0) return;
+
+  const email = process.env.BOOTSTRAP_ADMIN_EMAIL || "admin@edificio.com";
+  const password = process.env.BOOTSTRAP_ADMIN_PASSWORD || "admin123";
+  const nome = process.env.BOOTSTRAP_ADMIN_NAME || "Administrador SCA";
+
+  const existing = await Utilizador.findOne({ where: { email } });
+  if (existing) {
+    await existing.update({ admin: true });
+    console.log(`Conta promovida a admin: ${email}`);
+    return;
+  }
+
+  await Utilizador.create({
+    nome,
+    email,
+    palavra_passe_hash: hashPassword(password),
+    admin: true,
+    data_criacao: new Date(),
+  });
+
+  console.log(`Conta admin criada: ${email}`);
 }
 
 bootstrap();

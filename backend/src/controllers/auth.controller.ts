@@ -15,6 +15,65 @@ function buildToken(id: number, admin: boolean) {
   ).toString("base64url");
 }
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export function validateUserInput(nome: unknown, email: unknown, password: unknown) {
+  if (!nome || !email || !password) {
+    return "nome, email e password são obrigatórios";
+  }
+  if (typeof nome !== "string" || typeof email !== "string" || typeof password !== "string") {
+    return "dados inválidos";
+  }
+  if (!EMAIL_REGEX.test(email)) {
+    return "Email inválido";
+  }
+  if (password.length < 6) {
+    return "A password deve ter pelo menos 6 caracteres";
+  }
+  return null;
+}
+
+export async function createUtilizador(input: {
+  nome: string;
+  email: string;
+  password: string;
+  admin?: boolean;
+}) {
+  const validationError = validateUserInput(input.nome, input.email, input.password);
+  if (validationError) {
+    const err = new Error(validationError) as Error & { status?: number };
+    err.status = 400;
+    throw err;
+  }
+
+  const existing = await models.Utilizador.findOne({
+    where: { email: input.email },
+  });
+
+  if (existing) {
+    const err = new Error("email já existe") as Error & { status?: number };
+    err.status = 409;
+    throw err;
+  }
+
+  return models.Utilizador.create({
+    nome: input.nome.trim(),
+    email: input.email.trim(),
+    palavra_passe_hash: hashPassword(input.password),
+    data_criacao: new Date(),
+    admin: Boolean(input.admin),
+  });
+}
+
+function formatUserResponse(user: { get: (key: string) => unknown }) {
+  return {
+    id: user.get("id_administrador"),
+    nome: user.get("nome"),
+    email: user.get("email"),
+    admin: user.get("admin"),
+  };
+}
+
 // ============================================
 // REGISTER
 // ============================================
@@ -22,65 +81,19 @@ function buildToken(id: number, admin: boolean) {
 export async function register(req: Request, res: Response) {
   try {
     const { nome, email, password } = req.body;
-
-    // Validate required fields
-    if (!nome || !email || !password) {
-      return res.status(400).json({
-        error: "nome, email e password são obrigatórios",
-      });
-    }
-
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({
-        error: "Email inválido",
-      });
-    }
-
-    // Validate password length
-    if (password.length < 6) {
-      return res.status(400).json({
-        error: "A password deve ter pelo menos 6 caracteres",
-      });
-    }
-
-    // Check if email already exists
-    const existing = await models.Utilizador.findOne({
-      where: { email },
-    });
-
-    if (existing) {
-      return res.status(409).json({
-        error: "email já existe",
-      });
-    }
-
-    // Create user
-    const user = await models.Utilizador.create({
-      nome,
-      email,
-      palavra_passe_hash: hashPassword(password),
-      data_criacao: new Date(),
-      admin: false,
-    });
+    const user = await createUtilizador({ nome, email, password, admin: false });
 
     return res.status(201).json({
       message: "Utilizador criado com sucesso",
-      user: {
-        id: user.get("id_administrador"),
-        nome: user.get("nome"),
-        email: user.get("email"),
-        admin: user.get("admin"),
-      },
+      user: formatUserResponse(user),
     });
   } catch (err) {
+    const error = err as Error & { status?: number };
+    if (error.status) {
+      return res.status(error.status).json({ error: error.message });
+    }
     console.error("REGISTER ERROR:", err);
-
-    return res.status(500).json({
-      error: "Erro interno do servidor",
-    });
+    return res.status(500).json({ error: "Erro interno do servidor" });
   }
 }
 

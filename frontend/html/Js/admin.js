@@ -161,10 +161,10 @@ async function loadUsers() {
   return response.json();
 }
 
-async function createUser(name, email, password) {
-  const response = await fetchWithAuth("/api/auth/register", {
+async function createUser(name, email, password, isAdmin = false) {
+  const response = await fetchWithAuth("/api/users", {
     method: "POST",
-    body: JSON.stringify({ nome: name, email, password }),
+    body: JSON.stringify({ nome: name, email, password, admin: isAdmin }),
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
@@ -231,6 +231,8 @@ function bindUserForm() {
     const name = document.getElementById("input-user-name")?.value.trim();
     const email = document.getElementById("input-user-email")?.value.trim();
     const password = document.getElementById("input-user-password")?.value;
+    const role = document.getElementById("input-user-role")?.value || "User";
+    const isAdmin = role === "Admin";
 
     if (!name || !email || !password) {
       alert("Por favor, preencha todos os campos.");
@@ -242,7 +244,7 @@ function bindUserForm() {
     }
 
     try {
-      await createUser(name, email, password);
+      await createUser(name, email, password, isAdmin);
       closeModal("user-modal");
       userForm.reset();
       populateUsersTable(await loadUsers());
