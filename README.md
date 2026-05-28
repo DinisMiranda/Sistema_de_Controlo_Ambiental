@@ -21,7 +21,7 @@ A monitoring and control system for environmental sensors, actuators, and consum
 | Path | Purpose |
 | ---- | ------- |
 | `frontend/` | Web UI — HTML, CSS, JavaScript (`frontend/html/`) |
-| `backend/` | REST API — Node.js, Express, TypeScript |
+| `backend/` | REST API — Node.js, Express, JavaScript |
 | `database/` | MySQL schema (`schema.sql`) and seed CSV generators (`database/scripts/`) |
 | `docs/` | Design docs, use cases, and references |
 | `docker-compose.yml` | Local MySQL 8 service for development |
@@ -107,7 +107,7 @@ Schema: **sistema_controlo_ambiental2**
 | Layer | Stack |
 | ----- | ----- |
 | Frontend | HTML, CSS, JavaScript |
-| Backend | Node.js, Express, TypeScript, Sequelize |
+| Backend | Node.js, Express, JavaScript, Sequelize |
 | Database | MySQL 8 |
 
 ---
