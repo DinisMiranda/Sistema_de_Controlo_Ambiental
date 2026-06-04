@@ -1,6 +1,9 @@
 import { createHash } from "crypto";
 import { models } from "../models/sequelize/index.js";
 import { signToken } from "../lib/auth.js";
+import { createError } from "../utils/error.utils.js";
+// NOTA: SHA-256 direto (sem salt) é suficiente para o contexto académico.
+// Em produção, usar bcrypt ou argon2 para resistência a ataques de dicionário.
 function hashPassword(password) {
     return createHash("sha256")
         .update(password)
@@ -25,17 +28,13 @@ export function validateUserInput(nome, email, password) {
 export async function createUtilizador(input) {
     const validationError = validateUserInput(input.nome, input.email, input.password);
     if (validationError) {
-        const err = new Error(validationError);
-        err.status = 400;
-        throw err;
+        throw createError(400, validationError);
     }
     const existing = await models.Utilizador.findOne({
         where: { email: input.email },
     });
     if (existing) {
-        const err = new Error("email já existe");
-        err.status = 409;
-        throw err;
+        throw createError(409, "email já existe");
     }
     return models.Utilizador.create({
         nome: input.nome.trim(),
