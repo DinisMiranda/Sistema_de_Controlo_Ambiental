@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS `sistema_controlo_ambiental2`.`atuadores` (
     REFERENCES `sistema_controlo_ambiental2`.`Tipos` (`classe` , `tipo`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = InnoDB
+ENGINE = InnoDBINSERT INTO utilizadores
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
