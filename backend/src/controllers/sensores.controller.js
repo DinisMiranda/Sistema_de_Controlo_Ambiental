@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import { models } from "../models/sequelize/index.js";
 import { roomKeyFromLocation } from "../utils/room.js";
 function formatSensor(sensor) {
@@ -20,10 +21,8 @@ export async function getAllSensores(req, res) {
     const where = {};
     const sala = (req.query.sala ?? req.query.localizacao);
     if (sala) {
-        const sensores = await models.Sensor.findAll({ order: [["id_sensor", "ASC"]] });
-        const key = roomKeyFromLocation(sala);
-        const filtered = sensores.filter((s) => roomKeyFromLocation(String(s.get("localizacao"))) === key);
-        return res.json(filtered.map(formatSensor));
+        const term = String(sala).replace(/-/g, " ");
+        where.localizacao = { [Op.like]: `%${term}%` };
     }
     const rows = await models.Sensor.findAll({ where, order: [["id_sensor", "ASC"]] });
     res.json(rows.map(formatSensor));

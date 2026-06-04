@@ -1,20 +1,18 @@
-export function createToken(user) {
-    const payload = {
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        department: user.department,
-        exp: Date.now() + 1000 * 60 * 60 * 8,
-    };
-    return Buffer.from(JSON.stringify(payload)).toString("base64");
+import jwt from "jsonwebtoken";
+
+const JWT_EXPIRES_IN = "8h";
+
+function getSecret() {
+    return process.env.JWT_SECRET ?? "change-me-in-production";
 }
+
+export function signToken(payload) {
+    return jwt.sign(payload, getSecret(), { expiresIn: JWT_EXPIRES_IN });
+}
+
 export function verifyToken(token) {
     try {
-        const decoded = Buffer.from(token, "base64").toString("utf-8");
-        const payload = JSON.parse(decoded);
-        if (!payload || typeof payload.exp !== "number")
-            return null;
-        return payload.exp > Date.now() ? payload : null;
+        return jwt.verify(token, getSecret());
     }
     catch {
         return null;

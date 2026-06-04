@@ -1,3 +1,4 @@
+import { verifyToken } from "../lib/auth.js";
 function readBearerToken(req) {
     const authorization = req.headers.authorization;
     if (!authorization || !authorization.startsWith("Bearer ")) {
@@ -10,15 +11,12 @@ export function requireAuth(req, res, next) {
     if (!token) {
         return res.status(401).json({ error: "token em falta" });
     }
-    try {
-        const payloadRaw = Buffer.from(token, "base64url").toString("utf-8");
-        const payload = JSON.parse(payloadRaw);
-        req.user = { id: Number(payload.id), admin: Boolean(payload.admin) };
-        next();
-    }
-    catch {
+    const payload = verifyToken(token);
+    if (!payload) {
         return res.status(401).json({ error: "token inválido" });
     }
+    req.user = { id: Number(payload.id), admin: Boolean(payload.admin) };
+    next();
 }
 export function requireAdmin(req, res, next) {
     if (!req.user) {

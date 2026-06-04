@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import { models } from "../models/sequelize/index.js";
 import { roomKeyFromLocation } from "../utils/room.js";
 function mapCasaForAdmin(casa) {
@@ -29,10 +30,11 @@ export async function getSalasFromSensores(_req, res) {
 }
 export async function getSalaByKey(req, res) {
     const key = req.params.id;
-    const sensores = await models.Sensor.findAll({
+    const term = String(key).replace(/-/g, " ");
+    const match = await models.Sensor.findOne({
+        where: { localizacao: { [Op.like]: `%${term}%` } },
         order: [["localizacao", "ASC"]],
     });
-    const match = sensores.find((s) => roomKeyFromLocation(String(s.get("localizacao"))) === key);
     if (!match) {
         return res.status(404).json({ error: "Sala não encontrada." });
     }
@@ -100,6 +102,18 @@ export async function deleteCasa(req, res) {
         return res.status(404).json({ error: "Casa não encontrada" });
     }
     res.status(204).send();
+}
+export async function createDepartment(req, res) {
+    const { name, morada, codigo_postal } = req.body;
+    if (!name) {
+        return res.status(400).json({ error: "name is required" });
+    }
+    req.body = {
+        nome: name,
+        morada: morada ?? "—",
+        codigo_postal: codigo_postal ?? "0000-000",
+    };
+    return createCasa(req, res);
 }
 export async function listDepartments(_req, res) {
     const casas = await models.Casa.findAll({

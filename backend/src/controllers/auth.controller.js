@@ -1,12 +1,10 @@
 import { createHash } from "crypto";
 import { models } from "../models/sequelize/index.js";
+import { signToken } from "../lib/auth.js";
 function hashPassword(password) {
     return createHash("sha256")
         .update(password)
         .digest("hex");
-}
-function buildToken(id, admin) {
-    return Buffer.from(JSON.stringify({ id, admin }), "utf-8").toString("base64url");
 }
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export function validateUserInput(nome, email, password) {
@@ -107,7 +105,7 @@ export async function login(req, res) {
         // Generate token
         const id = Number(user.get("id_administrador"));
         const admin = Boolean(user.get("admin"));
-        const token = buildToken(id, admin);
+        const token = signToken({ id, admin });
         return res.json({
             message: "Login efetuado com sucesso",
             token,

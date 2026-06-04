@@ -21,7 +21,6 @@ apiRouter.use("/atuadores", atuadoresRouter);
 apiRouter.use("/sensors", leiturasRouter);
 apiRouter.use("/actuators", acoesRouter);
 apiRouter.use("/consumo", consumoRouter);
-apiRouter.use("/consumption", consumoRouter);
 apiRouter.use("/automatic-parameters", parametrosRouter);
 apiRouter.use("/salas", roomsRouter);
 apiRouter.use("/casas", casasRouter);
