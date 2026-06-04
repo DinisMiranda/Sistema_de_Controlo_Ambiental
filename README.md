@@ -21,7 +21,7 @@ A monitoring and control system for environmental sensors, actuators, and consum
 | Path | Purpose |
 | ---- | ------- |
 | `frontend/` | Web UI — HTML, CSS, JavaScript (`frontend/html/`) |
-| `backend/` | REST API — Node.js, Express, TypeScript |
+| `backend/` | REST API — Node.js, Express, JavaScript |
 | `database/` | MySQL schema (`schema.sql`) and seed CSV generators (`database/scripts/`) |
 | `docs/` | Design docs, use cases, and references |
 | `docker-compose.yml` | Local MySQL 8 service for development |
@@ -107,7 +107,7 @@ Schema: **sistema_controlo_ambiental2**
 | Layer | Stack |
 | ----- | ----- |
 | Frontend | HTML, CSS, JavaScript |
-| Backend | Node.js, Express, TypeScript, Sequelize |
+| Backend | Node.js, Express, JavaScript, Sequelize |
 | Database | MySQL 8 |
 
 ---
@@ -123,3 +123,15 @@ To regenerate all seed CSVs:
 cd database/scripts
 ./generate_seed_csvs.sh
 ```
+
+## Quick start (integration)
+
+```bash
+docker compose up -d db
+docker exec -i sca-mysql mysql -u root -psca_root sistema_controlo_ambiental2 < database/schema.sql
+./database/import/import_csv.sh
+cd backend && cp .env.example .env && npm install && npm run dev
+cd frontend && python3 -m http.server 5173
+```
+
+Open `http://localhost:5173/html/login.html`. See `database/README.md` for import details.

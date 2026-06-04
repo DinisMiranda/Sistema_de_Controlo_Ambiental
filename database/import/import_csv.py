@@ -92,7 +92,8 @@ def run_sql(cfg: dict[str, str], sql: str) -> None:
             cfg["database"],
         ]
 
-    subprocess.run(cmd, input=sql.encode("utf-8"), check=True)
+    payload = f"SET NAMES utf8mb4;\n{sql}"
+    subprocess.run(cmd, input=payload.encode("utf-8"), check=True)
 
 
 def read_csv(name: str) -> list[dict[str, str]]:

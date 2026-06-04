@@ -44,13 +44,16 @@ function getSensorByType(room, typeRegExp) {
   return room.sensors.find((sensor) => typeRegExp.test(sensor.tipo_sensor));
 }
 
+function sensorIdOf(sensor) {
+  return sensor?.id_sensor ?? sensor?.id;
+}
+
 async function fetchLatestReading(sensorId) {
   if (!sensorId) return null;
   try {
-    const response = await fetchWithAuth(`/api/sensores/${sensorId}/readings`);
+    const response = await fetchWithAuth(`/api/sensores/${sensorId}/latest`);
     if (!response.ok) return null;
-    const readings = await response.json();
-    return Array.isArray(readings) && readings.length > 0 ? readings[0] : null;
+    return response.json();
   } catch (error) {
     console.error("Erro ao carregar leituras do sensor:", error);
     return null;
@@ -172,10 +175,10 @@ async function loadRoomActualData(room) {
 
   const [temperatureReading, humidityReading, lightReading, co2Reading] =
     await Promise.all([
-      fetchLatestReading(temperatureSensor?.id_sensor),
-      fetchLatestReading(humiditySensor?.id_sensor),
-      fetchLatestReading(lightSensor?.id_sensor),
-      fetchLatestReading(co2Sensor?.id_sensor),
+      fetchLatestReading(sensorIdOf(temperatureSensor)),
+      fetchLatestReading(sensorIdOf(humiditySensor)),
+      fetchLatestReading(sensorIdOf(lightSensor)),
+      fetchLatestReading(sensorIdOf(co2Sensor)),
     ]);
 
   const temperature = parseReadingValue(temperatureReading);
@@ -233,6 +236,7 @@ function loadUserInfo() {
 function updateRoomHeader() {
   const breadcrumbRoom = document.getElementById("breadcrumb-room");
   const roomTitle = document.getElementById("room-title");
+  const pageRoomTitle = document.getElementById("page-room-title");
   const roomBadge = document.getElementById("room-badge");
   const statusBadge = document.getElementById("room-status-badge");
   const roomStatusText = document.getElementById("room-status-text");
@@ -240,6 +244,7 @@ function updateRoomHeader() {
 
   if (breadcrumbRoom) breadcrumbRoom.textContent = currentRoom.name;
   if (roomTitle) roomTitle.textContent = `📍 ${currentRoom.name}`;
+  if (pageRoomTitle) pageRoomTitle.textContent = currentRoom.name;
   if (roomBadge) roomBadge.textContent = currentRoom.badge || "Ativo";
 
   if (statusBadge) {
@@ -547,54 +552,19 @@ function createLineChart(container, data, color, minValue, maxValue) {
   container.appendChild(svg);
 }
 
-function loadUserInfo() {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const userInfoElement = document.getElementById("user-info");
-
-  if (user && userInfoElement) {
-    userInfoElement.textContent = `👤 ${user.name}`;
-  }
-}
-
-function setupLogout() {
-  const logoutBtn = document.getElementById("logout-btn");
-
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      window.location.href = "login.html";
-    });
-  }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-
-  const adminLink = document.querySelector(".admin-link");
-
-  if (!adminLink) return;
-
-  const isAdmin =
-    user &&
-    String(user.role || "").toLowerCase() === "admin";
-
-  if (!isAdmin) {
-    adminLink.style.display = "none";
-  }
-});
-
 async function initializeRoomDetails() {
   const user = await requireAuth();
   if (!user) return;
 
-  loadUserInfo();
-  setupLogout();
-  loadUserInfo();
-  // checkAdminAccess();
+  setupShell("salas");
+  startTimestampClock();
 
   const urlParams = new URLSearchParams(window.location.search);
-  const roomId = urlParams.get("room") || "sala-101";
+  const roomId = urlParams.get("room");
+  if (!roomId) {
+    console.error("Missing room query parameter");
+    return;
+  }
 
   const rooms = await fetchSensorRooms();
   currentRoom = rooms[roomId];

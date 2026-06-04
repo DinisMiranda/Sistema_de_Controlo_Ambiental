@@ -1,12 +1,11 @@
 # SCA Backend (API)
 
-REST API in Node.js + Express + TypeScript for the Environmental Control System.
+REST API in Node.js + Express for the Environmental Control System.
 
 ## Scripts
 
-- `npm run dev` – development server with hot reload (tsx)
-- `npm run build` – compile TypeScript to `dist/`
-- `npm run start` – run `dist/index.js` (after build)
+- `npm run dev` – development server with auto-reload (`node --watch`)
+- `npm run start` – run `src/index.js`
 - `npm run lint` – ESLint
 
 ## Environment variables
